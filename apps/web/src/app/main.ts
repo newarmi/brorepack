@@ -1,18 +1,17 @@
-import './fonts';
+import './styles/fonts';
 import './styles/tokens.css';
 import './styles/base.css';
 
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 
-import { useSessionStore } from '@/entities/session/store';
-import { useBackButtonStore } from '@/shared/telegram/backButtonStore';
-import { initTelegram } from '@/shared/telegram/initTelegram';
-import { useToast } from '@/shared/ui/useToast';
+import { useSessionStore } from '@/entities/session';
+import { initTelegram,useBackButtonStore } from '@/shared/telegram';
+import { useToast } from '@/shared/ui';
 
 import App from './App.vue';
 import { router } from './router';
-import { goBack } from './router/goBack';
+import { goBack } from './router/navigation/goBack';
 
 const app = createApp(App);
 app.use(createPinia());

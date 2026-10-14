@@ -1,10 +1,10 @@
 import type { Order } from '@brorepack/shared';
 
-import type { PrintFileUpload } from '@/features/admin/api';
-import { fetchServerPrintFile, sendPrintFiles } from '@/features/admin/api';
-import { IS_GAS_TRANSPORT } from '@/shared/config/env';
-import { blobToBase64 } from '@/shared/lib/files';
+import { IS_GAS_TRANSPORT } from '@/shared/config';
+import { blobToBase64 } from '@/shared/lib';
 
+import type { PrintFileUpload } from '../api/admin';
+import { fetchServerPrintFile, sendPrintFiles } from '../api/admin';
 import type { PrintFileFormat } from './renderPrintFile';
 import { renderPrintFile } from './renderPrintFile';
 

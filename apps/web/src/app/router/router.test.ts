@@ -1,23 +1,23 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createOrderFixture, createProfileFixture } from '@/shared/testing/fixtures';
+import { createOrderFixture, createProfileFixture } from '@/shared/testing';
 
 const fetchMe = vi.fn();
 
-vi.mock('@/entities/session/api', () => {
+vi.mock('@/entities/session/api/me', () => {
   return { fetchMe };
 });
 
 // Экраны в тестах роутера не нужны — подменяем пустым компонентом
-vi.mock('@/pages/StartPage.vue', () => ({ default: { render: () => null } }));
-vi.mock('@/pages/NicknamePage.vue', () => ({ default: { render: () => null } }));
-vi.mock('@/pages/ProfilePage.vue', () => ({ default: { render: () => null } }));
-vi.mock('@/pages/ConstructorPage.vue', () => ({ default: { render: () => null } }));
-vi.mock('@/pages/CheckoutPage.vue', () => ({ default: { render: () => null } }));
-vi.mock('@/pages/MyOrdersPage.vue', () => ({ default: { render: () => null } }));
-vi.mock('@/pages/OrderPage.vue', () => ({ default: { render: () => null } }));
-vi.mock('@/pages/AdminOrdersPage.vue', () => ({ default: { render: () => null } }));
-vi.mock('@/pages/AdminOrderPage.vue', () => ({ default: { render: () => null } }));
+vi.mock('@/pages/orderFlow/StartPage.vue', () => ({ default: { render: () => null } }));
+vi.mock('@/pages/orderFlow/NicknamePage.vue', () => ({ default: { render: () => null } }));
+vi.mock('@/pages/orderFlow/ProfilePage.vue', () => ({ default: { render: () => null } }));
+vi.mock('@/pages/orderFlow/ConstructorPage.vue', () => ({ default: { render: () => null } }));
+vi.mock('@/pages/orderFlow/CheckoutPage.vue', () => ({ default: { render: () => null } }));
+vi.mock('@/pages/orders/MyOrdersPage.vue', () => ({ default: { render: () => null } }));
+vi.mock('@/pages/orders/OrderPage.vue', () => ({ default: { render: () => null } }));
+vi.mock('@/pages/admin/AdminOrdersPage.vue', () => ({ default: { render: () => null } }));
+vi.mock('@/pages/admin/AdminOrderPage.vue', () => ({ default: { render: () => null } }));
 
 const loadRouter = async (startParam?: string) => {
   vi.resetModules();
@@ -33,8 +33,8 @@ const loadRouter = async (startParam?: string) => {
   const { createPinia, setActivePinia } = await import('pinia');
   setActivePinia(createPinia());
   const { router } = await import('./index');
-  const { goBack } = await import('./goBack');
-  const { useDraftStore } = await import('@/entities/draft/store');
+  const { goBack } = await import('./navigation/goBack');
+  const { useDraftStore } = await import('@/entities/draft/stores/draftStore');
   return { router, goBack, useDraftStore };
 };
 

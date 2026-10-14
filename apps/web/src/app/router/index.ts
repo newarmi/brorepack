@@ -1,3 +1,7 @@
+/**
+ * Роутер приложения: hash-история + маршруты (routes/) + проверки переходов (guards/).
+ * «Назад» по умолчанию — navigation/goBack, его подключает app/main.ts к кнопке Telegram.
+ */
 import { createRouter, createWebHashHistory } from 'vue-router';
 
 import { installGuards } from './guards';

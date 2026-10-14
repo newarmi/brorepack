@@ -8,33 +8,53 @@ import pluginVue from 'eslint-plugin-vue';
 // Слои: app → pages → features → entities → shared. Импорт разрешён только вниз по списку.
 const LAYERS = ['app', 'pages', 'features', 'entities', 'shared'];
 
-const getForbiddenLayerPatterns = (layer) => {
+const listSlices = (layer) => {
+  const dir = new URL(`./src/${layer}`, import.meta.url);
+  return existsSync(dir) ? readdirSync(dir) : [];
+};
+
+const getUpperLayerPatterns = (layer) => {
   const upperLayers = LAYERS.slice(0, LAYERS.indexOf(layer));
   return upperLayers.map((upperLayer) => ({
-    group: [`@/${upperLayer}/**`],
+    group: [`@/${upperLayer}`, `@/${upperLayer}/**`],
     message: `Слой ${layer} не может импортировать ${upperLayer}: зависимости идут только вниз`,
   }));
 };
 
-// Из чужой папки импортируем только через алиас @/ — так сразу видно, откуда модуль
-const RELATIVE_PARENT_IMPORT = {
-  group: ['../*'],
-  message: 'Используй алиас @/ вместо ../',
+// Внутри модуля — относительные пути не дальше соседней папки; всё остальное — через @/
+const FAR_RELATIVE_IMPORT = {
+  group: ['../../*'],
+  message: 'Слишком далёкий относительный путь: импортируй через @/',
+};
+
+// Чужой модуль подключаем только через его index.ts — там видно, что он отдаёт наружу
+const getDeepImportPatterns = (layer) => {
+  const layersWithIndex =
+    layer === 'shared' ? ['features', 'entities'] : ['features', 'entities', 'shared'];
+  return layersWithIndex.map((target) => ({
+    group: [`@/${target}/*/*`],
+    message: `Импортируй модуль ${target} через его index.ts: @/${target}/<модуль>`,
+  }));
+};
+
+const getRestrictedPatterns = (layer, extraPatterns = []) => {
+  return [
+    FAR_RELATIVE_IMPORT,
+    ...getUpperLayerPatterns(layer),
+    ...getDeepImportPatterns(layer),
+    ...extraPatterns,
+  ];
 };
 
 const layerRules = LAYERS.map((layer) => ({
   files: [`src/${layer}/**/*.{ts,vue}`],
   rules: {
-    'no-restricted-imports': [
-      'error',
-      { patterns: [RELATIVE_PARENT_IMPORT, ...getForbiddenLayerPatterns(layer)] },
-    ],
+    'no-restricted-imports': ['error', { patterns: getRestrictedPatterns(layer) }],
   },
 }));
 
 // Фича не импортирует другую фичу: общее поднимается в entities или shared
-const featuresDir = new URL('./src/features', import.meta.url);
-const featureNames = existsSync(featuresDir) ? readdirSync(featuresDir) : [];
+const featureNames = listSlices('features');
 
 const featureRules = featureNames.map((feature) => ({
   files: [`src/features/${feature}/**/*.{ts,vue}`],
@@ -42,16 +62,14 @@ const featureRules = featureNames.map((feature) => ({
     'no-restricted-imports': [
       'error',
       {
-        patterns: [
-          RELATIVE_PARENT_IMPORT,
-          ...getForbiddenLayerPatterns('features'),
+        patterns: getRestrictedPatterns('features', [
           {
             group: featureNames
               .filter((name) => name !== feature)
-              .map((name) => `@/features/${name}/**`),
+              .flatMap((name) => [`@/features/${name}`, `@/features/${name}/**`]),
             message: 'Фича не импортирует другую фичу: вынеси общее в entities или shared',
           },
-        ],
+        ]),
       },
     ],
   },

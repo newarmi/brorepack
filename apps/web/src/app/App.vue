@@ -12,10 +12,8 @@
 import { computed } from 'vue';
 import { RouterView } from 'vue-router';
 
-import DevTelegramChrome from '@/shared/telegram/DevTelegramChrome.vue';
-import { useMainButtonStore } from '@/shared/telegram/mainButtonStore';
-import { useTelegram } from '@/shared/telegram/useTelegram';
-import AppToast from '@/shared/ui/AppToast.vue';
+import { DevTelegramChrome, useMainButtonStore, useTelegram } from '@/shared/telegram';
+import { AppToast } from '@/shared/ui';
 
 const telegram = useTelegram();
 const mainButton = useMainButtonStore();

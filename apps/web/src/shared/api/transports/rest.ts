@@ -1,9 +1,10 @@
 import type { ApiError as ApiErrorBody } from '@brorepack/shared';
 
-import { API_ERROR_CODES, ApiError } from '@/shared/api/errors';
-import { readJson, sendRequest } from '@/shared/api/http';
-import type { ApiTransport, QueryValue, RestEndpoint } from '@/shared/api/types';
-import { getAuthPayload } from '@/shared/telegram/auth';
+import { getAuthPayload } from '@/shared/telegram/webApp/auth';
+
+import { API_ERROR_CODES, ApiError } from '../errors';
+import type { ApiTransport, QueryValue, RestEndpoint } from '../types';
+import { readJson, sendRequest } from './http';
 
 // REST для apps/server: запросы на /api/*, подпись Telegram — в заголовке Authorization
 

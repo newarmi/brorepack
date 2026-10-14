@@ -1,10 +1,11 @@
 import type { ApiError as ApiErrorBody } from '@brorepack/shared';
 
-import { API_ERROR_CODES, ApiError } from '@/shared/api/errors';
-import { readJson, sendRequest } from '@/shared/api/http';
-import type { ApiTransport, GasEndpoint } from '@/shared/api/types';
 import { GAS_URL } from '@/shared/config/env';
-import { getAuthPayload } from '@/shared/telegram/auth';
+import { getAuthPayload } from '@/shared/telegram/webApp/auth';
+
+import { API_ERROR_CODES, ApiError } from '../errors';
+import type { ApiTransport, GasEndpoint } from '../types';
+import { readJson, sendRequest } from './http';
 
 // --- Google Apps Script (docs/gas.md) ---
 
