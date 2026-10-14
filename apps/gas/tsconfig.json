@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    // Только типы Apps Script: fetch, URL, Buffer и прочее из Node/DOM в src недоступно на этапе типов
+    "types": ["google-apps-script"]
+  },
+  "include": ["src/**/*.ts"]
+}

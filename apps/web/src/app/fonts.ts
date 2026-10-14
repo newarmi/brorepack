@@ -1,0 +1,10 @@
+// Шрифты интерфейса. Те же начертания вшиваются в файлы для печати — см. features/admin/print
+import '@fontsource/unbounded/600.css';
+import '@fontsource/unbounded/700.css';
+import '@fontsource/unbounded/900.css';
+import '@fontsource/onest/400.css';
+import '@fontsource/onest/500.css';
+import '@fontsource/onest/600.css';
+import '@fontsource/onest/700.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '@fontsource/jetbrains-mono/700.css';

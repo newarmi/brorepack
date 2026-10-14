@@ -1,0 +1,4 @@
+# Привязка к проекту Apps Script у каждого своя: скопируй .clasp.json.example в .clasp.json
+.clasp.json
+.clasprc.json
+dist

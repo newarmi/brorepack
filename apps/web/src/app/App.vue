@@ -1,0 +1,60 @@
+<template>
+  <div class="app" :class="appClasses">
+    <DevTelegramChrome v-if="isDevChrome" />
+    <main class="app__content">
+      <RouterView />
+    </main>
+    <AppToast />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import { RouterView } from 'vue-router';
+
+import DevTelegramChrome from '@/shared/telegram/DevTelegramChrome.vue';
+import { useMainButtonStore } from '@/shared/telegram/mainButtonStore';
+import { useTelegram } from '@/shared/telegram/useTelegram';
+import AppToast from '@/shared/ui/AppToast.vue';
+
+const telegram = useTelegram();
+const mainButton = useMainButtonStore();
+
+// Вне Telegram рисуем заглушки его шапки и главной кнопки
+const isDevChrome = !telegram.isTelegram;
+
+const appClasses = computed(() => ({
+  'app--dev': isDevChrome,
+  'app--dev-main-button': isDevChrome && mainButton.state.visible,
+}));
+</script>
+
+<style scoped>
+.app {
+  --toast-offset: 16px;
+
+  min-height: var(--viewport-height);
+  overflow-x: clip;
+}
+
+.app__content {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: calc(16px + var(--safe-top) + var(--content-safe-top))
+    calc(var(--screen-padding) + var(--safe-right)) calc(24px + var(--safe-bottom))
+    calc(var(--screen-padding) + var(--safe-left));
+}
+
+.app--dev .app__content {
+  padding-top: calc(var(--dev-header-height) + var(--safe-top) + 16px);
+}
+
+.app--dev-main-button {
+  --toast-offset: calc(var(--main-button-height) + 28px);
+}
+
+.app--dev-main-button .app__content {
+  padding-bottom: calc(var(--main-button-height) + 40px + var(--safe-bottom));
+}
+</style>

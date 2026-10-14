@@ -1,0 +1,45 @@
+// Заказы BROREPACK. SQLite: JSON-поля хранятся как текст, Prisma сам (де)сериализует.
+// DATABASE_URL с относительным путём (file:./dev.db) считается от этой папки → prisma/dev.db.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id                 Int       @id @default(autoincrement())
+  /// OrderStatus из packages/shared
+  status             String    @default("awaiting_payment")
+  /// Telegram id может быть больше 2^31 — храним BigInt, в API отдаём number
+  customerTelegramId BigInt
+  customerUsername   String?
+  customerFirstName  String
+  faceitPlayerId     String
+  faceitNickname     String
+  /// PlaqueDesign
+  design             Json
+  /// OrderExtras
+  extras             Json
+  /// OrderDelivery
+  delivery           Json
+  /// OrderRecipient
+  recipient          Json
+  /// PriceBreakdown
+  price              Json
+  /// Итог в рублях — дублирует price.total для проверки суммы в pre_checkout_query
+  total              Int
+  trackingNumber     String?
+  comment            String?
+  telegramChargeId   String?
+  providerChargeId   String?
+  createdAt          DateTime  @default(now())
+  paidAt             DateTime?
+  updatedAt          DateTime  @updatedAt
+
+  @@index([customerTelegramId, createdAt])
+  @@index([status, createdAt])
+}

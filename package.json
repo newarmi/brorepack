@@ -1,0 +1,16 @@
+{
+  "name": "brorepack",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @brorepack/server --filter @brorepack/web dev",
+    "build": "pnpm --filter @brorepack/web build && pnpm --filter @brorepack/server build",
+    "start": "pnpm --filter @brorepack/server start",
+    "typecheck": "pnpm -r typecheck",
+    "dev:gas": "pnpm --filter @brorepack/web dev:gas"
+  }
+}

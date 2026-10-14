@@ -1,0 +1,44 @@
+:root {
+  /* Цвета — только тёмная тема */
+  --color-bg: #080c16;
+  --color-surface: #0f1626;
+  --color-surface-2: #18233a;
+  --color-line: #22304d;
+  --color-text: #f2f6ff;
+  --color-muted: #8c9bba;
+  --color-faint: #5a6886;
+  --color-accent: #2f8cff;
+  --color-accent-hi: #5cc8ff;
+  --color-ok: #34d399;
+  --color-danger: #ff5c70;
+  --color-warn: #ffc24b;
+  --color-accent-soft: rgb(47 140 255 / 14%);
+  --color-ok-soft: rgb(52 211 153 / 14%);
+  --color-danger-soft: rgb(255 92 112 / 14%);
+  --color-warn-soft: rgb(255 194 75 / 14%);
+
+  /* Шрифты */
+  --font-display: 'Unbounded', 'Arial Black', sans-serif;
+  --font-body: 'Onest', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Радиусы */
+  --radius-card: 20px;
+  --radius-control: 12px;
+  --radius-chip: 999px;
+
+  /* Отступы */
+  --screen-padding: 20px;
+  --main-button-height: 48px;
+  --dev-header-height: 56px;
+
+  /* Безопасные зоны: Telegram (Bot API 8.0+) или устройство */
+  --safe-top: max(var(--tg-safe-area-inset-top, 0px), env(safe-area-inset-top, 0px));
+  --safe-bottom: max(var(--tg-safe-area-inset-bottom, 0px), env(safe-area-inset-bottom, 0px));
+  --safe-left: max(var(--tg-safe-area-inset-left, 0px), env(safe-area-inset-left, 0px));
+  --safe-right: max(var(--tg-safe-area-inset-right, 0px), env(safe-area-inset-right, 0px));
+  --content-safe-top: var(--tg-content-safe-area-inset-top, 0px);
+  --viewport-height: var(--tg-viewport-stable-height, 100dvh);
+
+  --transition-fast: 160ms ease;
+}

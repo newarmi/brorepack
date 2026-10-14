@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+*.local
+*.db
+*.db-journal
+apps/server/fonts/*.ttf
+.DS_Store
