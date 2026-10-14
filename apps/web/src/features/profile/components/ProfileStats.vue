@@ -8,8 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import type { FaceitStats } from '@brorepack/shared';
 import { computed } from 'vue';
+
+import type { FaceitStats } from '@brorepack/shared';
 
 import { formatNumber } from '@/shared/lib';
 

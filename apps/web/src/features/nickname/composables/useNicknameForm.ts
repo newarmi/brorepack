@@ -1,6 +1,7 @@
-import { nicknameSchema } from '@brorepack/shared';
 import { computed, shallowRef } from 'vue';
 import { useRouter } from 'vue-router';
+
+import { nicknameSchema } from '@brorepack/shared';
 
 import { useDraftStore } from '@/entities/draft';
 import { ROUTE_NAMES } from '@/shared/config';

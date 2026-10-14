@@ -1,6 +1,8 @@
 import type { CreateOrderInput, PlaqueDesign, PriceBreakdown } from '@brorepack/shared';
 import { calcPrice, DEFAULT_SIZE, getDefaultCaption } from '@brorepack/shared';
 
+import { CUSTOM_TEMPLATE_ID } from '@/entities/plaque';
+
 import type { DraftState } from '../types/draft';
 
 // Уровень, ELO и подпись с ними — только из профиля FACEIT; сервер при заказе пересчитает их сам
@@ -20,7 +22,7 @@ export const buildDraftDesign = (state: DraftState): PlaqueDesign => {
 /** Тело POST /api/orders; валидируется createOrderInputSchema на экране оформления */
 export const buildOrderInput = (state: DraftState): CreateOrderInput => {
   const comment = state.comment.trim();
-  const isCustomDesign = state.templateId === 'custom';
+  const isCustomDesign = state.templateId === CUSTOM_TEMPLATE_ID;
   return {
     nickname: state.profile?.nickname ?? state.nickname,
     design: {

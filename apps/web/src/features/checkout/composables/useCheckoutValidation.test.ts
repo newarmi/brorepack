@@ -1,6 +1,7 @@
+import { reactive } from 'vue';
+
 import type { CreateOrderInput } from '@brorepack/shared';
 import { describe, expect, it } from 'vitest';
-import { reactive } from 'vue';
 
 import { useCheckoutValidation } from './useCheckoutValidation';
 

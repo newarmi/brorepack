@@ -1,6 +1,7 @@
-import { createOrderInputSchema } from '@brorepack/shared';
-import type { MaybeRefOrGetter } from 'vue';
 import { computed, reactive, shallowRef, toValue } from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
+
+import { createOrderInputSchema } from '@brorepack/shared';
 
 /**
  * Валидация формы оформления той же zod-схемой, что и на сервере.

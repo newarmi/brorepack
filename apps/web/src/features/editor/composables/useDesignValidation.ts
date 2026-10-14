@@ -1,5 +1,6 @@
-import { designInputSchema } from '@brorepack/shared';
 import { computed } from 'vue';
+
+import { designInputSchema } from '@brorepack/shared';
 
 import { useDraftStore } from '@/entities/draft';
 

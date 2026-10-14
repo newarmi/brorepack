@@ -38,6 +38,7 @@ const props = withDefaults(
     disabled: false,
   },
 );
+defineSlots<{ default: () => unknown }>();
 
 const classes = computed(() => [
   'app-button',

@@ -15,7 +15,7 @@
   </StateMessage>
 
   <StateMessage v-else-if="props.isEmpty" :title="props.emptyTitle" :text="props.emptyText">
-    <template v-if="$slots.emptyActions" #default>
+    <template v-if="slots.emptyActions" #default>
       <slot name="emptyActions" />
     </template>
   </StateMessage>
@@ -44,4 +44,14 @@ const props = withDefaults(
   }>(),
   { errorText: undefined, isEmpty: false, emptyTitle: '', emptyText: undefined },
 );
+const slots = defineSlots<{
+  /** Скелетон, пока данные грузятся */
+  loading?: () => unknown;
+  /** Кнопки под ошибкой; по умолчанию — «Повторить» */
+  errorActions?: () => unknown;
+  /** Кнопки под пустым состоянием */
+  emptyActions?: () => unknown;
+  /** Данные */
+  default?: () => unknown;
+}>();
 </script>

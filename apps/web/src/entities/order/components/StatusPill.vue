@@ -3,9 +3,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import type { OrderStatus } from '@brorepack/shared';
 import { ORDER_STATUS_LABELS } from '@brorepack/shared';
-import { computed } from 'vue';
 
 const props = defineProps<{ status: OrderStatus }>();
 

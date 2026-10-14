@@ -1,5 +1,5 @@
-import type { NavigationGuard } from 'vue-router';
 import { START_LOCATION } from 'vue-router';
+import type { NavigationGuard } from 'vue-router';
 
 import { ROUTE_NAMES } from '@/shared/config';
 import { useTelegram } from '@/shared/telegram';

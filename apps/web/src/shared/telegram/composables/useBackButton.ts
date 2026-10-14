@@ -1,5 +1,5 @@
-import type { MaybeRefOrGetter, WatchStopHandle } from 'vue';
 import { onBeforeUnmount, onMounted, toValue, watch } from 'vue';
+import type { MaybeRefOrGetter, WatchStopHandle } from 'vue';
 
 import { useBackButtonStore } from '../stores/backButtonStore';
 

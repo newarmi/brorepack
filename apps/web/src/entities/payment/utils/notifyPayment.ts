@@ -1,6 +1,7 @@
 import { useTelegram } from '@/shared/telegram';
 import { useToast } from '@/shared/ui';
 
+import { PAYMENT_STATUS } from '../constants/paymentStatus';
 import type { PaymentOutcome } from '../types/payment';
 
 // Одинаковая реакция на оплату на любом экране: вибрация и тост об ошибке.
@@ -9,11 +10,11 @@ import type { PaymentOutcome } from '../types/payment';
 export const notifyPaymentOutcome = (outcome: PaymentOutcome): void => {
   const { haptic } = useTelegram();
   const { showToast } = useToast();
-  if (outcome.status === 'paid') {
+  if (outcome.status === PAYMENT_STATUS.paid) {
     haptic.notify('success');
     return;
   }
-  if (outcome.status === 'failed') {
+  if (outcome.status === PAYMENT_STATUS.failed) {
     haptic.notify('error');
     showToast('Оплата не прошла. Попробуй ещё раз', 'error');
   }

@@ -16,7 +16,7 @@
       v-model:phone="draft.recipient.phone"
       :nameError="validation.errorFor('recipient.name')"
       :phoneError="validation.errorFor('recipient.phone')"
-      :isPhoneRequesting="isPhoneRequesting"
+      :isPhoneRequesting
       @blur="validation.touch(`recipient.${$event}`)"
       @requestPhone="requestPhone"
     />
@@ -35,8 +35,9 @@
 </template>
 
 <script setup lang="ts">
-import { formatPrice } from '@brorepack/shared';
 import { useTemplateRef } from 'vue';
+
+import { formatPrice } from '@brorepack/shared';
 
 import { useDraftStore } from '@/entities/draft';
 import { OrderSummaryCard, PriceTotals } from '@/entities/order';

@@ -4,12 +4,12 @@
     <StatusFilter v-model="filter" class="admin-orders-page__filter" />
 
     <AsyncState
-      :status="status"
+      :status
       errorTitle="Не получилось загрузить заказы"
       :errorText="error?.message"
       :isEmpty="orders.length === 0"
       emptyTitle="Здесь пока пусто"
-      :emptyText="emptyText"
+      :emptyText
       @retry="load"
     >
       <template #loading>
@@ -21,7 +21,7 @@
       <ul class="admin-orders-page__list">
         <li v-for="order in orders" :key="order.id">
           <OrderListItem
-            :order="order"
+            :order
             :meta="getCustomerLabel(order)"
             :to="{ name: ROUTE_NAMES.adminOrder, params: { id: order.id } }"
           />
@@ -32,8 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Order } from '@brorepack/shared';
 import { computed } from 'vue';
+
+import type { Order } from '@brorepack/shared';
 
 import { OrderListItem } from '@/entities/order';
 import { StatusFilter, useAdminOrders } from '@/features/admin';

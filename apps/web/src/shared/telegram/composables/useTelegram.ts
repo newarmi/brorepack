@@ -2,7 +2,7 @@ import type {
   TelegramImpactStyle,
   TelegramInvoiceStatus,
   TelegramNotificationType,
-} from '../types/telegram.d.ts';
+} from '../types/telegram';
 import { checkTelegramVersion, isTelegram, startParam, webApp } from '../webApp/webApp';
 
 const DEV_PHONE = '+7 900 000-00-00';

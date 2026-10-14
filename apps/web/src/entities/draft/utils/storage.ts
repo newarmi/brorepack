@@ -1,5 +1,6 @@
 import { DELIVERY_METHOD_IDS, TEMPLATE_IDS } from '@brorepack/shared';
 
+import { DELIVERY_METHOD } from '@/entities/order';
 import { isOneOf } from '@/shared/lib';
 
 import type { DraftState } from '../types/draft';
@@ -14,7 +15,7 @@ export const getDefaultDraftState = (): DraftState => {
     templateId: 'blue',
     displayName: '',
     lightStand: false,
-    delivery: { method: 'cdek_pvz', city: '', address: '' },
+    delivery: { method: DELIVERY_METHOD.cdekPickupPoint, city: '', address: '' },
     recipient: { name: '', phone: '' },
     comment: '',
     pendingOrder: null,

@@ -10,13 +10,7 @@
         class="segmented__option"
         :class="{ 'segmented__option--active': option.value === model }"
       >
-        <input
-          v-model="model"
-          class="visually-hidden"
-          type="radio"
-          :name="name"
-          :value="option.value"
-        />
+        <input v-model="model" class="visually-hidden" type="radio" :name :value="option.value" />
         <span class="segmented__label">{{ option.label }}</span>
         <span v-if="option.hint" class="segmented__hint">{{ option.hint }}</span>
       </label>

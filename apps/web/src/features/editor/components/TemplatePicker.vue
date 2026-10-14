@@ -11,13 +11,7 @@
           'template-picker__option--custom': option.isCustom,
         }"
       >
-        <input
-          v-model="model"
-          class="visually-hidden"
-          type="radio"
-          :name="name"
-          :value="option.id"
-        />
+        <input v-model="model" class="visually-hidden" type="radio" :name :value="option.id" />
         <span v-if="option.isCustom" class="template-picker__custom" aria-hidden="true">
           <AppIcon name="plus" :size="props.showcase ? 28 : 22" />
           <span>{{ customPrice }}</span>
@@ -42,9 +36,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed, useId, watch } from 'vue';
+
 import type { PlaqueDesign, TemplateId } from '@brorepack/shared';
 import { formatPrice, getTemplate, TEMPLATES } from '@brorepack/shared';
-import { computed, useId, watch } from 'vue';
 
 import { CUSTOM_TEMPLATE_ID, PlaquePreview } from '@/entities/plaque';
 import { useTelegram } from '@/shared/telegram';

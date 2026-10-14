@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia';
 import { computed, shallowRef } from 'vue';
+import { defineStore } from 'pinia';
 
 // Общее состояние «нативной» BackButton Telegram: и для WebApp.BackButton, и для DevTelegramChrome
 

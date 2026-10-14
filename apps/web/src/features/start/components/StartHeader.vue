@@ -5,8 +5,10 @@
       <span class="start-header__motto">till we win</span>
     </p>
     <nav class="start-header__links" aria-label="Разделы">
-      <RouterLink class="start-header__link" :to="{ name: 'orders' }">Мои заказы</RouterLink>
-      <RouterLink v-if="props.isAdmin" class="start-header__link" :to="{ name: 'admin' }"
+      <RouterLink class="start-header__link" :to="{ name: ROUTE_NAMES.orders }"
+        >Мои заказы</RouterLink
+      >
+      <RouterLink v-if="props.isAdmin" class="start-header__link" :to="{ name: ROUTE_NAMES.admin }"
         >Админка</RouterLink
       >
     </nav>
@@ -15,6 +17,8 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+
+import { ROUTE_NAMES } from '@/shared/config';
 
 const props = defineProps<{ isAdmin: boolean }>();
 </script>

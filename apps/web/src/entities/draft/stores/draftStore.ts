@@ -1,6 +1,7 @@
-import type { FaceitProfile } from '@brorepack/shared';
-import { defineStore } from 'pinia';
 import { computed, reactive, toRefs, watch } from 'vue';
+import { defineStore } from 'pinia';
+
+import type { FaceitProfile } from '@brorepack/shared';
 
 import type { DraftState } from '../types/draft';
 import { buildDraftDesign, buildOrderInput, calcDraftPrice } from '../utils/mappers';

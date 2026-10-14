@@ -16,7 +16,8 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
-      const dataUrl = String(reader.result);
+      // readAsDataURL всегда отдаёт строку вида data:<тип>;base64,<данные>
+      const dataUrl = typeof reader.result === 'string' ? reader.result : '';
       resolve(dataUrl.slice(dataUrl.indexOf(',') + 1));
     };
     reader.onerror = () => reject(reader.error ?? new Error('Не получилось прочитать файл'));

@@ -16,4 +16,5 @@ export { default as OrderSummaryCard } from './components/OrderSummaryCard.vue';
 export { default as PriceTotals } from './components/PriceTotals.vue';
 export { default as StatusPill } from './components/StatusPill.vue';
 export { useOrder } from './composables/useOrder';
+export { DELIVERY_METHOD } from './constants/deliveryMethod';
 export { ORDER_STATUS } from './constants/orderStatus';

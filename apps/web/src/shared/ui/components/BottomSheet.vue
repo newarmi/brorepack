@@ -29,6 +29,7 @@ const open = defineModel<boolean>('open', { required: true });
 const props = withDefaults(defineProps<{ title: string; dismissible?: boolean }>(), {
   dismissible: true,
 });
+defineSlots<{ default: () => unknown }>();
 
 const titleId = `sheet-${useId()}`;
 const panelRef = useTemplateRef<HTMLElement>('panel');

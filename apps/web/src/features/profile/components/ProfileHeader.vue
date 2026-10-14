@@ -21,8 +21,9 @@
 </template>
 
 <script setup lang="ts">
-import type { FaceitProfile } from '@brorepack/shared';
 import { computed } from 'vue';
+
+import type { FaceitProfile } from '@brorepack/shared';
 
 import { formatCountry } from '@/shared/lib';
 import { AppIcon } from '@/shared/ui';

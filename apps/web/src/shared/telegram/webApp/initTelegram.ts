@@ -4,7 +4,7 @@ import { THEME_COLORS } from '@/shared/config/theme';
 
 import { useBackButtonStore } from '../stores/backButtonStore';
 import { useMainButtonStore } from '../stores/mainButtonStore';
-import type { TelegramWebApp } from '../types/telegram.d.ts';
+import type { TelegramWebApp } from '../types/telegram';
 import { checkTelegramVersion, isTelegram, webApp } from './webApp';
 
 const setupAppearance = (app: TelegramWebApp): void => {
@@ -32,20 +32,20 @@ const bindMainButton = (app: TelegramWebApp): void => {
   nativeButton.onClick(mainButton.click);
 
   watchEffect(() => {
-    const { text, visible, disabled, loading } = mainButton.state;
-    if (!visible) {
+    const { text, visible: isVisible, disabled: isDisabled, loading: isLoading } = mainButton.state;
+    if (!isVisible) {
       nativeButton.hideProgress();
       nativeButton.setParams({ is_visible: false });
       return;
     }
     nativeButton.setParams({
       text,
-      color: disabled ? THEME_COLORS.disabled : THEME_COLORS.accent,
-      text_color: disabled ? THEME_COLORS.disabledText : THEME_COLORS.accentText,
-      is_active: !disabled,
+      color: isDisabled ? THEME_COLORS.disabled : THEME_COLORS.accent,
+      text_color: isDisabled ? THEME_COLORS.disabledText : THEME_COLORS.accentText,
+      is_active: !isDisabled,
       is_visible: true,
     });
-    if (loading) {
+    if (isLoading) {
       nativeButton.showProgress(false);
       return;
     }

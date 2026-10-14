@@ -17,9 +17,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import type { Order } from '@brorepack/shared';
 import { formatPrice } from '@brorepack/shared';
-import { computed } from 'vue';
 
 import { AppButton, BottomSheet } from '@/shared/ui';
 

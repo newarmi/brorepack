@@ -8,13 +8,7 @@
         class="status-filter__chip"
         :class="{ 'status-filter__chip--active': option.value === model }"
       >
-        <input
-          v-model="model"
-          class="visually-hidden"
-          type="radio"
-          :name="name"
-          :value="option.value"
-        />
+        <input v-model="model" class="visually-hidden" type="radio" :name :value="option.value" />
         {{ option.label }}
       </label>
     </div>

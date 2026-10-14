@@ -1,9 +1,11 @@
-import type { Order } from '@brorepack/shared';
 import { computed, onBeforeUnmount, shallowRef } from 'vue';
+
+import type { Order } from '@brorepack/shared';
 
 import { mockPayOrder } from '@/entities/order';
 import { useToast } from '@/shared/ui';
 
+import { PAYMENT_STATUS } from '../constants/paymentStatus';
 import type { PaymentOutcome } from '../types/payment';
 
 /**
@@ -28,13 +30,13 @@ export const useMockPayment = () => {
     get: () => mockOrder.value !== null,
     set: (isOpen: boolean) => {
       if (!isOpen && !isMockPaying.value) {
-        finishMock({ status: 'cancelled' });
+        finishMock({ status: PAYMENT_STATUS.cancelled });
       }
     },
   });
 
   const openMockSheet = (order: Order): Promise<PaymentOutcome> => {
-    finishMock({ status: 'cancelled' });
+    finishMock({ status: PAYMENT_STATUS.cancelled });
     mockOrder.value = order;
     return new Promise((resolve) => {
       resolveMock = resolve;
@@ -49,7 +51,7 @@ export const useMockPayment = () => {
     isMockPaying.value = true;
     try {
       const paidOrder = await mockPayOrder(order.id);
-      finishMock({ status: 'paid', order: paidOrder });
+      finishMock({ status: PAYMENT_STATUS.paid, order: paidOrder });
     } catch (error) {
       showErrorToast(error);
     } finally {
@@ -57,7 +59,7 @@ export const useMockPayment = () => {
     }
   };
 
-  onBeforeUnmount(() => finishMock({ status: 'cancelled' }));
+  onBeforeUnmount(() => finishMock({ status: PAYMENT_STATUS.cancelled }));
 
   return { mockOrder, isMockSheetOpen, isMockPaying, openMockSheet, confirmMockPayment };
 };

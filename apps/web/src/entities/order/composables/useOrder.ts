@@ -1,5 +1,5 @@
-import type { MaybeRefOrGetter } from 'vue';
 import { toValue } from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
 
 import { useAsyncData, usePolling } from '@/shared/lib';
 

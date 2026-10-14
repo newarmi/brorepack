@@ -36,8 +36,9 @@
 </template>
 
 <script setup lang="ts">
-import { getLevelColor, MAX_FACEIT_LEVEL } from '@brorepack/shared';
 import { computed } from 'vue';
+
+import { getLevelColor, MAX_FACEIT_LEVEL } from '@brorepack/shared';
 
 const props = withDefaults(defineProps<{ level: number; size?: number }>(), { size: 112 });
 

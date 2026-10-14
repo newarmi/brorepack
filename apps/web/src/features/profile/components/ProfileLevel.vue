@@ -37,8 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import { getLevelColor, getLevelProgress } from '@brorepack/shared';
 import { computed } from 'vue';
+
+import { getLevelColor, getLevelProgress } from '@brorepack/shared';
 
 import LevelGauge from './LevelGauge.vue';
 

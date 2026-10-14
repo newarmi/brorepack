@@ -20,8 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { formatPrice, LIGHT_STAND } from '@brorepack/shared';
 import { watch } from 'vue';
+
+import { formatPrice, LIGHT_STAND } from '@brorepack/shared';
 
 import { useTelegram } from '@/shared/telegram';
 import { AppIcon, ToggleSwitch } from '@/shared/ui';

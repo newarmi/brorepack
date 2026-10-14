@@ -1,6 +1,7 @@
-import type { Order, OrderStatus } from '@brorepack/shared';
-import type { MaybeRefOrGetter } from 'vue';
 import { computed, shallowRef, toValue, watch } from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
+
+import type { Order, OrderStatus } from '@brorepack/shared';
 
 import { ORDER_STATUS } from '@/entities/order';
 import { useTelegram } from '@/shared/telegram';

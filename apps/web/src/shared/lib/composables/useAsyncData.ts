@@ -1,5 +1,5 @@
-import type { WatchSource } from 'vue';
 import { onScopeDispose, shallowRef, watch } from 'vue';
+import type { WatchSource } from 'vue';
 
 import type { ApiError } from '@/shared/api/errors';
 import { isAbortError, toApiError } from '@/shared/api/errors';

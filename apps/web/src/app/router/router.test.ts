@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { ROUTE_NAMES } from '@/shared/config';
 import { createOrderFixture, createProfileFixture } from '@/shared/testing';
 
 const fetchMe = vi.fn();
@@ -82,7 +83,7 @@ describe('router', () => {
 
   it('goBack goes to parent screen when app history is empty', async () => {
     const { router, goBack } = await loadRouter();
-    await router.push({ name: 'order', params: { id: createOrderFixture().id } });
+    await router.push({ name: ROUTE_NAMES.order, params: { id: createOrderFixture().id } });
     window.history.replaceState({ ...window.history.state, back: null }, '');
 
     goBack(router);

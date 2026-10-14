@@ -10,9 +10,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed, useId } from 'vue';
+
 import type { PlaqueDesign } from '@brorepack/shared';
 import { renderPlaqueSvg } from '@brorepack/shared';
-import { computed, useId } from 'vue';
 
 const props = withDefaults(
   defineProps<{

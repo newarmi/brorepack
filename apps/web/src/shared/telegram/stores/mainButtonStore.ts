@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia';
 import { reactive } from 'vue';
+import { defineStore } from 'pinia';
 
 // Общее состояние «нативной» MainButton Telegram. Его читают и настоящая
 // WebApp.MainButton (внутри Telegram), и DevTelegramChrome (в браузере),

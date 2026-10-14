@@ -23,7 +23,7 @@ export const usePolling = (task: () => Promise<unknown>, intervalMs: number): vo
   };
 
   onMounted(() => {
-    timer = setInterval(tick, intervalMs);
+    timer = setInterval(() => void tick(), intervalMs);
   });
 
   onBeforeUnmount(() => {

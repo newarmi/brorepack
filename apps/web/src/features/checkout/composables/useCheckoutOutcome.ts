@@ -1,9 +1,10 @@
-import type { Order } from '@brorepack/shared';
 import { useRouter } from 'vue-router';
+
+import type { Order } from '@brorepack/shared';
 
 import { useDraftStore } from '@/entities/draft';
 import type { PaymentOutcome, PaymentStatus } from '@/entities/payment';
-import { notifyPaymentOutcome } from '@/entities/payment';
+import { notifyPaymentOutcome, PAYMENT_STATUS } from '@/entities/payment';
 import { JUST_PAID_QUERY, ROUTE_NAMES } from '@/shared/config';
 import { useToast } from '@/shared/ui';
 
@@ -35,7 +36,7 @@ export const useCheckoutOutcome = () => {
 
   return (outcome: PaymentOutcome, order: Order): void => {
     notifyPaymentOutcome(outcome);
-    outcomeHandlers[outcome.status](outcome.status === 'paid' ? outcome.order : order);
+    outcomeHandlers[outcome.status](outcome.status === PAYMENT_STATUS.paid ? outcome.order : order);
   };
 };
 

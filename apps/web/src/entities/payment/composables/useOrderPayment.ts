@@ -1,10 +1,12 @@
-import type { Order } from '@brorepack/shared';
 import { shallowRef } from 'vue';
+
+import type { Order } from '@brorepack/shared';
 
 import type { InvoiceResponse } from '@/entities/order';
 import { useTelegram } from '@/shared/telegram';
 import { useToast } from '@/shared/ui';
 
+import { PAYMENT_STATUS } from '../constants/paymentStatus';
 import type { PaymentOutcome } from '../types/payment';
 import { waitForPaidOrder } from '../utils/waitForPaidOrder';
 import { useMockPayment } from './useMockPayment';
@@ -22,13 +24,13 @@ export const useOrderPayment = () => {
 
   const payInTelegram = async (order: Order, invoiceUrl: string): Promise<PaymentOutcome> => {
     const status = await telegram.openInvoice(invoiceUrl);
-    if (status !== 'paid') {
+    if (status !== PAYMENT_STATUS.paid) {
       return { status };
     }
     isConfirming.value = true;
     try {
       const paidOrder = await waitForPaidOrder(order.id);
-      return { status: 'paid', order: paidOrder ?? order };
+      return { status: PAYMENT_STATUS.paid, order: paidOrder ?? order };
     } finally {
       isConfirming.value = false;
     }
@@ -40,11 +42,11 @@ export const useOrderPayment = () => {
     }
     if (!invoice.invoiceUrl) {
       showToast('Не получилось выставить счёт. Попробуй ещё раз', 'error');
-      return { status: 'failed' };
+      return { status: PAYMENT_STATUS.failed };
     }
     if (!telegram.isTelegram) {
       showToast('Оплата через Telegram работает только внутри Telegram', 'error');
-      return { status: 'unavailable' };
+      return { status: PAYMENT_STATUS.unavailable };
     }
     return payInTelegram(order, invoice.invoiceUrl);
   };

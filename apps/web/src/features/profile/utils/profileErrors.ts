@@ -18,7 +18,7 @@ export const checkPlayerNotFound = (error: ApiError | null): boolean => {
 };
 
 export const getProfileErrorTitle = (error: ApiError | null): string => {
-  return (error && ERROR_TITLES[error.code]) || DEFAULT_ERROR_TITLE;
+  return (error ? ERROR_TITLES[error.code] : undefined) ?? DEFAULT_ERROR_TITLE;
 };
 
 export const getProfileErrorText = (error: ApiError | null, nickname: string) => {

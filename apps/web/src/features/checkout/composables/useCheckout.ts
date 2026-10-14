@@ -1,5 +1,5 @@
-import type { ShallowRef } from 'vue';
 import { computed, shallowRef } from 'vue';
+import type { ShallowRef } from 'vue';
 
 import { useDraftStore } from '@/entities/draft';
 import { notifyPaymentError, useOrderPayment } from '@/entities/payment';

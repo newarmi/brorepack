@@ -88,7 +88,7 @@ describe('api client', () => {
     expect((init.headers as Record<string, string>)['Content-Type']).toBe(
       'text/plain;charset=utf-8',
     );
-    expect(JSON.parse(String(init.body))).toEqual({
+    expect(JSON.parse(init.body as string)).toEqual({
       action: 'orders.create',
       auth: 'dev:1',
       params: { a: 1 },

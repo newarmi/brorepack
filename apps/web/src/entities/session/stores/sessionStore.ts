@@ -1,6 +1,7 @@
-import type { MeResponse } from '@brorepack/shared';
-import { defineStore } from 'pinia';
 import { computed, shallowRef } from 'vue';
+import { defineStore } from 'pinia';
+
+import type { MeResponse } from '@brorepack/shared';
 
 import { fetchMe } from '../api/me';
 

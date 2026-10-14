@@ -69,5 +69,6 @@ shared/    без бизнес-логики: api, config, lib, telegram, ui, tes
 
 - Node 22 (`nvm use`): Vitest 5 требует ≥ 22.12.
 - TypeScript закреплён на `~6.0`: typescript-eslint поддерживает < 6.1, а vue-tsc пока не работает с TS 7, который стоит в shared/server.
-- Перед коммитом: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`. Форматирование — `pnpm format`.
+- Перед коммитом: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`.
+- Все правила линтера с объяснениями — в `eslint/README.md`. Форматирование — `pnpm format`.
 - Тесты лежат рядом с кодом (`*.test.ts`). Хелперы — в `shared/testing` (`withSetup` для composables с хуками, фикстуры).

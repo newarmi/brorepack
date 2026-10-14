@@ -1,5 +1,6 @@
-import { mount } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
+
+import { mount } from '@vue/test-utils';
 
 /** Запускает composable внутри настоящего компонента, чтобы работали хуки жизненного цикла */
 export const withSetup = <T>(composable: () => T) => {

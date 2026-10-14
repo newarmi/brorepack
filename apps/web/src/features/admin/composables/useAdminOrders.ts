@@ -1,7 +1,8 @@
-import type { Order } from '@brorepack/shared';
-import { ORDER_STATUSES } from '@brorepack/shared';
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
+import type { Order } from '@brorepack/shared';
+import { ORDER_STATUSES } from '@brorepack/shared';
 
 import { isOneOf, useAsyncData, usePolling } from '@/shared/lib';
 

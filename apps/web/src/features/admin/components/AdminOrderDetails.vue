@@ -20,8 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Order } from '@brorepack/shared';
 import { computed } from 'vue';
+
+import type { Order } from '@brorepack/shared';
 
 import { useTelegram } from '@/shared/telegram';
 import { AppButton } from '@/shared/ui';

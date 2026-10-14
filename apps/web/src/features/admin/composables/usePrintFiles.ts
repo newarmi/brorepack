@@ -1,6 +1,7 @@
-import type { Order } from '@brorepack/shared';
-import type { MaybeRefOrGetter } from 'vue';
 import { shallowRef, toValue } from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
+
+import type { Order } from '@brorepack/shared';
 
 import { saveBlob } from '@/shared/lib';
 import { useTelegram } from '@/shared/telegram';

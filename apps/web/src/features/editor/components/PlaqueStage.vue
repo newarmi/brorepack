@@ -8,9 +8,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import type { PlaqueDesign } from '@brorepack/shared';
 import { getSize } from '@brorepack/shared';
-import { computed } from 'vue';
 
 import { PlaquePreview } from '@/entities/plaque';
 

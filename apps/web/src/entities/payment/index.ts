@@ -6,5 +6,6 @@
 
 export { default as MockPaySheet } from './components/MockPaySheet.vue';
 export { useOrderPayment } from './composables/useOrderPayment';
+export { PAYMENT_STATUS } from './constants/paymentStatus';
 export type { PaymentOutcome, PaymentStatus } from './types/payment';
 export { notifyPaymentError, notifyPaymentOutcome } from './utils/notifyPayment';

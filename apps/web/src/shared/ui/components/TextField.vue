@@ -94,6 +94,12 @@ const props = withDefaults(
     name: undefined,
   },
 );
+defineSlots<{
+  /** Иконка слева от поля */
+  prefix?: () => unknown;
+  /** Кнопка или подпись справа от поля */
+  suffix?: () => unknown;
+}>();
 
 const inputId = `field-${useId()}`;
 const hintId = `${inputId}-hint`;

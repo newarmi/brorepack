@@ -1,6 +1,7 @@
-import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, expect, it } from 'vitest';
 import { nextTick } from 'vue';
+import { createPinia, setActivePinia } from 'pinia';
+
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { createProfileFixture } from '@/shared/testing';
 

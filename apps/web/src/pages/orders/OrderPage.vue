@@ -1,7 +1,7 @@
 <template>
   <div class="order-page">
     <AsyncState
-      :status="status"
+      :status
       :errorTitle="isOrderMissing ? 'Заказ не найден' : 'Не получилось загрузить заказ'"
       :errorText="error?.message"
     >
@@ -19,12 +19,12 @@
       </template>
 
       <template v-if="order">
-        <OrderHeader :order="order" :isJustPaid="isJustPaid" />
+        <OrderHeader :order :isJustPaid />
 
         <OrderSummaryCard :design="order.design" :amount="order.price.total" />
 
         <CancelledNotice v-if="isCancelled" />
-        <OrderTimeline v-else :order="order" />
+        <OrderTimeline v-else :order />
 
         <AppButton v-if="isShareVisible" icon="share" block @click="shareOrder(order)">
           Поделиться превью
@@ -42,10 +42,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Order } from '@brorepack/shared';
-import { formatPrice } from '@brorepack/shared';
 import { computed, shallowRef } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
+import type { Order } from '@brorepack/shared';
+import { formatPrice } from '@brorepack/shared';
 
 import { ORDER_STATUS, OrderSummaryCard, useOrder } from '@/entities/order';
 import { MockPaySheet } from '@/entities/payment';

@@ -2,11 +2,11 @@ import './styles/fonts';
 import './styles/tokens.css';
 import './styles/base.css';
 
-import { createPinia } from 'pinia';
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 
 import { useSessionStore } from '@/entities/session';
-import { initTelegram,useBackButtonStore } from '@/shared/telegram';
+import { initTelegram, useBackButtonStore } from '@/shared/telegram';
 import { useToast } from '@/shared/ui';
 
 import App from './App.vue';

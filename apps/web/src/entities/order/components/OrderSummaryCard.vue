@@ -12,9 +12,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import type { PlaqueDesign } from '@brorepack/shared';
 import { formatPrice } from '@brorepack/shared';
-import { computed } from 'vue';
 
 import { formatDesignSummary, formatPlaqueTitle, PlaquePreview } from '@/entities/plaque';
 

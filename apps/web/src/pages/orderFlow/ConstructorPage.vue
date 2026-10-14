@@ -33,9 +33,10 @@
 </template>
 
 <script setup lang="ts">
-import { DISPLAY_NAME_MAX, formatPrice, getTemplate } from '@brorepack/shared';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+
+import { DISPLAY_NAME_MAX, formatPrice, getTemplate } from '@brorepack/shared';
 
 import { useDraftStore } from '@/entities/draft';
 import { CUSTOM_TEMPLATE_ID } from '@/entities/plaque';

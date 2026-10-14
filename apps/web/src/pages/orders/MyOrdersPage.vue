@@ -3,7 +3,7 @@
     <h1 class="page-title my-orders-page__title">Мои заказы</h1>
 
     <AsyncState
-      :status="status"
+      :status
       errorTitle="Не получилось загрузить заказы"
       :errorText="error?.message"
       :isEmpty="orders.length === 0"
@@ -23,10 +23,7 @@
 
       <ul class="my-orders-page__list">
         <li v-for="order in orders" :key="order.id">
-          <OrderListItem
-            :order="order"
-            :to="{ name: ROUTE_NAMES.order, params: { id: order.id } }"
-          />
+          <OrderListItem :order :to="{ name: ROUTE_NAMES.order, params: { id: order.id } }" />
         </li>
       </ul>
     </AsyncState>

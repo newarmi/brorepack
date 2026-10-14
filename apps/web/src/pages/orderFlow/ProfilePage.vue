@@ -1,7 +1,7 @@
 <template>
   <div class="profile-page">
     <AsyncState
-      :status="status"
+      :status
       :errorTitle="getProfileErrorTitle(error)"
       :errorText="getProfileErrorText(error, nickname)"
     >
@@ -19,7 +19,7 @@
         </template>
       </template>
 
-      <ProfileDetails v-if="profile" :profile="profile" @changeNickname="changeNicknameHandler" />
+      <ProfileDetails v-if="profile" :profile @changeNickname="changeNicknameHandler" />
     </AsyncState>
   </div>
 </template>

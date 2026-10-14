@@ -1,7 +1,7 @@
 <template>
   <div class="admin-order-page">
     <AsyncState
-      :status="status"
+      :status
       errorTitle="Не получилось загрузить заказ"
       :errorText="error?.message"
       @retry="reload"
@@ -26,9 +26,9 @@
 
         <AdminStatusControl v-model:status="statusDraft" v-model:trackingNumber="trackingDraft" />
 
-        <PrintFilesPanel :order="order" />
+        <PrintFilesPanel :order />
 
-        <AdminOrderDetails :order="order" />
+        <AdminOrderDetails :order />
 
         <PriceTotals :lines="order.price.lines" :total="order.price.total" />
       </div>

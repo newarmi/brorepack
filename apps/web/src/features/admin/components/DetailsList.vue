@@ -15,6 +15,7 @@
 import type { DetailsItem } from '../types/details';
 
 const props = defineProps<{ title: string; items: DetailsItem[] }>();
+defineSlots<{ default?: () => unknown }>();
 </script>
 
 <style scoped>

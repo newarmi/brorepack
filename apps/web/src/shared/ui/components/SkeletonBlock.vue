@@ -1,5 +1,5 @@
 <template>
-  <span class="skeleton-block" :style="style" aria-hidden="true" />
+  <span class="skeleton-block" :style aria-hidden="true" />
 </template>
 
 <script setup lang="ts">

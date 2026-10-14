@@ -13,7 +13,7 @@
             v-model="status"
             class="visually-hidden"
             type="radio"
-            :name="name"
+            :name
             :value="option.value"
           />
           {{ option.label }}
@@ -35,9 +35,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed, useId } from 'vue';
+
 import type { OrderStatus } from '@brorepack/shared';
 import { ORDER_STATUS_LABELS, ORDER_STATUSES } from '@brorepack/shared';
-import { computed, useId } from 'vue';
 
 import { ORDER_STATUS } from '@/entities/order';
 import { TextField } from '@/shared/ui';

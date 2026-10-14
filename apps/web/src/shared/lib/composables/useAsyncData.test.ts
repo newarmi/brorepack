@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
 import { nextTick, shallowRef } from 'vue';
+
+import { describe, expect, it, vi } from 'vitest';
 
 import { ApiError } from '@/shared/api/errors';
 import { withSetup } from '@/shared/testing/withSetup';

@@ -27,10 +27,12 @@
 </template>
 
 <script setup lang="ts">
-import type { DeliveryMethod } from '@brorepack/shared';
-import { DELIVERY_METHODS, formatPrice, getDeliveryMethod } from '@brorepack/shared';
 import { computed, watch } from 'vue';
 
+import type { DeliveryMethod } from '@brorepack/shared';
+import { DELIVERY_METHODS, formatPrice, getDeliveryMethod } from '@brorepack/shared';
+
+import { DELIVERY_METHOD } from '@/entities/order';
 import { useTelegram } from '@/shared/telegram';
 import type { SegmentedOption } from '@/shared/ui';
 import { SegmentedControl, TextField } from '@/shared/ui';
@@ -50,7 +52,7 @@ const methodOptions: SegmentedOption<DeliveryMethod>[] = DELIVERY_METHODS.map((i
   hint: formatPrice(item.price),
 }));
 
-const isPickupPoint = computed(() => method.value === 'cdek_pvz');
+const isPickupPoint = computed(() => method.value === DELIVERY_METHOD.cdekPickupPoint);
 const addressLabel = computed(() => (isPickupPoint.value ? 'Адрес пункта СДЭК' : 'Адрес доставки'));
 const addressPlaceholder = computed(() =>
   isPickupPoint.value ? 'Например, Тверская, 7' : 'Улица, дом, квартира',
