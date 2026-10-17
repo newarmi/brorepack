@@ -69,7 +69,7 @@ const steps = computed(() => buildTimelineSteps(props.order));
 }
 
 .order-timeline__step--done:not(:last-child)::after {
-  background: var(--color-ok);
+  background: var(--color-accent);
 }
 
 .order-timeline__marker {
@@ -85,12 +85,14 @@ const steps = computed(() => buildTimelineSteps(props.order));
 }
 
 .order-timeline__step--done .order-timeline__marker {
-  background: var(--color-ok);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
 .order-timeline__step--current .order-timeline__marker {
   background: transparent;
   border: 2px solid var(--color-accent);
+  box-shadow: var(--glow-accent);
 }
 
 .order-timeline__step--current .order-timeline__marker::after {

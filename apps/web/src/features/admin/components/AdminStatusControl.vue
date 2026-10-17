@@ -82,7 +82,7 @@ const isShipped = computed(() => status.value === ORDER_STATUS.shipped);
 
 .status-control__option--active {
   border-color: var(--color-accent);
-  background: var(--color-surface-2);
+  background: var(--color-accent-soft);
   color: var(--color-text);
 }
 

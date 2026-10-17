@@ -50,11 +50,12 @@ const details = computed(() =>
 
 .order-item:hover {
   border-color: var(--color-accent);
+  box-shadow: var(--glow-accent);
 }
 
 .order-item__thumb {
   flex-shrink: 0;
-  width: 52px;
+  width: 64px;
 }
 
 .order-item__body {
@@ -72,7 +73,8 @@ const details = computed(() =>
 }
 
 .order-item__number {
-  font-size: 14px;
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
   font-weight: 700;
 }
 

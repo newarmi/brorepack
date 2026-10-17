@@ -1,7 +1,7 @@
 <template>
   <div class="print-files">
     <AppButton icon="send" block :loading="isSendingPrint" @click="sendPrint">
-      Прислать файл для печати в чат
+      Прислать файл в чат
     </AppButton>
     <div class="print-files__downloads">
       <AppButton
