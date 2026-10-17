@@ -17,7 +17,7 @@ describe('draft store', () => {
 
   it('starts with defaults when storage is empty', () => {
     const draft = useDraftStore();
-    expect(draft.templateId).toBe('blue');
+    expect(draft.templateId).toBe('graphite');
     expect(draft.delivery.method).toBe('cdek_pvz');
     expect(draft.hasProfile).toBe(false);
     expect(draft.pendingOrderId).toBeNull();
@@ -34,15 +34,20 @@ describe('draft store', () => {
       }),
     );
     const draft = useDraftStore();
-    expect(draft.templateId).toBe('blue');
+    expect(draft.templateId).toBe('graphite');
     expect(draft.displayName).toBe('saved');
     expect(draft.delivery).toEqual({ method: 'cdek_pvz', city: 'Казань', address: '' });
     expect(draft.recipient).toEqual({ name: 'Пётр', phone: '' });
   });
 
+  it('maps a template of the first version to its new replacement', () => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ templateId: 'red' }));
+    expect(useDraftStore().templateId).toBe('bloodsport');
+  });
+
   it('falls back to defaults on broken JSON', () => {
     sessionStorage.setItem(STORAGE_KEY, '{broken');
-    expect(useDraftStore().templateId).toBe('blue');
+    expect(useDraftStore().templateId).toBe('graphite');
   });
 
   it('persists changes to sessionStorage', async () => {
@@ -70,10 +75,10 @@ describe('draft store', () => {
     const draft = useDraftStore();
     draft.setProfile(createProfileFixture());
     expect(draft.design).toEqual({
-      templateId: 'blue',
+      templateId: 'graphite',
       size: 'A5',
       displayName: 'goodlifeee',
-      caption: 'for reaching 9 lvl · 1809 elo',
+      caption: 'for reaching 9 lvl 1809 elo',
       level: 9,
       elo: 1809,
     });

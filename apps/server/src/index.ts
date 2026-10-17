@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { buildApp, createFastify } from './app'
 import { createTelegram } from './bot'
-import { FONTS_DIR, loadConfig } from './config'
+import { FONTS_DIR, loadConfig, PLAQUE_ART_DIR } from './config'
 import { createFaceitClient } from './faceit'
 import { OrderService } from './orders'
 import { createPrintRenderer } from './print'
@@ -27,7 +27,7 @@ const prisma = new PrismaClient({ datasourceUrl: config.databaseUrl })
 const faceit = createFaceitClient({ mode: config.faceitMode, apiKey: config.faceitApiKey }, log)
 const telegram = createTelegram(config, log)
 const orders = new OrderService({ prisma, faceit, telegram, paymentsMode: config.paymentsMode, logger: log })
-const print = createPrintRenderer({ fontsDir: FONTS_DIR, logger: log })
+const print = createPrintRenderer({ fontsDir: FONTS_DIR, artDir: PLAQUE_ART_DIR, logger: log })
 telegram.registerOrderHandlers(orders)
 
 await buildApp(app, { config, orders, faceit, telegram, print })

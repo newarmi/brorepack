@@ -1,6 +1,8 @@
 import type { PlaqueDesign } from '@brorepack/shared';
 import { PLAQUE_PRINT_SIZE_MM, renderPlaqueSvg } from '@brorepack/shared';
 
+import { loadPrintArt } from '@/entities/plaque';
+
 import { loadEmbeddedFontCss } from './embeddedFonts';
 import { setPngDpi } from './pngDpi';
 
@@ -57,11 +59,11 @@ export const renderPrintFile = async (
   design: PlaqueDesign,
   format: PrintFileFormat,
 ): Promise<Blob> => {
-  const svg = renderPlaqueSvg(design, {
-    mode: 'print',
-    embeddedFontCss: await loadEmbeddedFontCss(),
-    idPrefix: 'print',
-  });
+  const [art, embeddedFontCss] = await Promise.all([
+    loadPrintArt(design.templateId),
+    loadEmbeddedFontCss(),
+  ]);
+  const svg = renderPlaqueSvg(design, { mode: 'print', art, embeddedFontCss, idPrefix: 'print' });
   if (format === 'svg') {
     return new Blob([svg], { type: 'image/svg+xml' });
   }

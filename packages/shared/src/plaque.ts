@@ -1,26 +1,60 @@
 import { getTemplate } from './catalog'
+import type { LevelColorRule } from './catalog'
+import { getLevelColor } from './faceit'
 import type { PlaqueDesign, PlaqueSize } from './types'
 
 // Плашка рисуется одной функцией и для превью в приложении, и для файла в типографию.
-// Холст — в миллиметрах формата A4 (пропорции A-форматов совпадают), печатается в масштабе под A5.
+// Холст — лист A5 в пунктах, как в макетах дизайнера (FACEIT_A5_*.pdf). Фон, стрелка и знак FACEIT —
+// готовый арт шаблона (packages/shared/assets/plaques), поверх него — кольцо уровня, ник и подпись.
 
-export const PLAQUE_VIEWBOX = { width: 210, height: 297 } as const
+export const PLAQUE_VIEWBOX = { width: 419.5276, height: 595.2756 } as const
 
 export const PLAQUE_PRINT_SIZE_MM: Record<PlaqueSize, { width: number; height: number }> = {
   A5: { width: 148, height: 210 },
 }
 
+export const PLAQUE_FONT = "Play, 'Arial Narrow', Arial, sans-serif"
+
+/** Арт шаблона: ссылка на файл (превью) или его разметка, встроенная в SVG (печать) */
+export type PlaqueArt = { href: string } | { markup: string }
+
 export interface RenderPlaqueOptions {
   /** preview тянется по контейнеру, со скруглением и кантом акрила; print — размеры в мм, без канта */
   mode?: 'preview' | 'print'
+  /** Без арта рисуется только цвет фона шаблона */
+  art?: PlaqueArt
   /** CSS с @font-face в base64, чтобы файл для печати был самодостаточным */
   embeddedFontCss?: string
   /** Префикс для id внутри SVG, если на странице несколько плашек */
   idPrefix?: string
 }
 
-export const PLAQUE_FONT_DISPLAY = "Unbounded, 'Arial Black', sans-serif"
-export const PLAQUE_FONT_TEXT = "Onest, 'Helvetica Neue', Arial, sans-serif"
+// В макетах содержимое занимает 419.02 × 594.55 pt со сдвигом 0.02 — растягиваем его на весь лист,
+// иначе справа и снизу остаётся полоса в полпункта
+const ART_TRANSFORM = 'matrix(1.00122 0 0 1.00122 -0.02 0)'
+
+// --- Геометрия из макетов, pt ---
+const CENTER_X = 209.53
+const RING = {
+  cx: 209.29,
+  cy: 365.79,
+  outerRadius: 44.48,
+  innerRadius: 35.03,
+  /** Начало дуги — внизу слева; углы SVG, по часовой от оси X */
+  startAngle: 124.4,
+  /** Длина дуги растёт с уровнем: 7 lvl — 243.8°, 9 lvl — 269.9°, как в макетах */
+  sweepBase: 152.3,
+  sweepPerLevel: 13.07,
+  /** Конец дуги срезан наискось: внутренний край короче внешнего */
+  endCutAngle: 4.9,
+}
+const DIGIT = { size: 42.9, baseline: 380.24 }
+const NICKNAME = { size: 15.65, baseline: 430.6, maxWidth: 330 }
+const CAPTION = { size: 15.1, baseline: 452.4, maxWidth: 360 }
+
+/** Звезда в знаке FACEIT: у части шаблонов её цвет зависит от уровня, поэтому она не входит в арт */
+const FACEIT_STAR_PATH =
+  'M238.77 521.1C239.46 521.59 241.91 522.36 242.92 522.76C244.85 523.51 254.61 527.47 255.24 527.42L255.2 514.48C254.86 514.55 254.77 514.8 254.55 515.15L252.98 517.6C252.28 518.66 251.53 520 250.84 520.92C249.14 520.94 239.43 520.67 238.77 521.1Z'
 
 export function escapeXml(value: string): string {
   return value
@@ -39,109 +73,95 @@ function fitFontSize(text: string, baseSize: number, maxWidth: number, charWidth
   return estimatedWidth > maxWidth ? round((baseSize * maxWidth) / estimatedWidth) : baseSize
 }
 
-export function renderPlaqueSvg(design: PlaqueDesign, options: RenderPlaqueOptions = {}): string {
-  const { mode = 'preview', embeddedFontCss, idPrefix = 'plaque' } = options
-  const { primary, secondary, highlight, base } = getTemplate(design.templateId).palette
-  const w = PLAQUE_VIEWBOX.width
-  const h = PLAQUE_VIEWBOX.height
-  const k = w / 220
-  const bandH = Math.round(h * 0.42)
-  const clipId = `${idPrefix}-clip`
+/** Цвет кольца или звезды для уровня игрока */
+export function resolveLevelColor(rule: LevelColorRule, level: number): string {
+  if (rule === 'faceit') return getLevelColor(level)
+  if (typeof rule === 'string') return rule
+  return level <= 7 ? rule.low : rule.high
+}
 
-  // --- Шапка: полосы, стрелка, звезда, пунктир ---
-  const band: string[] = [
-    `<rect width="${w}" height="${bandH}" fill="${primary}"/>`,
-    `<path d="M0 ${bandH} L${round(w * 0.42)} 0 L${round(w * 0.6)} 0 L${round(w * 0.18)} ${bandH} Z" fill="${secondary}" fill-opacity="0.6"/>`,
-    `<path d="M${round(w * 0.72)} ${bandH} L${w} ${round(bandH * 0.3)} L${w} ${round(bandH * 0.58)} L${round(w * 0.86)} ${bandH} Z" fill="${secondary}" fill-opacity="0.55"/>`,
-    `<path d="M${round(w * 0.26)} ${round(bandH * 0.5)} L${round(w * 0.84)} ${round(bandH * 0.18)} L${round(w * 0.78)} ${round(bandH * 0.86)} L${round(w * 0.58)} ${round(bandH * 0.58)} Z" fill="#FFFFFF"/>`,
-    `<path d="M${round(w * 0.13)} ${round(bandH * 0.2)} l${round(3 * k)} ${round(7 * k)} l${round(7 * k)} ${round(3 * k)} l${round(-7 * k)} ${round(3 * k)} l${round(-3 * k)} ${round(7 * k)} l${round(-3 * k)} ${round(-7 * k)} l${round(-7 * k)} ${round(-3 * k)} l${round(7 * k)} ${round(-3 * k)} Z" fill="${base}"/>`,
-    `<rect y="${round(bandH - 14 * k)}" width="${w}" height="${round(14 * k)}" fill="${base}"/>`,
-  ]
-  for (let x = 6 * k; x < w; x += 14 * k) {
-    band.push(`<rect x="${round(x)}" y="${round(bandH - 9 * k)}" width="${round(8 * k)}" height="${round(3 * k)}" fill="${highlight}"/>`)
-  }
-  for (let x = 6 * k; x < w * 0.6; x += 10 * k) {
-    band.push(`<rect x="${round(x)}" y="${round(8 * k)}" width="${round(5 * k)}" height="${round(2 * k)}" fill="#FFFFFF" fill-opacity="0.8"/>`)
-  }
+function polarPoint(radius: number, angle: number): string {
+  const radians = (angle * Math.PI) / 180
+  return `${round(RING.cx + radius * Math.cos(radians))} ${round(RING.cy + radius * Math.sin(radians))}`
+}
 
-  // --- Центр: кольцо уровня, надпись, подпись. Группа центрируется между шапкой и низом ---
-  const decoTop = h - 40 * k
-  const ringSize = 56 * k
-  const levelSize = 22 * k
-  const nameBaseSize = 15 * k
-  const captionBaseSize = 10 * k
-  const groupHeight = ringSize + 10 * k + nameBaseSize + 5 * k + captionBaseSize
-  const groupTop = bandH + (decoTop - bandH - groupHeight) / 2
-  const cx = w / 2
-  const cy = groupTop + ringSize / 2
-  const ringStroke = (ringSize / 2) * 0.16
-  const ringRadius = ringSize / 2 - ringStroke / 2
-  // Дуга-«спидометр» с разрывом снизу: от 135° до 45° по часовой
-  const arcStartX = cx + ringRadius * Math.cos(Math.PI * 0.75)
-  const arcStartY = cy + ringRadius * Math.sin(Math.PI * 0.75)
-  const arcEndX = cx + ringRadius * Math.cos(Math.PI * 0.25)
-  const arcEndY = cy + ringRadius * Math.sin(Math.PI * 0.25)
+/** Контур кольца уровня. Тот же контур рисует шкала уровня в приложении */
+export function buildLevelRingPath(level: number): string {
+  const clampedLevel = Math.min(10, Math.max(1, Math.round(level)))
+  const { outerRadius, innerRadius, startAngle } = RING
+  const outerEnd = startAngle + RING.sweepBase + RING.sweepPerLevel * clampedLevel
+  const innerEnd = outerEnd - RING.endCutAngle
+  const largeArcFlag = (end: number) => (end - startAngle > 180 ? 1 : 0)
+  return [
+    `M${polarPoint(outerRadius, startAngle)}`,
+    `A${outerRadius} ${outerRadius} 0 ${largeArcFlag(outerEnd)} 1 ${polarPoint(outerRadius, outerEnd)}`,
+    `L${polarPoint(innerRadius, innerEnd)}`,
+    `A${innerRadius} ${innerRadius} 0 ${largeArcFlag(innerEnd)} 0 ${polarPoint(innerRadius, startAngle)}`,
+    'Z',
+  ].join('')
+}
 
-  const maxTextWidth = w - 40 * k
-  const nameSize = fitFontSize(design.displayName, nameBaseSize, maxTextWidth, 0.6)
-  const captionSize = fitFontSize(design.caption, captionBaseSize, maxTextWidth, 0.52)
-  const nameBaseline = groupTop + ringSize + 10 * k + nameBaseSize * 0.78
-  const captionBaseline = nameBaseline + 5 * k + captionBaseSize * 0.95
+/** Квадрат вокруг кольца — viewBox для шкалы уровня в приложении */
+export const LEVEL_RING_VIEWBOX = `${round(RING.cx - 50)} ${round(RING.cy - 50)} 100 100`
 
-  const center = [
-    `<path d="M${round(arcStartX)} ${round(arcStartY)} A${round(ringRadius)} ${round(ringRadius)} 0 1 1 ${round(arcEndX)} ${round(arcEndY)}" stroke="${primary}" stroke-width="${round(ringStroke)}" fill="none"/>`,
-    `<text x="${round(cx)}" y="${round(cy + levelSize * 0.36)}" text-anchor="middle" font-family="${PLAQUE_FONT_DISPLAY}" font-weight="700" font-size="${round(levelSize)}" fill="#FFFFFF">${design.level}</text>`,
-    `<text x="${round(cx)}" y="${round(nameBaseline)}" text-anchor="middle" font-family="${PLAQUE_FONT_TEXT}" font-weight="600" font-size="${nameSize}" fill="#FFFFFF">${escapeXml(design.displayName)}</text>`,
+/** Внутренности SVG-файла без обёртки <svg> — чтобы встроить арт в файл для печати */
+export function getSvgInnerMarkup(svg: string): string {
+  const start = svg.indexOf('>', svg.indexOf('<svg')) + 1
+  return svg.slice(start, svg.lastIndexOf('</svg>'))
+}
+
+function renderArt(art: PlaqueArt | undefined): string {
+  if (!art) return ''
+  if ('markup' in art) return art.markup
+  return `<image href="${escapeXml(art.href)}" width="${PLAQUE_VIEWBOX.width}" height="${PLAQUE_VIEWBOX.height}"/>`
+}
+
+/** Всё, что зависит от игрока: кольцо, звезда FACEIT, цифра уровня, ник и подпись */
+function renderPlayerLayer(design: PlaqueDesign): string {
+  const template = getTemplate(design.templateId)
+  const nameSize = fitFontSize(design.displayName, NICKNAME.size, NICKNAME.maxWidth, 0.56)
+  const captionSize = fitFontSize(design.caption, CAPTION.size, CAPTION.maxWidth, 0.48)
+  const textAttrs = `text-anchor="middle" font-family="${PLAQUE_FONT}" fill="${template.textColor}"`
+  const layer = [
+    `<path d="${buildLevelRingPath(design.level)}" fill="${resolveLevelColor(template.ringColor, design.level)}"/>`,
+    `<path d="${FACEIT_STAR_PATH}" fill="${resolveLevelColor(template.starColor, design.level)}"/>`,
+    `<text x="${CENTER_X}" y="${DIGIT.baseline}" ${textAttrs} font-weight="700" font-size="${DIGIT.size}">${design.level}</text>`,
+    `<text x="${CENTER_X}" y="${NICKNAME.baseline}" ${textAttrs} font-weight="700" font-size="${nameSize}">${escapeXml(design.displayName)}</text>`,
   ]
   if (design.caption) {
-    center.push(
-      `<text x="${round(cx)}" y="${round(captionBaseline)}" text-anchor="middle" font-family="${PLAQUE_FONT_TEXT}" font-weight="400" font-size="${captionSize}" fill="#C9D3E6">${escapeXml(design.caption)}</text>`,
+    layer.push(
+      `<text x="${CENTER_X}" y="${CAPTION.baseline}" ${textAttrs} font-weight="400" font-size="${captionSize}">${escapeXml(design.caption)}</text>`,
     )
   }
+  return layer.join('')
+}
 
-  // --- Низ: шевроны, марка, штрихкод ---
-  const decoY = h - 36 * k
-  const chevrons = [10, 20, 30]
-    .map((x) => `M${round(x * k)} ${round(decoY + 8 * k)} l${round(7 * k)} ${round(7 * k)} l${round(-7 * k)} ${round(7 * k)}`)
-    .join(' ')
-  const bottom: string[] = [
-    `<path d="${chevrons}" stroke="${highlight}" stroke-width="${round(2.4 * k)}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
-  ]
-  let barX = 0
-  ;[1, 2, 1, 3, 1, 1, 2, 1, 3, 1, 2, 1, 1, 2].forEach((barWidth, index) => {
-    if (index % 2 === 0) {
-      bottom.push(`<rect x="${round(w - 46 * k + barX * k)}" y="${round(decoY + 9 * k)}" width="${round(barWidth * k)}" height="${round(12 * k)}" fill="#FFFFFF"/>`)
-    }
-    barX += barWidth + 1
-  })
-  const markSize = 9 * k
-  bottom.push(
-    `<text x="${round(cx)}" y="${round(h - 21 * k + markSize * 0.36)}" text-anchor="middle" font-family="${PLAQUE_FONT_DISPLAY}" font-weight="900" font-size="${round(markSize)}" letter-spacing="${round(markSize * 0.12)}" fill="#FFFFFF">BROREPACK</text>`,
-  )
-
-  // --- Сборка ---
+export function renderPlaqueSvg(design: PlaqueDesign, options: RenderPlaqueOptions = {}): string {
+  const { mode = 'preview', art, embeddedFontCss, idPrefix = 'plaque' } = options
+  const { width: w, height: h } = PLAQUE_VIEWBOX
   const isPrint = mode === 'print'
   const printSize = PLAQUE_PRINT_SIZE_MM[design.size]
   const sizeAttrs = isPrint ? `width="${printSize.width}mm" height="${printSize.height}mm"` : 'width="100%" height="100%"'
-  // A5 чуть «выше» A4 по пропорциям: при печати заполняем лист целиком (slice срезает ~0.25 мм по бокам),
-  // иначе сверху и снизу остаются прозрачные полосы
-  const aspectRatio = isPrint ? 'xMidYMid slice' : 'xMidYMid meet'
-  const cornerRadius = isPrint ? 0 : 4
+  const cornerRadius = isPrint ? 0 : 8
+  const clipId = `${idPrefix}-clip`
+
   const defs = [`<clipPath id="${clipId}"><rect width="${w}" height="${h}" rx="${cornerRadius}"/></clipPath>`]
   if (embeddedFontCss) defs.push(`<style>${embeddedFontCss}</style>`)
+  // Кант акрила — только в превью
   const edge = isPrint
     ? ''
-    : `<rect x="0.6" y="0.6" width="${w - 1.2}" height="${h - 1.2}" rx="${cornerRadius}" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1.2"/>`
+    : `<rect x="1" y="1" width="${w - 2}" height="${h - 2}" rx="${cornerRadius}" fill="none" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2"/>`
   const label = escapeXml(`Плашка: ${design.displayName}, ${design.level} уровень`)
 
   return [
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" ${sizeAttrs} preserveAspectRatio="${aspectRatio}" role="img" aria-label="${label}">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${w} ${h}" ${sizeAttrs} role="img" aria-label="${label}">`,
     `<defs>${defs.join('')}</defs>`,
     `<g clip-path="url(#${clipId})">`,
-    `<rect width="${w}" height="${h}" fill="${base}"/>`,
-    ...band,
-    ...center,
-    ...bottom,
+    `<rect width="${w}" height="${h}" fill="${getTemplate(design.templateId).baseColor}"/>`,
+    `<g transform="${ART_TRANSFORM}">`,
+    renderArt(art),
+    renderPlayerLayer(design),
+    '</g>',
     '</g>',
     edge,
     '</svg>',

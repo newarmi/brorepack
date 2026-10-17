@@ -4,7 +4,7 @@ import { FACEIT_NICKNAME_PATTERN } from './faceit'
 
 // Одни и те же схемы валидируют форму на клиенте и тело запроса на сервере.
 
-export const TEMPLATE_IDS = ['blue', 'red', 'mono', 'custom'] as const
+export const TEMPLATE_IDS = ['graphite', 'dead_silence', 'blue_skin', 'bloodsport', 'tech', 'orange', 'custom'] as const
 export const PLAQUE_SIZES = ['A5'] as const
 export const DELIVERY_METHOD_IDS = ['cdek_pvz', 'courier'] as const
 export const ORDER_STATUSES = ['awaiting_payment', 'paid', 'printing', 'shipped', 'delivered', 'cancelled'] as const
@@ -22,7 +22,7 @@ export const phoneSchema = z
     return digits.length >= 10 && digits.length <= 15
   }, 'Проверь номер телефона')
 
-// Подписи с цифрами («for reaching 9 lvl · 1809 elo») во входе нет: сервер собирает её сам
+// Подписи с цифрами («for reaching 9 lvl 1809 elo») во входе нет: сервер собирает её сам
 // из профиля FACEIT, чтобы на плашку нельзя было вписать чужой или выдуманный рейтинг
 export const designInputSchema = z.object({
   templateId: z.enum(TEMPLATE_IDS),

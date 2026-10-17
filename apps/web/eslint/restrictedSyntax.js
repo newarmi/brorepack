@@ -54,9 +54,13 @@ export const getRestrictedSyntax = (...allowedKeys) => {
 export const restrictedSyntaxExceptions = [
   { files: ['src/shared/config/env.ts'], allow: ['env'] },
   { files: ['src/shared/telegram/webApp/webApp.ts'], allow: ['telegram'] },
-  // Шрифты для печати — статические файлы приложения, а не запрос к API
+  // Шрифты и макеты плашки для печати — статические файлы приложения, а не запрос к API
   {
-    files: ['src/shared/api/transports/http.ts', 'src/features/admin/print/embeddedFonts.ts'],
+    files: [
+      'src/shared/api/transports/http.ts',
+      'src/features/admin/print/embeddedFonts.ts',
+      'src/entities/plaque/utils/art.ts',
+    ],
     allow: ['fetch'],
   },
   { files: ['src/entities/draft/utils/storage.ts'], allow: ['storage'] },

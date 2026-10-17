@@ -1,7 +1,7 @@
 import type { PlaqueDesign } from '@brorepack/shared';
 import { getTemplate } from '@brorepack/shared';
 
-/** «Плашка «Blue Ninja»» */
+/** «Плашка «Graphite»» */
 export const formatPlaqueTitle = (design: Pick<PlaqueDesign, 'templateId'>): string => {
   return `Плашка «${getTemplate(design.templateId).name}»`;
 };

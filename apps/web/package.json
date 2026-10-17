@@ -19,6 +19,7 @@
     "@brorepack/shared": "workspace:*",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "@fontsource/onest": "^5.3.1",
+    "@fontsource/play": "^5.3.0",
     "@fontsource/unbounded": "^5.3.0",
     "pinia": "^4.0.3",
     "vue": "^3.5.44",

@@ -8,7 +8,7 @@ import { useCheckoutValidation } from './useCheckoutValidation';
 const createInput = (): CreateOrderInput => {
   return {
     nickname: 'goodlifeee',
-    design: { templateId: 'blue', size: 'A5', displayName: 'goodlifeee' },
+    design: { templateId: 'graphite', size: 'A5', displayName: 'goodlifeee' },
     extras: { lightStand: false },
     delivery: { method: 'cdek_pvz', city: '', address: 'Тверская, 7' },
     recipient: { name: 'Иван', phone: '+79000000000' },

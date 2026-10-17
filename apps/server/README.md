@@ -44,7 +44,7 @@ curl -H "$H" 'localhost:3000/api/faceit/player?nickname=notfound'     # 404 play
 | `test` | `node --test` по `src/**/*.test.ts` (initData, FACEIT, бот) |
 | `db:push` | применить `prisma/schema.prisma` к базе |
 | `db:generate` | сгенерировать Prisma Client |
-| `fonts` | скачать Unbounded 700/900 и Onest 400/600 в `fonts/*.ttf` (в git не попадают) |
+| `fonts` | скачать Play 400/700 в `fonts/*.ttf` (в git не попадают) |
 
 ## Переменные окружения
 

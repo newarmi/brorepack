@@ -5,7 +5,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const CSS_URL = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=Onest:wght@400;600'
+const CSS_URL = 'https://fonts.googleapis.com/css2?family=Play:wght@400;700'
 const fontsDir = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'fonts')
 
 const cssResponse = await fetch(CSS_URL)

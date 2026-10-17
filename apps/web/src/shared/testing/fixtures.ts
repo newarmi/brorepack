@@ -22,10 +22,10 @@ export const createOrderFixture = (overrides: Partial<Order> = {}): Order => {
     faceitPlayerId: 'player-1',
     faceitNickname: 'goodlifeee',
     design: {
-      templateId: 'blue',
+      templateId: 'graphite',
       size: 'A5',
       displayName: 'goodlifeee',
-      caption: 'for reaching 9 lvl · 1809 elo',
+      caption: 'for reaching 9 lvl 1809 elo',
       level: 9,
       elo: 1809,
     },

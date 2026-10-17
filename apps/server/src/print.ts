@@ -2,18 +2,16 @@ import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { crc32 } from 'node:zlib'
-import { PLAQUE_PRINT_SIZE_MM, renderPlaqueSvg, type PlaqueDesign } from '@brorepack/shared'
+import { getSvgInnerMarkup, getTemplate, PLAQUE_PRINT_SIZE_MM, renderPlaqueSvg, type PlaqueArt, type PlaqueDesign } from '@brorepack/shared'
 import { renderAsync } from '@resvg/resvg-js'
 import type { FastifyBaseLogger } from 'fastify'
 
 export const PRINT_DPI = 300
 
-/** Начертания плашки: имена семейств совпадают с PLAQUE_FONT_DISPLAY / PLAQUE_FONT_TEXT из shared */
+/** Начертания плашки: имя семейства совпадает с PLAQUE_FONT из shared */
 const FONT_FACES = [
-  { family: 'Unbounded', weight: 700, file: 'Unbounded-700.ttf' },
-  { family: 'Unbounded', weight: 900, file: 'Unbounded-900.ttf' },
-  { family: 'Onest', weight: 400, file: 'Onest-400.ttf' },
-  { family: 'Onest', weight: 600, file: 'Onest-600.ttf' },
+  { family: 'Play', weight: 400, file: 'Play-400.ttf' },
+  { family: 'Play', weight: 700, file: 'Play-700.ttf' },
 ] as const
 
 interface LoadedFonts {
@@ -38,8 +36,20 @@ export interface PrintRenderer {
   renderPng(design: PlaqueDesign): Promise<RenderedPng>
 }
 
-export function createPrintRenderer({ fontsDir, logger }: { fontsDir: string; logger: FastifyBaseLogger }): PrintRenderer {
+interface PrintRendererDeps {
+  fontsDir: string
+  /** packages/shared/assets/plaques — арт шаблонов из макетов дизайнера */
+  artDir: string
+  logger: FastifyBaseLogger
+}
+
+export function createPrintRenderer({ fontsDir, artDir, logger }: PrintRendererDeps): PrintRenderer {
   let fontsPromise: Promise<LoadedFonts> | null = null
+
+  async function loadArt(design: PlaqueDesign): Promise<PlaqueArt> {
+    const svg = await readFile(resolve(artDir, `${getTemplate(design.templateId).artId}.svg`), 'utf8')
+    return { markup: getSvgInnerMarkup(svg) }
+  }
 
   async function readFonts(): Promise<LoadedFonts> {
     const rules: string[] = []
@@ -79,20 +89,20 @@ export function createPrintRenderer({ fontsDir, logger }: { fontsDir: string; lo
 
   return {
     async renderSvg(design) {
-      const { css } = await loadFonts()
-      return renderPlaqueSvg(design, { mode: 'print', embeddedFontCss: css || undefined })
+      const [{ css }, art] = await Promise.all([loadFonts(), loadArt(design)])
+      return renderPlaqueSvg(design, { mode: 'print', art, embeddedFontCss: css || undefined })
     },
 
     async renderPng(design) {
-      const { files } = await loadFonts()
+      const [{ files }, art] = await Promise.all([loadFonts(), loadArt(design)])
       // resvg не читает @font-face, ему шрифты передаются файлами — поэтому рендерим SVG без base64
-      const svg = renderPlaqueSvg(design, { mode: 'print' })
+      const svg = renderPlaqueSvg(design, { mode: 'print', art })
       const image = await renderAsync(svg, {
         fitTo: { mode: 'width', value: mmToPx(PLAQUE_PRINT_SIZE_MM[design.size].width) },
         font: {
           fontFiles: files,
           loadSystemFonts: files.length === 0,
-          defaultFontFamily: 'Onest',
+          defaultFontFamily: 'Play',
         },
         logLevel: 'off',
       })

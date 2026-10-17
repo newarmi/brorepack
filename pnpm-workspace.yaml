@@ -7,3 +7,11 @@ onlyBuiltDependencies:
   - '@prisma/engines'
   - esbuild
   - prisma
+
+# eslint-plugin-vue подгружает typescript сам, без объявленной зависимости, и находит общий hoisted —
+# а там может оказаться TS 7 из shared/server, с которым плагин падает. Peer-зависимость
+# заставляет pnpm дать ему typescript того пакета, где запускается линтер (web, ~6.0)
+packageExtensions:
+  eslint-plugin-vue:
+    peerDependencies:
+      typescript: '*'

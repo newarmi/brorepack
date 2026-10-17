@@ -1,4 +1,4 @@
-import { DELIVERY_METHOD_IDS, TEMPLATE_IDS } from '@brorepack/shared';
+import { DELIVERY_METHOD_IDS, normalizeTemplateId } from '@brorepack/shared';
 
 import { DELIVERY_METHOD } from '@/entities/order';
 import { isOneOf } from '@/shared/lib';
@@ -12,7 +12,7 @@ export const getDefaultDraftState = (): DraftState => {
   return {
     nickname: '',
     profile: null,
-    templateId: 'blue',
+    templateId: 'graphite',
     displayName: '',
     lightStand: false,
     delivery: { method: DELIVERY_METHOD.cdekPickupPoint, city: '', address: '' },
@@ -22,14 +22,14 @@ export const getDefaultDraftState = (): DraftState => {
   };
 };
 
-/** Сохранённый черновик поверх значений по умолчанию; неизвестные шаблон и доставку отбрасываем */
+/** Сохранённый черновик поверх значений по умолчанию; старый шаблон переводим в новый, неизвестные шаблон и доставку отбрасываем */
 const mergeWithDefaults = (stored: Partial<DraftState>): DraftState => {
   const defaults = getDefaultDraftState();
   const storedMethod = stored.delivery?.method;
   return {
     ...defaults,
     ...stored,
-    templateId: isOneOf(TEMPLATE_IDS, stored.templateId) ? stored.templateId : defaults.templateId,
+    templateId: normalizeTemplateId(stored.templateId) ?? defaults.templateId,
     delivery: {
       ...defaults.delivery,
       ...stored.delivery,

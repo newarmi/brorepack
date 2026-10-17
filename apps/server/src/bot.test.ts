@@ -27,7 +27,7 @@ const order: Order = {
   status: 'awaiting_payment',
   faceitPlayerId: 'p1',
   faceitNickname: 'goodlifeee',
-  design: { templateId: 'blue', size: 'A5', displayName: 'Леха <Гей>', caption: 'for reaching 9 lvl · 1809 elo', level: 9, elo: 1809 },
+  design: { templateId: 'graphite', size: 'A5', displayName: 'Леха <Гей>', caption: 'for reaching 9 lvl 1809 elo', level: 9, elo: 1809 },
   extras: { lightStand: true },
   delivery: { method: 'cdek_pvz', city: 'Москва', address: 'ул. Тверская, 1' },
   recipient: { name: 'Алексей', phone: '+79991234567' },

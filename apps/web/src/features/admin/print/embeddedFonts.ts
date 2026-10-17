@@ -1,11 +1,7 @@
-import onestCyrillic400 from '@fontsource/onest/files/onest-cyrillic-400-normal.woff2?url';
-import onestCyrillic600 from '@fontsource/onest/files/onest-cyrillic-600-normal.woff2?url';
-import onestLatin400 from '@fontsource/onest/files/onest-latin-400-normal.woff2?url';
-import onestLatin600 from '@fontsource/onest/files/onest-latin-600-normal.woff2?url';
-import unboundedCyrillic700 from '@fontsource/unbounded/files/unbounded-cyrillic-700-normal.woff2?url';
-import unboundedCyrillic900 from '@fontsource/unbounded/files/unbounded-cyrillic-900-normal.woff2?url';
-import unboundedLatin700 from '@fontsource/unbounded/files/unbounded-latin-700-normal.woff2?url';
-import unboundedLatin900 from '@fontsource/unbounded/files/unbounded-latin-900-normal.woff2?url';
+import playCyrillic400 from '@fontsource/play/files/play-cyrillic-400-normal.woff2?url';
+import playCyrillic700 from '@fontsource/play/files/play-cyrillic-700-normal.woff2?url';
+import playLatin400 from '@fontsource/play/files/play-latin-400-normal.woff2?url';
+import playLatin700 from '@fontsource/play/files/play-latin-700-normal.woff2?url';
 
 import { blobToBase64 } from '@/shared/lib';
 
@@ -14,22 +10,18 @@ const LATIN_RANGE =
 const CYRILLIC_RANGE = 'U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116';
 
 interface FontSource {
-  family: 'Unbounded' | 'Onest';
+  family: 'Play';
   weight: number;
   unicodeRange: string;
   url: string;
 }
 
-// Начертания — те, что использует renderPlaqueSvg: Unbounded 700/900, Onest 400/600
+// Начертания — те, что использует renderPlaqueSvg: Play 400/700
 const FONT_SOURCES: FontSource[] = [
-  { family: 'Unbounded', weight: 700, unicodeRange: LATIN_RANGE, url: unboundedLatin700 },
-  { family: 'Unbounded', weight: 700, unicodeRange: CYRILLIC_RANGE, url: unboundedCyrillic700 },
-  { family: 'Unbounded', weight: 900, unicodeRange: LATIN_RANGE, url: unboundedLatin900 },
-  { family: 'Unbounded', weight: 900, unicodeRange: CYRILLIC_RANGE, url: unboundedCyrillic900 },
-  { family: 'Onest', weight: 400, unicodeRange: LATIN_RANGE, url: onestLatin400 },
-  { family: 'Onest', weight: 400, unicodeRange: CYRILLIC_RANGE, url: onestCyrillic400 },
-  { family: 'Onest', weight: 600, unicodeRange: LATIN_RANGE, url: onestLatin600 },
-  { family: 'Onest', weight: 600, unicodeRange: CYRILLIC_RANGE, url: onestCyrillic600 },
+  { family: 'Play', weight: 400, unicodeRange: LATIN_RANGE, url: playLatin400 },
+  { family: 'Play', weight: 400, unicodeRange: CYRILLIC_RANGE, url: playCyrillic400 },
+  { family: 'Play', weight: 700, unicodeRange: LATIN_RANGE, url: playLatin700 },
+  { family: 'Play', weight: 700, unicodeRange: CYRILLIC_RANGE, url: playCyrillic700 },
 ];
 
 const loadFontFace = async (font: FontSource): Promise<string> => {

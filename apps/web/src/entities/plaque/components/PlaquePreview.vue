@@ -15,6 +15,8 @@ import { computed, useId } from 'vue';
 import type { PlaqueDesign } from '@brorepack/shared';
 import { renderPlaqueSvg } from '@brorepack/shared';
 
+import { getPreviewArt } from '../utils/art';
+
 const props = withDefaults(
   defineProps<{
     design: PlaqueDesign;
@@ -30,7 +32,9 @@ const idPrefix = `plaque-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
 
 // Та же функция рендерит файл для печати, поэтому превью совпадает с результатом.
 // Пользовательский текст экранируется внутри renderPlaqueSvg (escapeXml).
-const svg = computed(() => renderPlaqueSvg(props.design, { idPrefix }));
+const svg = computed(() =>
+  renderPlaqueSvg(props.design, { idPrefix, art: getPreviewArt(props.design.templateId) }),
+);
 </script>
 
 <style scoped>

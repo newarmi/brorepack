@@ -233,7 +233,7 @@ export type Gas = ReturnType<typeof createGas>
 export function orderInput(overrides: Record<string, unknown> = {}) {
   return {
     nickname: 'goodlifeee',
-    design: { templateId: 'blue', size: 'A5', displayName: 'Леха Гей', caption: 'for reaching 9 lvl · 1809 elo' },
+    design: { templateId: 'graphite', size: 'A5', displayName: 'Леха Гей', caption: 'for reaching 9 lvl 1809 elo' },
     extras: { lightStand: true },
     delivery: { method: 'cdek_pvz', city: 'Москва', address: 'ул. Тверская, 1' },
     recipient: { name: 'Алексей', phone: '+7 999 123-45-67' },

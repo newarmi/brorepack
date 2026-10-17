@@ -30,7 +30,7 @@ ESLint проверяет правила проекта из `apps/web/CLAUDE.md
 |---|---|---|
 | `import.meta.env` | `shared/config/env.ts` | переменные окружения описаны в одном месте |
 | `window.Telegram` | `shared/telegram/webApp/webApp.ts` | всё общение с Telegram — через `@/shared/telegram`, вне Telegram работают заглушки |
-| `fetch(...)` | `shared/api/transports/http.ts`, `features/admin/print/embeddedFonts.ts` | запросы — через `call()`, он сам выбирает REST или GAS |
+| `fetch(...)` | `shared/api/transports/http.ts`, `features/admin/print/embeddedFonts.ts`, `entities/plaque/utils/art.ts` | запросы — через `call()`, он сам выбирает REST или GAS |
 | `localStorage` / `sessionStorage` | `entities/draft/utils/storage.ts` | хранилище бывает недоступно, обработка сделана в одном месте |
 | Сравнение со строкой статуса, шаблона или доставки (`=== 'paid'`, `case 'custom'`) | нигде | `ORDER_STATUS`, `PAYMENT_STATUS`, `CUSTOM_TEMPLATE_ID`, `DELIVERY_METHOD` |
 | Имя маршрута строкой: `router.push({ name: 'order' })`, `:to="{ name: 'admin' }"` | нигде | `ROUTE_NAMES` |

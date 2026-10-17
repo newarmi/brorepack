@@ -1,4 +1,6 @@
-export type TemplateId = 'blue' | 'red' | 'mono' | 'custom'
+export type TemplateId = 'graphite' | 'dead_silence' | 'blue_skin' | 'bloodsport' | 'tech' | 'orange' | 'custom'
+/** Арт шаблона: файл packages/shared/assets/plaques/<id>.svg (и .preview.svg) */
+export type TemplateArtId = Exclude<TemplateId, 'custom'>
 /** Формат плашки. Сейчас производится только A5 */
 export type PlaqueSize = 'A5'
 export type DeliveryMethod = 'cdek_pvz' | 'courier'
@@ -35,7 +37,7 @@ export interface PlaqueDesign {
   size: PlaqueSize
   /** Крупная надпись на плашке, по умолчанию — ник */
   displayName: string
-  /** Подпись под ником, по умолчанию «for reaching 9 lvl · 1809 elo» */
+  /** Подпись под ником, по умолчанию «for reaching 9 lvl 1809 elo» */
   caption: string
   level: number
   elo: number

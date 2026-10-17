@@ -10,6 +10,8 @@ z.config(z.locales.ru())
 /** apps/server — и из src/config.ts (tsx), и из dist/index.js (tsup собирает в один файл) */
 export const SERVER_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 export const FONTS_DIR = resolve(SERVER_ROOT, 'fonts')
+/** Арт шаблонов плашки лежит в shared: сервер запускается из монорепозитория */
+export const PLAQUE_ART_DIR = resolve(SERVER_ROOT, '../../packages/shared/assets/plaques')
 const PRISMA_DIR = resolve(SERVER_ROOT, 'prisma')
 
 const emptyToUndefined = (value: unknown) => (typeof value === 'string' && value.trim() === '' ? undefined : value)

@@ -37,7 +37,7 @@ Authorization: tma <Telegram.WebApp.initData>
 `POST /api/orders`:
 1. Валидирует тело по `createOrderInputSchema`.
 2. Заново получает профиль FACEIT по `nickname` — `level`, `elo`, `playerId` и подпись
-   `caption` («for reaching 9 lvl · 1809 elo») собираются оттуда; клиент их не присылает и подделать не может.
+   `caption` («for reaching 9 lvl 1809 elo») собираются оттуда; клиент их не присылает и подделать не может.
    Формат — только `A5`.
 3. Считает цену `calcPrice({ templateId, size, extras, deliveryMethod })`.
 4. Создаёт заказ в статусе `awaiting_payment`.

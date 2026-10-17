@@ -15,11 +15,11 @@ export const FACEIT_LEVEL_MIN_ELO: Record<number, number> = {
 
 export const MAX_FACEIT_LEVEL = 10
 
-/** Фирменные цвета уровней FACEIT: серый, зелёный, жёлтый, оранжевый, красный */
+/** Цвета уровней FACEIT: серый, зелёный, жёлтый, оранжевый, красный. Жёлтый и оранжевый — как в макете плашки */
 export function getLevelColor(level: number): string {
   if (level >= 10) return '#FE1F00'
-  if (level >= 8) return '#FF6309'
-  if (level >= 4) return '#FFC800'
+  if (level >= 8) return '#FF5500'
+  if (level >= 4) return '#FFD200'
   if (level >= 2) return '#1CE400'
   return '#EEEEEE'
 }
@@ -56,7 +56,7 @@ export function getLevelProgress(elo: number): LevelProgress {
 }
 
 export function getDefaultCaption(level: number, elo: number): string {
-  return `for reaching ${level} lvl · ${elo} elo`
+  return `for reaching ${level} lvl ${elo} elo`
 }
 
 /** Ник FACEIT: латиница, цифры, «-» и «_» */
