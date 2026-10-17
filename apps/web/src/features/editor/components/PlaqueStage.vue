@@ -4,7 +4,8 @@
       <PlaquePreview :design="props.design" glow />
       <span v-if="isCustom" class="plaque-stage__sketch">Эскиз · макет нарисует дизайнер</span>
     </div>
-    <span v-if="props.lightStand" class="plaque-stage__stand" aria-hidden="true" />
+    <!-- Подставка всегда занимает место: при переключении меняется только прозрачность, без скачка -->
+    <span class="plaque-stage__stand" aria-hidden="true" />
     <figcaption class="plaque-stage__caption">
       <span class="plaque-stage__size mono">{{ sizeCaption }}</span>
       <span v-if="props.isRatingVisible" class="plaque-stage__rating">
@@ -81,7 +82,7 @@ const sizeCaption = computed(() => {
 }
 
 /* RGB-кромка акрила на подставке с подсветкой */
-.plaque-stage--lit .plaque-stage__plaque::after {
+.plaque-stage__plaque::after {
   content: '';
   position: absolute;
   inset: -3px;
@@ -90,7 +91,14 @@ const sizeCaption = computed(() => {
   background: linear-gradient(135deg, #ff2d55, #ff9500, #ffd60a, #30d158, #0a84ff, #bf5af2, #ff2d55);
   background-size: 300% 300%;
   filter: blur(6px);
-  animation: plaque-stage-rgb 6s linear infinite;
+  opacity: 0;
+  animation: plaque-stage-rgb 6s linear infinite paused;
+  transition: opacity 300ms ease;
+}
+
+.plaque-stage--lit .plaque-stage__plaque::after {
+  opacity: 1;
+  animation-play-state: running;
 }
 
 .plaque-stage__stand {
@@ -102,6 +110,12 @@ const sizeCaption = computed(() => {
   box-shadow:
     0 -2px 12px rgb(255 255 255 / 25%),
     inset 0 1px 0 rgb(255 255 255 / 15%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.plaque-stage--lit .plaque-stage__stand {
+  opacity: 1;
 }
 
 .plaque-stage__caption {
