@@ -47,7 +47,7 @@ const props = withDefaults(defineProps<{ id?: string; label?: string }>(), {
   width: 100%;
   height: 100%;
   padding: 3px;
-  border-radius: var(--radius-chip);
+  border-radius: 999px;
   background: var(--color-surface-2);
   border: 1px solid var(--color-line);
   transition: background-color var(--transition-fast);
@@ -58,13 +58,18 @@ const props = withDefaults(defineProps<{ id?: string; label?: string }>(), {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--color-text);
   transition: transform var(--transition-fast);
 }
 
 .toggle-switch__input:checked + .toggle-switch__track {
   background: var(--color-accent);
   border-color: var(--color-accent);
+  box-shadow: var(--glow-accent);
+}
+
+.toggle-switch__input:checked + .toggle-switch__track .toggle-switch__thumb {
+  background: var(--color-on-accent);
 }
 
 .toggle-switch__input:checked + .toggle-switch__track .toggle-switch__thumb {

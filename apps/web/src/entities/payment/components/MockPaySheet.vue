@@ -41,7 +41,6 @@ const amount = computed(() => (props.order ? formatPrice(props.order.price.total
 
 .mock-pay__amount {
   margin: 18px 0;
-  font-family: var(--font-display);
   font-size: 28px;
   font-weight: 700;
   text-align: center;

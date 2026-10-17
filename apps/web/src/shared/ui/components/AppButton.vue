@@ -56,10 +56,14 @@ const classes = computed(() => [
   min-height: 48px;
   padding: 0 18px;
   border-radius: var(--radius-control);
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   transition:
     background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
     opacity var(--transition-fast),
     transform var(--transition-fast);
 }
@@ -79,24 +83,30 @@ const classes = computed(() => [
 
 .app-button--primary {
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-on-accent);
 }
 
+.app-button--primary:hover:not(:disabled) {
+  box-shadow: var(--glow-accent);
+}
+
+/* Контурная: не путается с карточками */
 .app-button--secondary {
-  background: var(--color-bg);
-  border: 1px solid var(--color-line);
-  color: var(--color-accent-hi);
+  background: transparent;
+  border: 1px solid var(--color-line-strong);
+  color: var(--color-text);
 }
 
 .app-button--secondary:hover:not(:disabled) {
-  background: var(--color-surface);
+  border-color: var(--color-accent);
 }
 
 .app-button--link {
   min-height: 40px;
   padding: 0 8px;
   color: var(--color-accent-hi);
-  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .app-button--loading {

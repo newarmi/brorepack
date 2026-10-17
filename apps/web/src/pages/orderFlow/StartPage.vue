@@ -56,7 +56,6 @@ useMainButton({
 <style scoped>
 .start-page__title {
   margin-top: 8px;
-  font-family: var(--font-display);
   font-size: 24px;
   font-weight: 700;
   line-height: 1.2;

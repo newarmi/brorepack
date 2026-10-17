@@ -14,7 +14,7 @@ const setupAppearance = (app: TelegramWebApp): void => {
     app.setBackgroundColor(THEME_COLORS.background);
   }
   if (checkTelegramVersion('6.9')) {
-    app.setHeaderColor(THEME_COLORS.background);
+    app.setHeaderColor(THEME_COLORS.header);
   }
   if (checkTelegramVersion('7.10')) {
     app.setBottomBarColor?.(THEME_COLORS.background);

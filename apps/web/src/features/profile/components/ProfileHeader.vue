@@ -55,7 +55,6 @@ const subtitle = computed(() =>
   border-radius: 50%;
   background: var(--color-surface-2);
   color: var(--color-accent-hi);
-  font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
 }
@@ -72,7 +71,6 @@ const subtitle = computed(() =>
 }
 
 .profile-header__name {
-  font-family: var(--font-display);
   font-size: 18px;
   font-weight: 700;
   line-height: 1.25;
@@ -96,6 +94,6 @@ const subtitle = computed(() =>
   background: var(--color-ok-soft);
   color: var(--color-ok);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
 }
 </style>

@@ -60,7 +60,6 @@ const valueDash = computed(() => `${ARC_LENGTH * fraction.value} ${CIRCUMFERENCE
 
 .level-gauge__value {
   fill: var(--color-text);
-  font-family: var(--font-display);
   font-size: 34px;
   font-weight: 700;
 }

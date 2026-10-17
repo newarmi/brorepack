@@ -49,7 +49,7 @@ const name = `status-filter-${useId()}`;
   background: var(--color-surface);
   color: var(--color-muted);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
 }

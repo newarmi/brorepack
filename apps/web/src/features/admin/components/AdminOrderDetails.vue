@@ -58,6 +58,6 @@ const openCustomerChatHandler = (): void => {
   display: inline-block;
   margin-top: 12px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }
 </style>

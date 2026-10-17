@@ -40,7 +40,7 @@ const STEPS = [
 
 .start-steps__title {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .start-steps__text {

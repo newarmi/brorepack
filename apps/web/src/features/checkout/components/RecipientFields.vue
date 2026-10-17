@@ -66,7 +66,7 @@ const props = defineProps<{
   border-radius: 8px;
   color: var(--color-accent-hi);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
 }
 

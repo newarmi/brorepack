@@ -43,7 +43,8 @@ const name = `segmented-${useId()}`;
   gap: 4px;
   padding: 4px;
   background: var(--color-surface);
-  border-radius: 14px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
 }
 
 .segmented__option {
@@ -66,7 +67,7 @@ const name = `segmented-${useId()}`;
 }
 
 .segmented__option--active {
-  background: var(--color-surface-2);
+  background: var(--color-accent-soft);
   border-color: var(--color-accent);
   color: var(--color-text);
 }
@@ -77,8 +78,8 @@ const name = `segmented-${useId()}`;
 }
 
 .segmented__label {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: 700;
   line-height: 1.2;
 }
 

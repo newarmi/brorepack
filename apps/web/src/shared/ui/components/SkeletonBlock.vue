@@ -24,7 +24,7 @@ const style = computed(() => ({
   background: linear-gradient(
     90deg,
     var(--color-surface-2) 0%,
-    rgb(34 48 77 / 90%) 40%,
+    var(--color-line-strong) 40%,
     var(--color-surface-2) 80%
   );
   background-size: 200% 100%;

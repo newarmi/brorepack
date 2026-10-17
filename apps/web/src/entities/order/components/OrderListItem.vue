@@ -72,7 +72,6 @@ const details = computed(() =>
 }
 
 .order-item__number {
-  font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 700;
 }
@@ -80,7 +79,7 @@ const details = computed(() =>
 .order-item__title {
   margin-top: 6px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .order-item__details {

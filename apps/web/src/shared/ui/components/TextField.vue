@@ -142,7 +142,7 @@ const counterText = computed(() => `${model.value.length}/${props.maxlength}`);
 
 .text-field__box:focus-within {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgb(47 140 255 / 22%);
+  box-shadow: var(--focus-ring);
 }
 
 .text-field--invalid .text-field__box {

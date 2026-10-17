@@ -15,7 +15,7 @@
 .cancelled-notice__title {
   color: var(--color-danger);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .cancelled-notice__text {

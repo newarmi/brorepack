@@ -26,9 +26,9 @@ const slots = defineSlots<{ default?: () => unknown }>();
 }
 
 .state-message__title {
-  font-family: var(--font-display);
-  font-size: 18px;
+  font-size: var(--text-lg);
   font-weight: 700;
+  text-transform: uppercase;
   line-height: 1.3;
 }
 

@@ -1,6 +1,6 @@
 <template>
   <section class="details-list card">
-    <h2 class="card-title">{{ props.title }}</h2>
+    <h2 class="section-label">{{ props.title }}</h2>
     <dl class="details-list__rows">
       <div v-for="item in props.items" :key="item.label" class="details-list__row">
         <dt>{{ item.label }}</dt>

@@ -150,7 +150,7 @@ watch(model, () => telegram.haptic.selection());
   background: var(--color-surface-2);
   color: var(--color-accent-hi);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .template-picker--showcase .template-picker__custom {
@@ -161,7 +161,7 @@ watch(model, () => telegram.haptic.selection());
   max-width: 100%;
   overflow: hidden;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

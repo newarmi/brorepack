@@ -37,23 +37,23 @@ const { toast, hideToast } = useToast();
 .app-toast {
   max-width: 440px;
   padding: 12px 16px;
-  border-radius: 14px;
+  border-radius: var(--radius-control);
   background: var(--color-surface-2);
   border: 1px solid var(--color-line);
   box-shadow: 0 12px 32px rgb(0 0 0 / 45%);
   color: var(--color-text);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   text-align: center;
   pointer-events: auto;
 }
 
 .app-toast--success {
-  border-color: rgb(52 211 153 / 45%);
+  border-color: var(--color-ok);
 }
 
 .app-toast--error {
-  border-color: rgb(255 92 112 / 55%);
+  border-color: var(--color-danger);
 }
 
 .toast-enter-active,

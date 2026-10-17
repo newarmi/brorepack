@@ -45,7 +45,7 @@ const summary = computed(() => formatDesignSummary(props.design));
 
 .order-summary__title {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
 }
 

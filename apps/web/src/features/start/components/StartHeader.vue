@@ -41,7 +41,6 @@ const props = defineProps<{ isAdmin: boolean }>();
 }
 
 .start-header__wordmark {
-  font-family: var(--font-display);
   font-size: 14px;
   font-weight: 900;
   letter-spacing: 0.06em;
@@ -65,7 +64,7 @@ const props = defineProps<{ isAdmin: boolean }>();
   border-radius: 8px;
   color: var(--color-accent-hi);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   white-space: nowrap;
 }
 </style>

@@ -11,13 +11,15 @@ html {
   color-scheme: dark;
 }
 
+/* Фон как у плашки Graphite: светлее сверху, к низу уходит в чёрный */
 body {
   margin: 0;
   min-height: var(--viewport-height);
-  background: var(--color-bg);
+  background: linear-gradient(180deg, var(--color-bg-top) 0, var(--color-bg) 60vh) no-repeat,
+    var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-body);
-  font-size: 15px;
+  font-family: var(--font-family);
+  font-size: var(--text-base);
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -101,28 +103,28 @@ a {
   border: 0;
 }
 
+/* Подпись блока: «// Доставка», «// Статус». Косые черты — мотив плашек */
 .section-label {
+  display: block;
   margin-bottom: 10px;
   color: var(--color-muted);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.section-label::before {
+  content: '// ';
+  color: var(--color-accent);
 }
 
 /* Заголовок экрана: «Мои заказы», «Заказ №1042» */
 .page-title {
-  font-family: var(--font-display);
-  font-size: 22px;
+  font-size: var(--text-xl);
   font-weight: 700;
-}
-
-/* Заголовок внутри карточки: «Статус», «Доставка» */
-.card-title {
-  margin-bottom: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-muted);
 }
 
 .card {
@@ -131,8 +133,8 @@ a {
   border-radius: var(--radius-card);
 }
 
+/* Цифры одной ширины: цены, ELO, номера заказов */
 .mono {
-  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 

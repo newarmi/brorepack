@@ -68,7 +68,7 @@ watch(model, () => telegram.haptic.selection());
 
 .light-stand__title {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .light-stand__details {

@@ -108,7 +108,7 @@ const steps = computed(() => buildTimelineSteps(props.order));
 
 .order-timeline__label {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .order-timeline__step--todo .order-timeline__label {

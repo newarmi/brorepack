@@ -86,7 +86,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', keydownHandler));
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgb(4 7 14 / 72%);
+  background: rgb(0 0 0 / 72%);
 }
 
 .bottom-sheet__panel {
@@ -97,8 +97,9 @@ onBeforeUnmount(() => document.removeEventListener('keydown', keydownHandler));
   padding: 10px var(--screen-padding) calc(24px + var(--safe-bottom));
   background: var(--color-surface);
   border: 1px solid var(--color-line);
+  border-top: 2px solid var(--color-accent);
   border-bottom: 0;
-  border-radius: 24px 24px 0 0;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 
 .bottom-sheet__panel:focus-visible {
@@ -116,9 +117,9 @@ onBeforeUnmount(() => document.removeEventListener('keydown', keydownHandler));
 
 .bottom-sheet__title {
   margin-bottom: 16px;
-  font-family: var(--font-display);
-  font-size: 18px;
+  font-size: var(--text-lg);
   font-weight: 700;
+  text-transform: uppercase;
 }
 
 .sheet-enter-active,

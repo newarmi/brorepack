@@ -43,7 +43,7 @@ const props = defineProps<{ lines: PriceLine[]; total: number }>();
 .price-totals__row dd {
   margin: 0;
   color: var(--color-text);
-  font-weight: 500;
+  font-weight: 400;
   white-space: nowrap;
 }
 
@@ -53,11 +53,10 @@ const props = defineProps<{ lines: PriceLine[]; total: number }>();
   justify-content: space-between;
   padding-top: 14px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .price-totals__total strong {
-  font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
   white-space: nowrap;

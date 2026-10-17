@@ -1,7 +1,7 @@
 <template>
   <section class="status-control card">
     <fieldset>
-      <legend class="card-title">Статус</legend>
+      <legend class="section-label">Статус</legend>
       <div class="status-control__grid">
         <label
           v-for="option in options"
@@ -75,7 +75,7 @@ const isShipped = computed(() => status.value === ORDER_STATUS.shipped);
   background: var(--color-bg);
   color: var(--color-muted);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   text-align: center;
   cursor: pointer;
 }

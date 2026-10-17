@@ -69,8 +69,7 @@ const closeHandler = (): void => {
   align-items: center;
   height: calc(var(--dev-header-height) + var(--safe-top));
   padding: var(--safe-top) 12px 0;
-  background: var(--color-bg);
-  border-bottom: 1px solid var(--color-line);
+  background: var(--color-bg-top);
 }
 
 .dev-chrome__side-button {
@@ -129,20 +128,24 @@ const closeHandler = (): void => {
   margin: 0 auto;
   border-radius: var(--radius-control);
   background: var(--color-accent);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
+  color: var(--color-on-accent);
+  font-size: var(--text-base);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   transition: opacity var(--transition-fast);
 }
 
+/* Как нативная кнопка в неактивном состоянии: THEME_COLORS.disabled / disabledText */
 .dev-chrome__main-button:disabled {
-  opacity: 0.45;
+  background: var(--color-line);
+  color: var(--color-faint);
 }
 
 .dev-chrome__spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid #fff;
+  border: 2px solid currentColor;
   border-right-color: transparent;
   border-radius: 50%;
   animation: dev-chrome-spin 0.8s linear infinite;

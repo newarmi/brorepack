@@ -21,7 +21,7 @@ const label = computed(() => ORDER_STATUS_LABELS[props.status]);
   padding: 0 10px;
   border-radius: var(--radius-chip);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   color: var(--color-accent-hi);
   background: var(--color-accent-soft);
