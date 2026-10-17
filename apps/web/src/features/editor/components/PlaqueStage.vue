@@ -1,16 +1,20 @@
 <template>
   <figure class="plaque-stage" :class="{ 'plaque-stage--lit': props.lightStand }">
-    <!-- Наклон пальцем — только украшение: без него плашка остаётся обычной картинкой -->
+    <!-- Наклон пальцем — только украшение: без него плашка остаётся обычной картинкой.
+         Плашка и подставка наклоняются вместе, как один предмет -->
     <div
-      ref="plaque"
-      class="plaque-stage__plaque"
-      :class="{ 'plaque-stage__plaque--tiltable': isTiltEnabled }"
+      ref="product"
+      class="plaque-stage__product"
+      :class="{ 'plaque-stage__product--tiltable': isTiltEnabled }"
     >
-      <PlaquePreview :design="props.design" glow />
-      <span v-if="isCustom" class="plaque-stage__sketch">Эскиз · макет нарисует дизайнер</span>
+      <div class="plaque-stage__plaque">
+        <span class="plaque-stage__glow" aria-hidden="true" />
+        <PlaquePreview :design="props.design" glow />
+        <span v-if="isCustom" class="plaque-stage__sketch">Эскиз · макет нарисует дизайнер</span>
+      </div>
+      <!-- Подставка всегда занимает место: при переключении меняется только прозрачность, без скачка -->
+      <PlaqueStand :isLit="props.lightStand" />
     </div>
-    <!-- Подставка всегда занимает место: при переключении меняется только прозрачность, без скачка -->
-    <span class="plaque-stage__stand" aria-hidden="true" />
     <figcaption class="plaque-stage__caption">
       <span class="plaque-stage__size mono">{{ sizeCaption }}</span>
       <span v-if="props.isRatingVisible" class="plaque-stage__rating">
@@ -32,6 +36,7 @@ import { CUSTOM_TEMPLATE_ID, PlaquePreview } from '@/entities/plaque';
 import { AppIcon } from '@/shared/ui';
 
 import { usePointerTilt } from '../composables/usePointerTilt';
+import PlaqueStand from './PlaqueStand.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -44,8 +49,8 @@ const props = withDefaults(
   { lightStand: false, isRatingVisible: false },
 );
 
-const plaque = useTemplateRef<HTMLElement>('plaque');
-const { isTiltEnabled } = usePointerTilt(plaque);
+const product = useTemplateRef<HTMLElement>('product');
+const { isTiltEnabled } = usePointerTilt(product);
 
 const isCustom = computed(() => props.design.templateId === CUSTOM_TEMPLATE_ID);
 
@@ -57,6 +62,11 @@ const sizeCaption = computed(() => {
 
 <style scoped>
 .plaque-stage {
+  /* Камера чуть выше предмета: верх подставки виден и без наклона, плашка (z = 0) не искажается.
+     Размеры самой подставки — в PlaqueStand.vue */
+  --stage-perspective: 900px;
+  --stage-camera-y: 5%;
+
   position: relative;
   z-index: 0;
   display: flex;
@@ -67,15 +77,21 @@ const sizeCaption = computed(() => {
   background: linear-gradient(180deg, #2e2e2e 0%, #0b0b0b 100%);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-card);
+  perspective: var(--stage-perspective);
+  perspective-origin: 50% var(--stage-camera-y);
 }
 
-.plaque-stage__plaque {
-  position: relative;
-  width: min(60%, 230px);
+/* Ширина — по подставке, она шире плашки. Так область касания не выходит за предмет */
+.plaque-stage__product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(70%, 268px);
+  transform-style: preserve-3d;
 }
 
-/* touch-action: none — только на плашке и только когда наклон работает: свайп мимо неё прокручивает страницу */
-.plaque-stage__plaque--tiltable {
+/* touch-action: none — только на предмете и только когда наклон работает: свайп мимо него прокручивает страницу */
+.plaque-stage__product--tiltable {
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -84,8 +100,14 @@ const sizeCaption = computed(() => {
   will-change: transform;
 }
 
-.plaque-stage__plaque--tiltable:active {
+.plaque-stage__product--tiltable:active {
   cursor: grabbing;
+}
+
+/* Те же размеры, что раньше относительно сцены: min(60%, 230px) = 230/268 ширины подставки */
+.plaque-stage__plaque {
+  position: relative;
+  width: calc(100% * 230 / 268);
 }
 
 .plaque-stage__sketch {
@@ -106,40 +128,37 @@ const sizeCaption = computed(() => {
 }
 
 /* RGB-кромка акрила на подставке с подсветкой */
-.plaque-stage__plaque::after {
-  content: '';
+.plaque-stage__glow {
   position: absolute;
   inset: -3px;
   z-index: -1;
+  overflow: hidden;
   border-radius: 10px;
-  background: linear-gradient(135deg, #ff2d55, #ff9500, #ffd60a, #30d158, #0a84ff, #bf5af2, #ff2d55);
-  background-size: 300% 300%;
   filter: blur(6px);
   opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+/* Цвета бегут по кромке за счёт вращения (transform): анимация идёт на GPU, без перерисовки каждый кадр.
+   Квадрат больше диагонали плашки, чтобы при любом угле закрывать её целиком */
+.plaque-stage__glow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 180%;
+  aspect-ratio: 1;
+  background: conic-gradient(#ff2d55, #ff9500, #ffd60a, #30d158, #0a84ff, #bf5af2, #ff2d55);
+  transform: translate(-50%, -50%);
   animation: plaque-stage-rgb 6s linear infinite paused;
-  transition: opacity 300ms ease;
 }
 
-.plaque-stage--lit .plaque-stage__plaque::after {
+.plaque-stage--lit .plaque-stage__glow {
   opacity: 1;
+}
+
+.plaque-stage--lit .plaque-stage__glow::before {
   animation-play-state: running;
-}
-
-.plaque-stage__stand {
-  width: min(70%, 268px);
-  height: 14px;
-  margin-top: -2px;
-  border-radius: 4px 4px 8px 8px;
-  background: linear-gradient(180deg, #2a2a2a, #111);
-  box-shadow:
-    0 -2px 12px rgb(255 255 255 / 25%),
-    inset 0 1px 0 rgb(255 255 255 / 15%);
-  opacity: 0;
-  transition: opacity 300ms ease;
-}
-
-.plaque-stage--lit .plaque-stage__stand {
-  opacity: 1;
 }
 
 .plaque-stage__caption {
@@ -175,9 +194,16 @@ const sizeCaption = computed(() => {
   font-weight: 700;
 }
 
+/* Глобальное правило сокращает анимации до 1ms — бесконечное вращение мерцало бы, поэтому отключаем его */
+@media (prefers-reduced-motion: reduce) {
+  .plaque-stage__glow::before {
+    animation: none;
+  }
+}
+
 @keyframes plaque-stage-rgb {
   to {
-    background-position: 300% 300%;
+    transform: translate(-50%, -50%) rotate(1turn);
   }
 }
 </style>

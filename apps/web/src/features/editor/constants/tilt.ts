@@ -1,4 +1,7 @@
-/** Настройки наклона плашки пальцем. Меняются здесь или точечно через опции usePointerTilt */
+/**
+ * Настройки наклона плашки пальцем. Меняются здесь или точечно через опции usePointerTilt.
+ * Перспектива и размеры подставки — CSS-переменные в PlaqueStage.vue
+ */
 export const TILT_OPTIONS = {
   /** Предел наклона вперёд-назад (rotateX), градусы */
   maxRotateX: 18,
@@ -8,8 +11,6 @@ export const TILT_OPTIONS = {
   dragRange: 0.5,
   /** Какую часть пути до нужного угла плашка проходит за кадр 60 fps: меньше — мягче и медленнее */
   smoothing: 0.2,
-  /** Расстояние до «камеры», px: меньше — сильнее перспектива */
-  perspective: 900,
 };
 
 export type TiltOptions = typeof TILT_OPTIONS;

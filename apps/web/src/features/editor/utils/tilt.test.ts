@@ -47,9 +47,7 @@ describe('tilt', () => {
   });
 
   it('drops transform for a flat card', () => {
-    expect(formatTiltTransform(FLAT_TILT, 900)).toBe('');
-    expect(formatTiltTransform({ x: -3, y: 4.567 }, 900)).toBe(
-      'perspective(900px) rotateX(-3.00deg) rotateY(4.57deg)',
-    );
+    expect(formatTiltTransform(FLAT_TILT)).toBe('');
+    expect(formatTiltTransform({ x: -3, y: 4.567 })).toBe('rotateX(-3.00deg) rotateY(4.57deg)');
   });
 });

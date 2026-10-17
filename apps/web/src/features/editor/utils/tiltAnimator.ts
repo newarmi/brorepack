@@ -18,7 +18,7 @@ export interface TiltAnimator {
  */
 export const createTiltAnimator = (
   element: HTMLElement,
-  settings: Pick<TiltOptions, 'perspective' | 'smoothing'>,
+  settings: Pick<TiltOptions, 'smoothing'>,
 ): TiltAnimator => {
   let current = FLAT_TILT;
   let goal = FLAT_TILT;
@@ -26,7 +26,7 @@ export const createTiltAnimator = (
   let lastFrameTime = 0;
 
   const applyTransform = (): void => {
-    element.style.setProperty('transform', formatTiltTransform(current, settings.perspective));
+    element.style.setProperty('transform', formatTiltTransform(current));
   };
 
   const renderFrame = (time: number): void => {

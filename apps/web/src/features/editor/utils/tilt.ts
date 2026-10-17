@@ -50,10 +50,13 @@ export const stepTilt = (current: TiltAngles, goal: TiltAngles, factor: number):
   return isSettled ? { ...goal } : next;
 };
 
-/** CSS transform для наклона; для ровной плашки — пустая строка, чтобы не держать 3D-слой */
-export const formatTiltTransform = (angles: TiltAngles, perspective: number): string => {
+/**
+ * CSS transform для наклона; для ровной плашки — пустая строка.
+ * Перспективу задаёт родитель (CSS perspective): так у вложенных 3D-деталей общая камера
+ */
+export const formatTiltTransform = (angles: TiltAngles): string => {
   if (angles.x === 0 && angles.y === 0) {
     return '';
   }
-  return `perspective(${perspective}px) rotateX(${angles.x.toFixed(2)}deg) rotateY(${angles.y.toFixed(2)}deg)`;
+  return `rotateX(${angles.x.toFixed(2)}deg) rotateY(${angles.y.toFixed(2)}deg)`;
 };
