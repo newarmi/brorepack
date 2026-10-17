@@ -1,6 +1,6 @@
 <template>
   <div class="profile-header">
-    <div class="profile-header__avatar">
+    <div class="profile-header__avatar" :style="{ borderColor: levelColor }">
       <img
         v-if="props.profile.avatarUrl"
         :src="props.profile.avatarUrl"
@@ -24,12 +24,15 @@
 import { computed } from 'vue';
 
 import type { FaceitProfile } from '@brorepack/shared';
+import { getLevelColor } from '@brorepack/shared';
 
 import { formatCountry } from '@/shared/lib';
 import { AppIcon } from '@/shared/ui';
 
 const props = defineProps<{ profile: FaceitProfile }>();
 
+// Обводка аватара — цвет уровня, как кольцо на плашке
+const levelColor = computed(() => getLevelColor(props.profile.level));
 const initial = computed(() => props.profile.nickname.charAt(0).toUpperCase());
 const subtitle = computed(() =>
   [formatCountry(props.profile.country), 'CS2'].filter(Boolean).join(' · '),
@@ -51,11 +54,11 @@ const subtitle = computed(() =>
   width: 52px;
   height: 52px;
   overflow: hidden;
-  border: 2px solid var(--color-accent);
+  border: 2px solid var(--color-line-strong);
   border-radius: 50%;
   background: var(--color-surface-2);
-  color: var(--color-accent-hi);
-  font-size: 20px;
+  color: var(--color-text);
+  font-size: var(--text-lg);
   font-weight: 700;
 }
 
@@ -90,9 +93,9 @@ const subtitle = computed(() =>
   gap: 4px;
   height: 28px;
   padding: 0 10px;
+  border: 1px solid var(--color-line-strong);
   border-radius: var(--radius-chip);
-  background: var(--color-ok-soft);
-  color: var(--color-ok);
+  color: var(--color-muted);
   font-size: 12px;
   font-weight: 700;
 }

@@ -39,6 +39,7 @@ export interface PlaqueDesign {
   displayName: string
   /** Подпись под ником, по умолчанию «for reaching 9 lvl 1809 elo» */
   caption: string
+  /** 0 — уровень ещё неизвестен: превью на экране ввода ника */
   level: number
   elo: number
 }

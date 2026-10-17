@@ -1,5 +1,7 @@
 <template>
   <div ref="root" class="checkout-page">
+    <StepProgress :steps="ORDER_FLOW_STEPS" :current="ORDER_FLOW_STEP.payment" />
+
     <OrderSummaryCard :design="draft.design" :amount="draft.plaquePrice.total" />
 
     <DeliveryFields
@@ -39,7 +41,7 @@ import { useTemplateRef } from 'vue';
 
 import { formatPrice } from '@brorepack/shared';
 
-import { useDraftStore } from '@/entities/draft';
+import { ORDER_FLOW_STEP, ORDER_FLOW_STEPS, useDraftStore } from '@/entities/draft';
 import { OrderSummaryCard, PriceTotals } from '@/entities/order';
 import { MockPaySheet } from '@/entities/payment';
 import {
@@ -49,6 +51,7 @@ import {
   usePhoneFromTelegram,
 } from '@/features/checkout';
 import { useBackButton, useMainButton } from '@/shared/telegram';
+import { StepProgress } from '@/shared/ui';
 
 const draft = useDraftStore();
 const root = useTemplateRef<HTMLElement>('root');

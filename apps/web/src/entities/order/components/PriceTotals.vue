@@ -57,7 +57,8 @@ const props = defineProps<{ lines: PriceLine[]; total: number }>();
 }
 
 .price-totals__total strong {
-  font-size: 20px;
+  color: var(--color-accent);
+  font-size: var(--text-2xl);
   font-weight: 700;
   white-space: nowrap;
 }

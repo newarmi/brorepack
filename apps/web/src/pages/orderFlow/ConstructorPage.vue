@@ -1,8 +1,10 @@
 <template>
   <div class="constructor-page">
+    <StepProgress :steps="ORDER_FLOW_STEPS" :current="ORDER_FLOW_STEP.plaque" />
+
     <MockDataNotice v-if="isMockProfile" />
 
-    <PlaqueStage :design="draft.design" />
+    <PlaqueStage :design="draft.design" :lightStand="draft.lightStand" isRatingVisible />
 
     <TemplatePicker v-model="draft.templateId" :design="draft.design" />
 
@@ -26,8 +28,6 @@
       enterkeyhint="done"
     />
 
-    <RatingNote :level="draft.design.level" :elo="draft.design.elo" />
-
     <LightStandRow v-model="draft.lightStand" />
   </div>
 </template>
@@ -38,19 +38,18 @@ import { useRouter } from 'vue-router';
 
 import { DISPLAY_NAME_MAX, formatPrice, getTemplate } from '@brorepack/shared';
 
-import { useDraftStore } from '@/entities/draft';
+import { ORDER_FLOW_STEP, ORDER_FLOW_STEPS, useDraftStore } from '@/entities/draft';
 import { CUSTOM_TEMPLATE_ID } from '@/entities/plaque';
 import { MockDataNotice } from '@/entities/player';
 import {
   LightStandRow,
   PlaqueStage,
-  RatingNote,
   TemplatePicker,
   useDesignValidation,
 } from '@/features/editor';
 import { ROUTE_NAMES } from '@/shared/config';
 import { useMainButton, useTelegram } from '@/shared/telegram';
-import { TextField } from '@/shared/ui';
+import { StepProgress, TextField } from '@/shared/ui';
 
 const router = useRouter();
 const telegram = useTelegram();

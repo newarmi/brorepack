@@ -1,5 +1,11 @@
 <template>
   <div class="profile-page">
+    <StepProgress
+      class="profile-page__steps"
+      :steps="ORDER_FLOW_STEPS"
+      :current="ORDER_FLOW_STEP.profile"
+    />
+
     <AsyncState
       :status
       :errorTitle="getProfileErrorTitle(error)"
@@ -28,7 +34,7 @@
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { useDraftStore } from '@/entities/draft';
+import { ORDER_FLOW_STEP, ORDER_FLOW_STEPS, useDraftStore } from '@/entities/draft';
 import {
   checkPlayerNotFound,
   getProfileErrorText,
@@ -39,7 +45,7 @@ import {
 } from '@/features/profile';
 import { ROUTE_NAMES } from '@/shared/config';
 import { useMainButton, useTelegram } from '@/shared/telegram';
-import { AppButton, AsyncState } from '@/shared/ui';
+import { AppButton, AsyncState, StepProgress } from '@/shared/ui';
 
 const route = useRoute();
 const router = useRouter();
@@ -70,3 +76,9 @@ useMainButton({
   onClick: buildPlaqueHandler,
 });
 </script>
+
+<style scoped>
+.profile-page__steps {
+  margin-bottom: 16px;
+}
+</style>

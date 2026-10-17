@@ -104,6 +104,9 @@ export function buildLevelRingPath(level: number): string {
 /** Квадрат вокруг кольца — viewBox для шкалы уровня в приложении */
 export const LEVEL_RING_VIEWBOX = `${round(RING.cx - 50)} ${round(RING.cy - 50)} 100 100`
 
+/** Где и каким кеглем стоит цифра уровня — для шкалы уровня в приложении */
+export const LEVEL_DIGIT = { x: CENTER_X, y: DIGIT.baseline, size: DIGIT.size } as const
+
 /** Внутренности SVG-файла без обёртки <svg> — чтобы встроить арт в файл для печати */
 export function getSvgInnerMarkup(svg: string): string {
   const start = svg.indexOf('>', svg.indexOf('<svg')) + 1
@@ -116,16 +119,28 @@ function renderArt(art: PlaqueArt | undefined): string {
   return `<image href="${escapeXml(art.href)}" width="${PLAQUE_VIEWBOX.width}" height="${PLAQUE_VIEWBOX.height}"/>`
 }
 
+/** Уровень 0 — ещё неизвестен (экран ввода ника): кольцо во весь ход полупрозрачное, вместо цифры «?» */
+const UNKNOWN_LEVEL = 0
+
+function renderRing(design: PlaqueDesign): string {
+  const template = getTemplate(design.templateId)
+  if (design.level === UNKNOWN_LEVEL) {
+    return `<path d="${buildLevelRingPath(10)}" fill="${template.textColor}" fill-opacity="0.3"/>`
+  }
+  return `<path d="${buildLevelRingPath(design.level)}" fill="${resolveLevelColor(template.ringColor, design.level)}"/>`
+}
+
 /** Всё, что зависит от игрока: кольцо, звезда FACEIT, цифра уровня, ник и подпись */
 function renderPlayerLayer(design: PlaqueDesign): string {
   const template = getTemplate(design.templateId)
+  const digit = design.level === UNKNOWN_LEVEL ? '?' : String(design.level)
   const nameSize = fitFontSize(design.displayName, NICKNAME.size, NICKNAME.maxWidth, 0.56)
   const captionSize = fitFontSize(design.caption, CAPTION.size, CAPTION.maxWidth, 0.48)
   const textAttrs = `text-anchor="middle" font-family="${PLAQUE_FONT}" fill="${template.textColor}"`
   const layer = [
-    `<path d="${buildLevelRingPath(design.level)}" fill="${resolveLevelColor(template.ringColor, design.level)}"/>`,
+    renderRing(design),
     `<path d="${FACEIT_STAR_PATH}" fill="${resolveLevelColor(template.starColor, design.level)}"/>`,
-    `<text x="${CENTER_X}" y="${DIGIT.baseline}" ${textAttrs} font-weight="700" font-size="${DIGIT.size}">${design.level}</text>`,
+    `<text x="${CENTER_X}" y="${DIGIT.baseline}" ${textAttrs} font-weight="700" font-size="${DIGIT.size}">${digit}</text>`,
     `<text x="${CENTER_X}" y="${NICKNAME.baseline}" ${textAttrs} font-weight="700" font-size="${nameSize}">${escapeXml(design.displayName)}</text>`,
   ]
   if (design.caption) {

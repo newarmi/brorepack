@@ -1,14 +1,13 @@
 <template>
   <fieldset class="recipient-fields">
-    <legend class="section-label">Получатель</legend>
+    <legend class="visually-hidden">Получатель</legend>
     <TextField
       v-model="name"
-      label="Имя и фамилия"
-      hideLabel
+      label="Имя получателя"
       name="name"
       autocomplete="name"
       autocapitalize="words"
-      placeholder="Имя и фамилия"
+      placeholder="Иван Иванов"
       :maxlength="80"
       :error="props.nameError"
       @blur="emits('blur', 'name')"
@@ -16,7 +15,6 @@
     <TextField
       v-model="phone"
       label="Телефон"
-      hideLabel
       name="phone"
       type="tel"
       inputmode="tel"
@@ -57,7 +55,7 @@ const props = defineProps<{
 <style scoped>
 .recipient-fields {
   display: grid;
-  gap: 10px;
+  gap: 14px;
 }
 
 .recipient-fields__contact {

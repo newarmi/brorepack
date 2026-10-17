@@ -67,3 +67,10 @@ describe('renderPlaqueSvg', () => {
     assert.ok(print.includes('<rect id="x"/>'))
   })
 })
+
+describe('неизвестный уровень', () => {
+  it('рисует «?» вместо цифры', () => {
+    const svg = renderPlaqueSvg({ ...design, level: 0, caption: '' })
+    assert.ok(svg.includes('>?</text>'))
+  })
+})

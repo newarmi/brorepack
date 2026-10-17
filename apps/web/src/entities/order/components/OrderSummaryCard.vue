@@ -35,7 +35,7 @@ const summary = computed(() => formatDesignSummary(props.design));
 
 .order-summary__thumb {
   flex-shrink: 0;
-  width: 48px;
+  width: 64px;
 }
 
 .order-summary__body {

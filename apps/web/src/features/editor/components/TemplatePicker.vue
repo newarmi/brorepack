@@ -1,7 +1,8 @@
 <template>
-  <fieldset class="template-picker" :class="{ 'template-picker--showcase': props.showcase }">
+  <fieldset class="template-picker">
     <legend class="section-label">{{ props.label }}</legend>
-    <div class="template-picker__grid">
+    <!-- Лента прокручивается вбок: шаблонов больше, чем помещается на экране -->
+    <div class="template-picker__strip">
       <label
         v-for="option in options"
         :key="option.id"
@@ -13,23 +14,16 @@
       >
         <input v-model="model" class="visually-hidden" type="radio" :name :value="option.id" />
         <span v-if="option.isCustom" class="template-picker__custom" aria-hidden="true">
-          <AppIcon name="plus" :size="props.showcase ? 28 : 22" />
+          <AppIcon name="plus" :size="22" />
           <span>{{ customPrice }}</span>
         </span>
         <span v-else class="template-picker__thumb">
-          <PlaquePreview
-            :design="option.design"
-            :glow="props.showcase && option.id === model"
-            decorative
-          />
+          <PlaquePreview :design="option.design" decorative />
         </span>
         <span class="template-picker__label">
           {{ option.label }}
-          <span v-if="option.isCustom && !props.showcase" class="visually-hidden"
-            >дизайн, {{ customPrice }}</span
-          >
+          <span v-if="option.isCustom" class="visually-hidden">, {{ customPrice }}</span>
         </span>
-        <span v-if="props.showcase" class="template-picker__hint">{{ option.hint }}</span>
       </label>
     </div>
   </fieldset>
@@ -47,15 +41,9 @@ import { AppIcon } from '@/shared/ui';
 
 const model = defineModel<TemplateId>({ required: true });
 
-const props = withDefaults(
-  defineProps<{
-    design: PlaqueDesign;
-    label?: string;
-    /** Витрина на стартовом экране: крупные карточки в две колонки с подписями */
-    showcase?: boolean;
-  }>(),
-  { label: 'Шаблон', showcase: false },
-);
+const props = withDefaults(defineProps<{ design: PlaqueDesign; label?: string }>(), {
+  label: 'Шаблон',
+});
 
 const telegram = useTelegram();
 
@@ -63,54 +51,52 @@ const name = `template-${useId()}`;
 const customPrice = `+${formatPrice(getTemplate(CUSTOM_TEMPLATE_ID).extraPrice)}`;
 
 const options = computed(() =>
-  TEMPLATES.map((template) => {
-    const isCustom = template.id === CUSTOM_TEMPLATE_ID;
-    return {
-      id: template.id,
-      label: isCustom && !props.showcase ? 'Свой' : template.name,
-      hint: isCustom ? `по твоей идее · ${customPrice}` : 'входит в цену',
-      isCustom,
-      design: { ...props.design, templateId: template.id },
-    };
-  }),
+  TEMPLATES.map((template) => ({
+    id: template.id,
+    label: template.name,
+    isCustom: template.id === CUSTOM_TEMPLATE_ID,
+    design: { ...props.design, templateId: template.id },
+  })),
 );
 
 watch(model, () => telegram.haptic.selection());
 </script>
 
 <style scoped>
-.template-picker__grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+.template-picker__strip {
+  display: flex;
+  gap: 10px;
+  margin: 0 calc(-1 * var(--screen-padding));
+  padding: 4px var(--screen-padding) 8px;
+  overflow-x: auto;
+  scroll-padding-inline: var(--screen-padding);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
 }
 
-.template-picker--showcase .template-picker__grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+.template-picker__strip::-webkit-scrollbar {
+  display: none;
 }
 
 .template-picker__option {
   position: relative;
   display: flex;
+  flex: 0 0 100px;
+  min-width: 0;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 6px 6px 8px;
-  border: 1.5px solid var(--color-line);
-  border-radius: 14px;
+  gap: 8px;
+  padding: 8px 8px 10px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-control);
   background: var(--color-surface);
   color: var(--color-muted);
   cursor: pointer;
+  scroll-snap-align: start;
   transition:
     border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
     color var(--transition-fast);
-}
-
-.template-picker--showcase .template-picker__option {
-  gap: 4px;
-  padding: 16px 14px 12px;
-  border-radius: var(--radius-card);
 }
 
 .template-picker__option--custom {
@@ -120,6 +106,7 @@ watch(model, () => telegram.haptic.selection());
 .template-picker__option--active {
   border-color: var(--color-accent);
   border-style: solid;
+  box-shadow: var(--glow-accent);
   color: var(--color-text);
 }
 
@@ -132,12 +119,6 @@ watch(model, () => telegram.haptic.selection());
   width: 100%;
 }
 
-.template-picker--showcase .template-picker__thumb,
-.template-picker--showcase .template-picker__custom {
-  width: 78%;
-  margin-bottom: 8px;
-}
-
 .template-picker__custom {
   display: flex;
   flex-direction: column;
@@ -145,34 +126,20 @@ watch(model, () => telegram.haptic.selection());
   justify-content: center;
   gap: 4px;
   width: 100%;
-  aspect-ratio: 210 / 297;
-  border-radius: 8px;
+  aspect-ratio: 148 / 210;
+  border-radius: 4px;
   background: var(--color-surface-2);
-  color: var(--color-accent-hi);
-  font-size: 11px;
+  color: var(--color-accent);
+  font-size: var(--text-xs);
   font-weight: 700;
-}
-
-.template-picker--showcase .template-picker__custom {
-  font-size: 13px;
 }
 
 .template-picker__label {
-  max-width: 100%;
-  overflow: hidden;
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.template-picker--showcase .template-picker__label {
-  font-size: 15px;
-}
-
-.template-picker__hint {
-  color: var(--color-faint);
-  font-size: 12px;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
   text-align: center;
+  text-transform: uppercase;
 }
 </style>

@@ -65,9 +65,9 @@ const progressPercent = computed(() => `${Math.round(progress.value.progress * 1
 }
 
 .profile-level__elo {
-  font-size: 40px;
+  font-size: var(--text-display);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1;
 }
 
 .profile-level__label {
