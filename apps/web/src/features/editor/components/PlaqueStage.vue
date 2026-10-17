@@ -1,6 +1,11 @@
 <template>
   <figure class="plaque-stage" :class="{ 'plaque-stage--lit': props.lightStand }">
-    <div class="plaque-stage__plaque">
+    <!-- Наклон пальцем — только украшение: без него плашка остаётся обычной картинкой -->
+    <div
+      ref="plaque"
+      class="plaque-stage__plaque"
+      :class="{ 'plaque-stage__plaque--tiltable': isTiltEnabled }"
+    >
       <PlaquePreview :design="props.design" glow />
       <span v-if="isCustom" class="plaque-stage__sketch">Эскиз · макет нарисует дизайнер</span>
     </div>
@@ -18,13 +23,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 
 import type { PlaqueDesign } from '@brorepack/shared';
 import { getSize } from '@brorepack/shared';
 
 import { CUSTOM_TEMPLATE_ID, PlaquePreview } from '@/entities/plaque';
 import { AppIcon } from '@/shared/ui';
+
+import { usePointerTilt } from '../composables/usePointerTilt';
 
 const props = withDefaults(
   defineProps<{
@@ -36,6 +43,9 @@ const props = withDefaults(
   }>(),
   { lightStand: false, isRatingVisible: false },
 );
+
+const plaque = useTemplateRef<HTMLElement>('plaque');
+const { isTiltEnabled } = usePointerTilt(plaque);
 
 const isCustom = computed(() => props.design.templateId === CUSTOM_TEMPLATE_ID);
 
@@ -62,6 +72,20 @@ const sizeCaption = computed(() => {
 .plaque-stage__plaque {
   position: relative;
   width: min(60%, 230px);
+}
+
+/* touch-action: none — только на плашке и только когда наклон работает: свайп мимо неё прокручивает страницу */
+.plaque-stage__plaque--tiltable {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  will-change: transform;
+}
+
+.plaque-stage__plaque--tiltable:active {
+  cursor: grabbing;
 }
 
 .plaque-stage__sketch {
