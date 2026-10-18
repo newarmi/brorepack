@@ -8,7 +8,8 @@
 
 На выходе для каждого шаблона два SVG в assets/plaques:
   <id>.svg          — для печати, растр в исходном разрешении (JPEG q92)
-  <id>.preview.svg  — для превью в приложении, растр в половину размера (JPEG q78)
+  <id>.preview.svg  — для превью в приложении, растр в половину размера (WebP q75):
+                      JPEG не сжимается gzip'ом, а превью — самая крупная картинка экрана (LCP)
 
 Запуск (нужны poppler — pdftocairo — и Pillow):
   python3 packages/shared/scripts/extract_plaque_art.py ~/Downloads
@@ -75,14 +76,18 @@ def pdf_page_to_svg(pdf, page):
     return ET.fromstring(result.stdout)
 
 
-def encode_image(data_uri, scale, quality):
-    """PNG из pdftocairo → JPEG (если нет прозрачности) или PNG поменьше (маски)"""
+def encode_image(data_uri, scale, quality, is_webp):
+    """PNG из pdftocairo → JPEG (если нет прозрачности) или PNG поменьше (маски); для превью — WebP"""
     raw = base64.b64decode(data_uri.split(',', 1)[1])
     image = Image.open(io.BytesIO(raw))
     if scale != 1:
         image = image.resize((round(image.width * scale), round(image.height * scale)), Image.LANCZOS)
     buffer = io.BytesIO()
-    if image.mode in ('L', 'LA', 'RGBA', 'P'):
+    if is_webp:
+        # WebP держит альфу; маску (L) кладём как RGB — яркость, которую читает <mask>, та же
+        image.convert('RGBA' if image.mode in ('LA', 'RGBA', 'P') else 'RGB').save(buffer, 'WEBP', quality=quality, method=6)
+        mime = 'image/webp'
+    elif image.mode in ('L', 'LA', 'RGBA', 'P'):
         image.save(buffer, 'PNG', optimize=True)
         mime = 'image/png'
     else:
@@ -91,7 +96,7 @@ def encode_image(data_uri, scale, quality):
     return f'data:{mime};base64,' + base64.b64encode(buffer.getvalue()).decode()
 
 
-def build_art(root, template_id, scale, quality):
+def build_art(root, template_id, scale, quality, is_webp):
     defs = root.find(f'{{{SVG_NS}}}defs')
     body = [child for child in root if child is not defs]
 
@@ -111,7 +116,7 @@ def build_art(root, template_id, scale, quality):
     # Картинка тянется на свои width/height, поэтому уменьшенный растр встаёт на то же место
     href = f'{{{XLINK_NS}}}href'
     for image in art.iter(f'{{{SVG_NS}}}image'):
-        image.set(href, encode_image(image.get(href), scale, quality))
+        image.set(href, encode_image(image.get(href), scale, quality, is_webp))
 
     text = ET.tostring(art, encoding='unicode')
     # id внутри арта уникальны на странице: превью разных шаблонов стоят рядом
@@ -122,10 +127,10 @@ def main():
     source_dir = Path(sys.argv[1] if len(sys.argv) > 1 else '.').expanduser()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     for template_id, file_name in TEMPLATES.items():
-        for suffix, scale, quality in (('', 1, 92), ('.preview', 0.5, 78)):
+        for suffix, scale, quality, is_webp in (('', 1, 92, False), ('.preview', 0.5, 75, True)):
             root = pdf_page_to_svg(source_dir / file_name, 2)
             out = OUT_DIR / f'{template_id}{suffix}.svg'
-            out.write_text(build_art(root, template_id, scale, quality), encoding='utf-8')
+            out.write_text(build_art(root, template_id, scale, quality, is_webp), encoding='utf-8')
             print(f'✓ {out.name}: {out.stat().st_size // 1024} КБ')
 
 
