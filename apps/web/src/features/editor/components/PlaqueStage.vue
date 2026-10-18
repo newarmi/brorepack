@@ -18,9 +18,6 @@
             glow
           />
         </Transition>
-        <span v-if="isCustom && !props.image" class="plaque-stage__sketch">
-          Эскиз · макет нарисует дизайнер
-        </span>
       </div>
       <!-- Подставка всегда занимает место: при переключении меняется только прозрачность, без скачка -->
       <PlaqueStand :isLit="props.lightStand" />
@@ -42,7 +39,7 @@ import { computed, useTemplateRef } from 'vue';
 import type { PlaqueDesign, PlaqueImage } from '@brorepack/shared';
 import { getSize } from '@brorepack/shared';
 
-import { CUSTOM_TEMPLATE_ID, PlaquePreview } from '@/entities/plaque';
+import { PlaquePreview } from '@/entities/plaque';
 import { AppIcon } from '@/shared/ui';
 
 import { usePointerTilt } from '../composables/usePointerTilt';
@@ -63,8 +60,6 @@ const props = withDefaults(
 
 const product = useTemplateRef<HTMLElement>('product');
 const { isTiltEnabled } = usePointerTilt(product);
-
-const isCustom = computed(() => props.design.templateId === CUSTOM_TEMPLATE_ID);
 
 const sizeCaption = computed(() => {
   const size = getSize(props.design.size);
@@ -144,23 +139,6 @@ const sizeCaption = computed(() => {
 
 .plaque-swap-leave-to {
   opacity: 0;
-}
-
-.plaque-stage__sketch {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  padding: 6px 10px;
-  border: 1px dashed var(--color-accent);
-  border-radius: var(--radius-chip);
-  background: rgb(11 11 11 / 85%);
-  color: var(--color-text);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transform: translate(-50%, -50%);
 }
 
 /* RGB-кромка акрила на подставке с подсветкой */
