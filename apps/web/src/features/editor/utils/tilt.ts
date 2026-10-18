@@ -22,14 +22,17 @@ export const getTiltAngle = (shift: number, range: number, maxAngle: number): nu
   return maxAngle * Math.tanh(shift / range);
 };
 
-/** Наклон по сдвигу пальца от точки касания. Палец вниз — верх выходит вперёд, вправо — правый край уходит назад */
+/**
+ * Наклон по сдвигу пальца от точки касания: плашка поворачивается к пальцу.
+ * Палец вниз — верх уходит назад, вправо — правый край выходит вперёд
+ */
 export const getDragTilt = (
   shift: { x: number; y: number },
   size: { width: number; height: number },
   settings: Pick<TiltOptions, 'dragRange' | 'maxRotateX' | 'maxRotateY'>,
 ): TiltAngles => ({
-  x: -getTiltAngle(shift.y, size.height * settings.dragRange, settings.maxRotateX),
-  y: getTiltAngle(shift.x, size.width * settings.dragRange, settings.maxRotateY),
+  x: getTiltAngle(shift.y, size.height * settings.dragRange, settings.maxRotateX),
+  y: -getTiltAngle(shift.x, size.width * settings.dragRange, settings.maxRotateY),
 });
 
 /**

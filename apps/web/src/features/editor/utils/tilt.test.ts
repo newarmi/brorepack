@@ -27,10 +27,18 @@ describe('tilt', () => {
 
   it('keeps drag tilt within ±18° by X and ±25° by Y', () => {
     const tilt = getDragTilt({ x: 5000, y: 5000 }, SIZE, TILT_OPTIONS);
-    expect(tilt.x).toBeLessThan(0);
-    expect(tilt.x).toBeGreaterThanOrEqual(-TILT_OPTIONS.maxRotateX);
-    expect(tilt.y).toBeGreaterThan(0);
-    expect(tilt.y).toBeLessThanOrEqual(TILT_OPTIONS.maxRotateY);
+    expect(tilt.x).toBeGreaterThan(0);
+    expect(tilt.x).toBeLessThanOrEqual(TILT_OPTIONS.maxRotateX);
+    expect(tilt.y).toBeLessThan(0);
+    expect(tilt.y).toBeGreaterThanOrEqual(-TILT_OPTIONS.maxRotateY);
+  });
+
+  // Плашка поворачивается к пальцу: вправо — правый край вперёд (rotateY < 0), вниз — верх назад (rotateX > 0)
+  it('turns the plaque towards the finger', () => {
+    const right = getDragTilt({ x: 40, y: 0 }, SIZE, TILT_OPTIONS);
+    const down = getDragTilt({ x: 0, y: 40 }, SIZE, TILT_OPTIONS);
+    expect(right.y).toBeLessThan(0);
+    expect(down.x).toBeGreaterThan(0);
   });
 
   it('moves the same distance per second at any frame rate', () => {
