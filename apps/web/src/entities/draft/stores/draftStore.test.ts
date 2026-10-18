@@ -36,7 +36,13 @@ describe('draft store', () => {
     const draft = useDraftStore();
     expect(draft.templateId).toBe('graphite');
     expect(draft.displayName).toBe('saved');
-    expect(draft.delivery).toEqual({ method: 'cdek_pvz', city: 'Казань', address: '' });
+    expect(draft.delivery).toEqual({
+      method: 'cdek_pvz',
+      city: 'Казань',
+      address: '',
+      location: null,
+      isManualAddress: false,
+    });
     expect(draft.recipient).toEqual({ name: 'Пётр', phone: '' });
   });
 

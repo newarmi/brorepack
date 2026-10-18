@@ -53,6 +53,7 @@ jobs:
           VITE_API_TRANSPORT: gas
           VITE_GAS_URL: ${{ vars.GAS_URL }}
           VITE_BOT_URL: ${{ vars.BOT_URL }}
+          VITE_GEOCODER_URL: ${{ vars.GEOCODER_URL }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

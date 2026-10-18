@@ -23,6 +23,14 @@ describe('orderDetails', () => {
       'Способ',
       'Город',
       'Адрес',
+      'Координаты',
+    ]);
+    const manual = createOrderFixture({
+      delivery: { method: 'courier', city: '', address: 'Казань, Баумана, 1', location: null },
+    });
+    expect(getDeliveryDetails(manual).slice(1)).toEqual([
+      { label: 'Адрес', value: 'Казань, Баумана, 1', selectable: true },
+      { label: 'Координаты', value: 'нет — адрес введён вручную' },
     ]);
     const shipped = getDeliveryDetails(createOrderFixture({ trackingNumber: 'CDEK1' }));
     expect(shipped.at(-1)).toMatchObject({ label: 'Трек-номер', value: 'CDEK1' });

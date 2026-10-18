@@ -71,7 +71,6 @@
   /* Сдвиг при появлении и сжатие при нажатии — едва заметные, только для подсказки движения */
   --motion-shift: 8px;
   --page-shift: 40px;
-  --tab-shift: 24px;
   --press-scale: 0.97;
 
   --transition-fast: var(--duration-fast) var(--ease-out);

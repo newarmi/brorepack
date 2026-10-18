@@ -18,3 +18,12 @@ export const DEV_USER_ID = import.meta.env.VITE_DEV_USER_ID ?? '1';
 
 /** Без VITE_BOT_URL «Поделиться превью» ведёт на адрес самого приложения */
 export const BOT_URL = import.meta.env.VITE_BOT_URL || window.location.origin;
+
+/**
+ * Геокодер Photon для подсказок адреса: публичный https://photon.komoot.io или свой экземпляр.
+ * Nominatim сюда нельзя: у него другой API, а публичный сервер запрещает автоподсказки.
+ * Пусто — подсказок нет, адрес вводится вручную.
+ */
+export const GEOCODER_URL = (import.meta.env.VITE_GEOCODER_URL ?? '').replace(/\/+$/, '');
+
+export const IS_ADDRESS_SEARCH_ENABLED = GEOCODER_URL !== '';

@@ -1,6 +1,8 @@
 import {
+  formatGeoPoint,
   formatOrderNumber,
   type DeliveryMethod,
+  type GeoPoint,
   type Order,
   type OrderStatus,
   type PlaqueSize,
@@ -54,6 +56,7 @@ export type ColumnKey =
   | 'deliveryMethod'
   | 'city'
   | 'address'
+  | 'location'
   | 'recipientName'
   | 'phone'
   | 'comment'
@@ -85,6 +88,7 @@ export const ORDER_COLUMNS: readonly ColumnDef[] = [
   { key: 'deliveryMethod', header: 'доставка', type: 'text', width: 100 },
   { key: 'city', header: 'город', type: 'text', width: 130 },
   { key: 'address', header: 'адрес', type: 'text', width: 260 },
+  { key: 'location', header: 'координаты', type: 'text', width: 170 },
   { key: 'recipientName', header: 'получатель', type: 'text', width: 170 },
   { key: 'phone', header: 'телефон', type: 'text', width: 140 },
   { key: 'comment', header: 'комментарий', type: 'text', width: 260 },
@@ -149,6 +153,13 @@ function decodeBoolean(value: SheetValue): boolean {
   return ['да', 'true', '1', 'yes'].includes(decodeText(value).trim().toLowerCase())
 }
 
+/** «55.760900, 37.608700» → точка; пусто или мусор → null (адрес введён вручную) */
+function decodeGeoPoint(value: SheetValue): GeoPoint | null {
+  const [lat, lon] = decodeText(value).split(',').map((part) => Number(part.trim()))
+  if (lat === undefined || lon === undefined || !Number.isFinite(lat) || !Number.isFinite(lon)) return null
+  return { lat, lon }
+}
+
 function decodePriceLines(value: SheetValue): PriceLine[] {
   try {
     const parsed: unknown = JSON.parse(decodeText(value) || '[]')
@@ -181,6 +192,7 @@ export function orderToCells({ order, telegramChargeId, providerChargeId }: Stor
     deliveryMethod: order.delivery.method,
     city: encodeText(order.delivery.city),
     address: encodeText(order.delivery.address),
+    location: order.delivery.location ? formatGeoPoint(order.delivery.location) : '',
     recipientName: encodeText(order.recipient.name),
     phone: encodeText(order.recipient.phone),
     comment: encodeText(order.comment),
@@ -216,6 +228,7 @@ export function cellsToOrder(read: (key: ColumnKey) => SheetValue): StoredOrder 
       method: decodeText(read('deliveryMethod')).trim() as DeliveryMethod,
       city: decodeText(read('city')),
       address: decodeText(read('address')),
+      location: decodeGeoPoint(read('location')),
     },
     recipient: {
       name: decodeText(read('recipientName')),

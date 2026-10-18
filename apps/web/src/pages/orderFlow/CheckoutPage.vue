@@ -6,9 +6,8 @@
 
     <DeliveryFields
       v-model:method="draft.delivery.method"
-      v-model:city="draft.delivery.city"
-      v-model:address="draft.delivery.address"
-      :cityError="validation.errorFor('delivery.city')"
+      v-model:address="draft.deliveryAddress"
+      v-model:manual="draft.delivery.isManualAddress"
       :addressError="validation.errorFor('delivery.address')"
       @blur="validation.touch(`delivery.${$event}`)"
     />

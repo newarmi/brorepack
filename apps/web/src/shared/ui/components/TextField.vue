@@ -9,45 +9,52 @@
     >
       {{ props.label }}
     </label>
-    <div class="text-field__box">
-      <slot name="prefix" />
-      <textarea
-        v-if="props.multiline"
-        :id="inputId"
-        v-model="model"
-        class="text-field__control"
-        :name="props.name"
-        :rows="props.rows"
-        :maxlength="props.maxlength"
-        :placeholder="props.placeholder"
-        :aria-invalid="props.error ? 'true' : undefined"
-        :aria-describedby="describedBy"
-        @blur="emits('blur')"
-      />
-      <input
-        v-else
-        :id="inputId"
-        v-model="model"
-        class="text-field__control"
-        :name="props.name"
-        :type="props.type"
-        :inputmode="props.inputmode"
-        :autocomplete="props.autocomplete"
-        :enterkeyhint="props.enterkeyhint"
-        :autocapitalize="props.autocapitalize"
-        :maxlength="props.maxlength"
-        :placeholder="props.placeholder"
-        :aria-invalid="props.error ? 'true' : undefined"
-        :aria-describedby="describedBy"
-        spellcheck="false"
-        @blur="emits('blur')"
-      />
-      <span v-if="isCounterVisible" class="text-field__counter mono" aria-hidden="true">{{
-        counterText
-      }}</span>
-      <slot name="suffix" />
+    <!-- Якорь для выпадающего списка: он открывается прямо под рамкой поля, поверх подсказки -->
+    <div class="text-field__anchor">
+      <div class="text-field__box">
+        <slot name="prefix" />
+        <textarea
+          v-if="props.multiline"
+          :id="inputId"
+          v-model="model"
+          class="text-field__control"
+          :name="props.name"
+          :rows="props.rows"
+          :maxlength="props.maxlength"
+          :placeholder="props.placeholder"
+          :aria-invalid="props.error ? 'true' : undefined"
+          :aria-describedby="describedBy"
+          @blur="emits('blur')"
+        />
+        <input
+          v-else
+          :id="inputId"
+          v-model="model"
+          class="text-field__control"
+          :name="props.name"
+          :type="props.type"
+          :inputmode="props.inputmode"
+          :autocomplete="props.autocomplete"
+          :enterkeyhint="props.enterkeyhint"
+          :autocapitalize="props.autocapitalize"
+          :maxlength="props.maxlength"
+          :placeholder="props.placeholder"
+          :aria-invalid="props.error ? 'true' : undefined"
+          :aria-describedby="describedBy"
+          spellcheck="false"
+          v-bind="props.inputAttrs"
+          @blur="emits('blur')"
+        />
+        <span v-if="isCounterVisible" class="text-field__counter mono" aria-hidden="true">{{
+          counterText
+        }}</span>
+        <slot name="suffix" />
+      </div>
+      <slot name="dropdown" />
     </div>
-    <p v-if="props.error" :id="errorId" class="text-field__error appear" role="alert">{{ props.error }}</p>
+    <p v-if="props.error" :id="errorId" class="text-field__error appear" role="alert">
+      {{ props.error }}
+    </p>
     <p v-if="props.hint" :id="hintId" class="text-field__hint">{{ props.hint }}</p>
   </div>
 </template>
@@ -76,6 +83,8 @@ const props = withDefaults(
     multiline?: boolean;
     rows?: number;
     name?: string;
+    /** Дополнительные атрибуты и обработчики для <input>: например, ARIA combobox и onKeydown */
+    inputAttrs?: Record<string, unknown>;
   }>(),
   {
     hideLabel: false,
@@ -92,6 +101,7 @@ const props = withDefaults(
     multiline: false,
     rows: 3,
     name: undefined,
+    inputAttrs: undefined,
   },
 );
 defineSlots<{
@@ -99,6 +109,8 @@ defineSlots<{
   prefix?: () => unknown;
   /** Кнопка или подпись справа от поля */
   suffix?: () => unknown;
+  /** Выпадающий список под полем: позиционируется абсолютно относительно рамки */
+  dropdown?: () => unknown;
 }>();
 
 const inputId = `field-${useId()}`;
@@ -117,6 +129,10 @@ const counterText = computed(() => `${model.value.length}/${props.maxlength}`);
 <style scoped>
 .text-field__label {
   display: block;
+}
+
+.text-field__anchor {
+  position: relative;
 }
 
 .text-field__box {

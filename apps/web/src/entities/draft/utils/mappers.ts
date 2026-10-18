@@ -1,4 +1,9 @@
-import type { CreateOrderInput, PlaqueDesign, PriceBreakdown } from '@brorepack/shared';
+import type {
+  CreateOrderInput,
+  DeliveryAddress,
+  PlaqueDesign,
+  PriceBreakdown,
+} from '@brorepack/shared';
 import { calcPrice, DEFAULT_SIZE, getDefaultCaption } from '@brorepack/shared';
 
 import { CUSTOM_TEMPLATE_ID } from '@/entities/plaque';
@@ -19,6 +24,11 @@ export const buildDraftDesign = (state: DraftState): PlaqueDesign => {
   };
 };
 
+/** Адрес, город и координаты из черновика — то, что выбирают в поле адреса */
+export const pickDeliveryAddress = (delivery: DraftState['delivery']): DeliveryAddress => {
+  return { address: delivery.address, city: delivery.city, location: delivery.location };
+};
+
 /** Тело POST /api/orders; валидируется createOrderInputSchema на экране оформления */
 export const buildOrderInput = (state: DraftState): CreateOrderInput => {
   const comment = state.comment.trim();
@@ -31,7 +41,8 @@ export const buildOrderInput = (state: DraftState): CreateOrderInput => {
       displayName: state.displayName,
     },
     extras: { lightStand: state.lightStand },
-    delivery: { ...state.delivery },
+    // Флаг ручного ввода — только для интерфейса: на бэкенде ручной адрес виден по location = null
+    delivery: { method: state.delivery.method, ...pickDeliveryAddress(state.delivery) },
     recipient: { ...state.recipient },
     comment: isCustomDesign && comment ? comment : undefined,
   };

@@ -1,5 +1,11 @@
 import type { Order } from '@brorepack/shared';
-import { getDeliveryMethod, getSize, getTemplate, LIGHT_STAND } from '@brorepack/shared';
+import {
+  formatGeoPoint,
+  getDeliveryMethod,
+  getSize,
+  getTemplate,
+  LIGHT_STAND,
+} from '@brorepack/shared';
 
 import { formatDateTime } from '@/shared/lib';
 
@@ -31,12 +37,19 @@ export const getRecipientDetails = (order: Order): DetailsItem[] => {
 };
 
 export const getDeliveryDetails = (order: Order): DetailsItem[] => {
-  const method = getDeliveryMethod(order.delivery.method);
-  const items: DetailsItem[] = [
-    { label: 'Способ', value: `${method.label} · ${method.eta}` },
-    { label: 'Город', value: order.delivery.city, selectable: true },
-    { label: 'Адрес', value: order.delivery.address, selectable: true },
-  ];
+  const { delivery } = order;
+  const method = getDeliveryMethod(delivery.method);
+  const items: DetailsItem[] = [{ label: 'Способ', value: `${method.label} · ${method.eta}` }];
+  // У адреса, введённого вручную, города нет
+  if (delivery.city) {
+    items.push({ label: 'Город', value: delivery.city, selectable: true });
+  }
+  items.push(
+    { label: 'Адрес', value: delivery.address, selectable: true },
+    delivery.location
+      ? { label: 'Координаты', value: formatGeoPoint(delivery.location), selectable: true }
+      : { label: 'Координаты', value: 'нет — адрес введён вручную' },
+  );
   if (order.trackingNumber) {
     items.push({ label: 'Трек-номер', value: order.trackingNumber, selectable: true });
   }

@@ -22,6 +22,7 @@ import { computed } from 'vue';
 export type IconName =
   | 'search'
   | 'chevron-left'
+  | 'chevron-down'
   | 'chevron-right'
   | 'check'
   | 'share'
@@ -44,6 +45,7 @@ const props = withDefaults(defineProps<{ name: IconName; size?: number }>(), { s
 const PATHS: Record<IconName, string> = {
   search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm9 16-3.6-3.6',
   'chevron-left': 'M15 5l-7 7 7 7',
+  'chevron-down': 'M5 9l7 7 7-7',
   'chevron-right': 'M9 5l7 7-7 7',
   check: 'M5 12.5l4.5 4.5L19 7.5',
   share: 'M12 15V4m0 0L8 8m4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5',

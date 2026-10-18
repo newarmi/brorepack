@@ -48,10 +48,24 @@ export interface OrderExtras {
   lightStand: boolean
 }
 
-export interface OrderDelivery {
-  method: DeliveryMethod
+/** Точка на карте из геокодера, градусы WGS 84 */
+export interface GeoPoint {
+  lat: number
+  lon: number
+}
+
+/**
+ * Адрес доставки. Выбран из подсказок геокодера — address полный, есть город и координаты.
+ * Введён вручную — только address как написал клиент: город пустой, location = null.
+ */
+export interface DeliveryAddress {
   city: string
   address: string
+  location: GeoPoint | null
+}
+
+export interface OrderDelivery extends DeliveryAddress {
+  method: DeliveryMethod
 }
 
 export interface OrderRecipient {

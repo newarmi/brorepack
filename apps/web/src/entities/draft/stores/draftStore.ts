@@ -1,10 +1,15 @@
 import { computed, reactive, toRefs, watch } from 'vue';
 import { defineStore } from 'pinia';
 
-import type { FaceitProfile } from '@brorepack/shared';
+import type { DeliveryAddress, FaceitProfile } from '@brorepack/shared';
 
 import type { DraftState } from '../types/draft';
-import { buildDraftDesign, buildOrderInput, calcDraftPrice } from '../utils/mappers';
+import {
+  buildDraftDesign,
+  buildOrderInput,
+  calcDraftPrice,
+  pickDeliveryAddress,
+} from '../utils/mappers';
 import { getDefaultDraftState, readDraftState, writeDraftState } from '../utils/storage';
 import { useCustomImageStore } from './customImageStore';
 
@@ -20,6 +25,12 @@ export const useDraftStore = defineStore('draft', () => {
   /** Плашка с допами, без доставки — для экрана конструктора */
   const plaquePrice = computed(() => calcDraftPrice(state, false));
   const orderPrice = computed(() => calcDraftPrice(state, true));
+
+  /** Адрес, город и координаты меняются только вместе — чтобы не уйти на бэкенд вразнобой */
+  const deliveryAddress = computed<DeliveryAddress>({
+    get: () => pickDeliveryAddress(state.delivery),
+    set: (value) => Object.assign(state.delivery, value),
+  });
 
   const orderSignature = computed(() => JSON.stringify(orderInput.value));
 
@@ -60,6 +71,7 @@ export const useDraftStore = defineStore('draft', () => {
     plaquePrice,
     orderPrice,
     orderInput,
+    deliveryAddress,
     pendingOrderId,
     setProfile,
     rememberPendingOrder,

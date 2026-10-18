@@ -235,7 +235,12 @@ export function orderInput(overrides: Record<string, unknown> = {}) {
     nickname: 'goodlifeee',
     design: { templateId: 'graphite', size: 'A5', displayName: 'Леха Гей', caption: 'for reaching 9 lvl 1809 elo' },
     extras: { lightStand: true },
-    delivery: { method: 'cdek_pvz', city: 'Москва', address: 'ул. Тверская, 1' },
+    delivery: {
+      method: 'cdek_pvz',
+      city: 'Москва',
+      address: '1, Тверская улица, Москва, Россия',
+      location: { lat: 55.7576, lon: 37.6136 },
+    },
     recipient: { name: 'Алексей', phone: '+7 999 123-45-67' },
     comment: '',
     ...overrides,

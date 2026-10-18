@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly VITE_API_TRANSPORT?: 'rest' | 'gas';
   /** Адрес веб-приложения Apps Script (…/exec), нужен при VITE_API_TRANSPORT=gas */
   readonly VITE_GAS_URL?: string;
+  /** Базовый URL геокодера Photon для подсказок адреса, например https://photon.komoot.io; пусто — ручной ввод */
+  readonly VITE_GEOCODER_URL?: string;
 }
 
 interface ImportMeta {

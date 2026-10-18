@@ -8,6 +8,8 @@ export const TEMPLATE_IDS = ['graphite', 'dead_silence', 'blue_skin', 'bloodspor
 export const PLAQUE_SIZES = ['A5'] as const
 export const DELIVERY_METHOD_IDS = ['cdek_pvz', 'courier'] as const
 export const ORDER_STATUSES = ['awaiting_payment', 'paid', 'printing', 'shipped', 'delivered', 'cancelled'] as const
+// Полный адрес из геокодера бывает длиннее 200 символов
+export const DELIVERY_ADDRESS_MAX = 300
 
 export const nicknameSchema = z
   .string()
@@ -39,8 +41,14 @@ export const createOrderInputSchema = z.object({
   }),
   delivery: z.object({
     method: z.enum(DELIVERY_METHOD_IDS),
-    city: z.string().trim().min(2, 'Укажи город').max(64),
-    address: z.string().trim().min(3, 'Укажи адрес или пункт выдачи').max(200),
+    // Город приходит из геокодера; при ручном вводе адреса он пустой
+    city: z.string().trim().max(64),
+    address: z.string().trim().min(3, 'Укажи адрес или пункт выдачи').max(DELIVERY_ADDRESS_MAX),
+    // null — адрес введён вручную; optional — для клиентов, открытых до появления координат
+    location: z
+      .object({ lat: z.number().min(-90).max(90), lon: z.number().min(-180).max(180) })
+      .nullable()
+      .optional(),
   }),
   recipient: z.object({
     name: z.string().trim().min(2, 'Укажи имя получателя').max(80),

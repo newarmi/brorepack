@@ -21,11 +21,11 @@ describe('setup()', () => {
 
     const sheet = ordersSheet()
     const headers = sheet.dump()[0] as string[]
-    assert.equal(headers.length, 29)
-    assert.ok(sheet.getMaxColumns() >= 29, 'столбцы добавлены сверх стандартных 26')
+    assert.equal(headers.length, 30)
+    assert.ok(sheet.getMaxColumns() >= 30, 'столбцы добавлены сверх стандартных 26')
     assert.equal(sheet.frozenRows, 1)
     assert.ok(sheet.styles.some((style) => style.row === 1 && style.style === 'fontWeight' && style.value === 'bold'))
-    assert.equal(sheet.columnWidths.size, 29)
+    assert.equal(sheet.columnWidths.size, 30)
 
     const statusColumn = headers.indexOf('статус') + 1
     const statusRule = sheet.validations.find((validation) => validation.column === statusColumn)

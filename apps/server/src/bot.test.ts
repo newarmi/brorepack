@@ -29,7 +29,12 @@ const order: Order = {
   faceitNickname: 'goodlifeee',
   design: { templateId: 'graphite', size: 'A5', displayName: 'Леха <Гей>', caption: 'for reaching 9 lvl 1809 elo', level: 9, elo: 1809 },
   extras: { lightStand: true },
-  delivery: { method: 'cdek_pvz', city: 'Москва', address: 'ул. Тверская, 1' },
+  delivery: {
+    method: 'cdek_pvz',
+    city: 'Москва',
+    address: '1, Тверская улица, Москва, Россия',
+    location: { lat: 55.7576, lon: 37.6136 },
+  },
   recipient: { name: 'Алексей', phone: '+79991234567' },
   price: {
     lines: [
@@ -176,6 +181,16 @@ describe('бот', () => {
     const summary = formatAdminSummary(order)
     assert.match(summary, /Леха &lt;Гей&gt;/)
     assert.match(summary, /Телефон: \+79991234567/)
+  })
+
+  it('сводка для админа: полный адрес без повтора города и координаты', () => {
+    const summary = formatAdminSummary(order)
+    assert.match(summary, /Доставка: Пункт СДЭК, 1, Тверская улица, Москва, Россия\n/)
+    assert.match(summary, /Координаты: 55\.757600, 37\.613600/)
+
+    const manual = formatAdminSummary({ ...order, delivery: { method: 'courier', city: '', address: 'Казань, Баумана, 1', location: null } })
+    assert.match(manual, /Доставка: Курьер, Казань, Баумана, 1\n/)
+    assert.match(manual, /Координаты: нет — адрес введён вручную/)
   })
 })
 

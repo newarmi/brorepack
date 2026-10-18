@@ -35,7 +35,8 @@ export function mapOrder(row: OrderRow): Order {
     faceitNickname: row.faceitNickname,
     design: row.design as unknown as PlaqueDesign,
     extras: row.extras as unknown as OrderExtras,
-    delivery: row.delivery as unknown as OrderDelivery,
+    // У заказов до появления координат поля location в JSON нет
+    delivery: { location: null, ...(row.delivery as unknown as Partial<OrderDelivery>) } as OrderDelivery,
     recipient: row.recipient as unknown as OrderRecipient,
     price: row.price as unknown as PriceBreakdown,
     trackingNumber: row.trackingNumber,
@@ -89,7 +90,7 @@ export class OrderService {
       elo: profile.elo,
     }
     const extras: OrderExtras = { lightStand: input.extras.lightStand }
-    const delivery: OrderDelivery = { ...input.delivery }
+    const delivery: OrderDelivery = { ...input.delivery, location: input.delivery.location ?? null }
     const recipient: OrderRecipient = { ...input.recipient }
     const price = calcPrice({
       templateId: design.templateId,

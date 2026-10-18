@@ -30,7 +30,12 @@ export const createOrderFixture = (overrides: Partial<Order> = {}): Order => {
       elo: 1809,
     },
     extras: { lightStand: false },
-    delivery: { method: 'cdek_pvz', city: 'Москва', address: 'Тверская, 7' },
+    delivery: {
+      method: 'cdek_pvz',
+      city: 'Москва',
+      address: '7, Тверская улица, Москва, Россия',
+      location: { lat: 55.7609, lon: 37.6087 },
+    },
     recipient: { name: 'Иван Иванов', phone: '+79000000000' },
     price: { lines: [{ code: 'plaque', label: 'Плашка A5', amount: 2490 }], total: 2490 },
     trackingNumber: null,

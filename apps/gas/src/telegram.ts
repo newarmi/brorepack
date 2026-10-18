@@ -1,5 +1,7 @@
 import {
   LIGHT_STAND,
+  formatDeliveryAddress,
+  formatGeoPoint,
   formatPrice,
   getDeliveryMethod,
   getSize,
@@ -145,7 +147,8 @@ export function formatAdminSummary(order: Order): string {
     `FACEIT: ${escapeHtml(order.faceitNickname)} — ${design.level} lvl, ${design.elo} elo`,
     `${LIGHT_STAND.label}: ${order.extras.lightStand ? 'да' : 'нет'}`,
     '',
-    `Доставка: ${getDeliveryMethod(delivery.method).label}, ${escapeHtml(delivery.city)}, ${escapeHtml(delivery.address)}`,
+    `Доставка: ${getDeliveryMethod(delivery.method).label}, ${escapeHtml(formatDeliveryAddress(delivery))}`,
+    `Координаты: ${delivery.location ? formatGeoPoint(delivery.location) : 'нет — адрес введён вручную'}`,
     `Получатель: ${escapeHtml(recipient.name)}`,
     `Телефон: ${escapeHtml(recipient.phone)}`,
     `Клиент: ${escapeHtml(customerName)} (id <code>${customer.telegramId}</code>)`,

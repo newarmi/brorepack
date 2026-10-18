@@ -25,6 +25,7 @@ const EXPECTED_HEADERS = [
   'доставка',
   'город',
   'адрес',
+  'координаты',
   'получатель',
   'телефон',
   'комментарий',
@@ -237,6 +238,8 @@ describe('API: заказы', () => {
     assert.equal(row!['подсветка'], 'да')
     assert.equal(row!['Telegram id'], 7)
     assert.equal(row!['город'], 'Москва')
+    assert.equal(row!['координаты'], '55.757600, 37.613600')
+    assert.deepEqual(order.delivery.location, { lat: 55.7576, lon: 37.6136 })
     // Текстовые ячейки остаются текстом: телефон не стал числом, дата — датой, «=…» — формулой
     assert.equal(row!['телефон'], '+7 999 123-45-67')
     assert.equal(typeof row!['создан'], 'string')
@@ -276,6 +279,7 @@ describe('API: заказы', () => {
     assert.equal('telegramChargeId' in list.data[0]!, false)
 
     assert.equal(api<Order>('orders.get', { id: order.id }, 'dev:7').data.id, order.id)
+    assert.deepEqual(list.data[0]!.delivery.location, { lat: 55.7576, lon: 37.6136 })
     assert.equal(api<Order>('orders.get', { id: String(order.id) }, 'dev:7').data.id, order.id)
     assert.deepEqual(api('orders.get', { id: order.id }, 'dev:2'), { ok: false, status: 403, error: 'forbidden', message: 'Это не твой заказ' })
     assert.equal(api<Order>('orders.get', { id: order.id }, 'dev:1').data.id, order.id, 'админ видит любой заказ')
@@ -342,11 +346,21 @@ describe('API: заказы', () => {
     })
   })
 
+  it('адрес, введённый вручную: без города и координат, ячейка «координаты» пустая', () => {
+    const { api, ordersSheet } = createGas({ properties: DEV_PROPERTIES })
+    const delivery = { method: 'courier', city: '', address: 'Казань, Баумана, 1, кв. 5', location: null }
+    const { order } = api<CreateOrderResponse>('orders.create', orderInput({ delivery }), 'dev:7').data
+
+    assert.deepEqual(order.delivery, delivery)
+    assert.equal(ordersSheet().records()[0]!['координаты'], '')
+    assert.equal(api<Order>('orders.get', { id: order.id }, 'dev:7').data.delivery.location, null)
+  })
+
   it('validation_error с issues по полям', () => {
     const { api } = createGas({ properties: DEV_PROPERTIES })
     const result = api(
       'orders.create',
-      orderInput({ recipient: { name: 'Алексей', phone: '123' }, delivery: { method: 'cdek_pvz', city: 'М', address: 'ул. Тверская, 1' } }),
+      orderInput({ recipient: { name: 'Алексей', phone: '123' }, delivery: { method: 'cdek_pvz', city: '', address: 'ул', location: null } }),
       'dev:7',
     )
     assert.equal(result.ok, false)
@@ -354,10 +368,10 @@ describe('API: заказы', () => {
     assert.equal(result.error, 'validation_error')
     assert.deepEqual(
       result.issues?.map((issue) => issue.path).sort(),
-      ['delivery.city', 'recipient.phone'],
+      ['delivery.address', 'recipient.phone'],
     )
     assert.deepEqual(result.issues?.find((issue) => issue.path === 'recipient.phone')?.message, 'Проверь номер телефона')
-    assert.deepEqual(result.issues?.find((issue) => issue.path === 'delivery.city')?.message, 'Укажи город')
+    assert.deepEqual(result.issues?.find((issue) => issue.path === 'delivery.address')?.message, 'Укажи адрес или пункт выдачи')
     assert.equal(result.message, result.issues?.[0]?.message)
 
     assert.equal(api('orders.create', orderInput({ nickname: 'notfound' }), 'dev:7').error, 'player_not_found')

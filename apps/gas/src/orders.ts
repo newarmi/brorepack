@@ -83,7 +83,12 @@ export class OrderService {
           elo: profile.elo,
         },
         extras: { lightStand: input.extras.lightStand },
-        delivery: { method: input.delivery.method, city: input.delivery.city, address: input.delivery.address },
+        delivery: {
+          method: input.delivery.method,
+          city: input.delivery.city,
+          address: input.delivery.address,
+          location: input.delivery.location ?? null,
+        },
         recipient: { name: input.recipient.name, phone: input.recipient.phone },
         price,
         trackingNumber: null,

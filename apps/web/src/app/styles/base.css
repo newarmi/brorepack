@@ -205,39 +205,6 @@ a {
   opacity: 0;
 }
 
-/* Смена содержимого вкладки: уезжает в сторону, противоположную переключению, новое въезжает следом.
-   Уходящий блок снят из потока и лежит поверх нового — высота не скачет.
-   Родителю нужен position: relative */
-.tab-forward-enter-active,
-.tab-back-enter-active {
-  transition:
-    opacity var(--duration-slow) var(--ease-out),
-    transform var(--duration-slow) var(--ease-out);
-}
-
-.tab-forward-leave-active,
-.tab-back-leave-active {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  transition:
-    opacity var(--duration-fast) var(--ease-in),
-    transform var(--duration-fast) var(--ease-in);
-}
-
-.tab-forward-enter-from,
-.tab-back-leave-to {
-  opacity: 0;
-  transform: translateX(var(--tab-shift));
-}
-
-.tab-forward-leave-to,
-.tab-back-enter-from {
-  opacity: 0;
-  transform: translateX(calc(var(--tab-shift) * -1));
-}
-
 /* Смена значения на месте: цена, подпись строки. Старое гаснет, новое поднимается снизу */
 .value-enter-active {
   transition:
