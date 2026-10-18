@@ -9,7 +9,10 @@
     >
       <div class="plaque-stage__plaque">
         <span class="plaque-stage__glow" aria-hidden="true" />
-        <PlaquePreview :design="props.design" glow />
+        <!-- Ключ — шаблон: смена шаблона перекрёстно растворяет плашки, правка ника перерисовывает без анимации -->
+        <Transition name="plaque-swap">
+          <PlaquePreview :key="props.design.templateId" :design="props.design" glow />
+        </Transition>
         <span v-if="isCustom" class="plaque-stage__sketch">Эскиз · макет нарисует дизайнер</span>
       </div>
       <!-- Подставка всегда занимает место: при переключении меняется только прозрачность, без скачка -->
@@ -108,6 +111,30 @@ const sizeCaption = computed(() => {
 .plaque-stage__plaque {
   position: relative;
   width: calc(100% * 230 / 268);
+}
+
+.plaque-swap-enter-active,
+.plaque-swap-leave-active {
+  transition:
+    opacity 280ms ease,
+    transform 280ms ease;
+}
+
+/* Уходящая плашка ложится поверх новой, чтобы блок не вырастал вдвое на время перехода */
+.plaque-swap-leave-active {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.plaque-swap-enter-from {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+.plaque-swap-leave-to {
+  opacity: 0;
 }
 
 .plaque-stage__sketch {
