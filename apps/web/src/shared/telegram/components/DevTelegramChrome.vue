@@ -35,10 +35,8 @@
           class="dev-chrome__spinner spinner"
           aria-hidden="true"
         />
-        <!-- Текст меняется вместе с экраном: старый растворяется, новый проявляется -->
-        <Transition v-else name="dev-chrome-text" mode="out-in">
-          <span :key="mainButton.state.text">{{ mainButton.state.text }}</span>
-        </Transition>
+        <!-- Сменилась надпись — буквы «расшифровываются», сменилась сумма — цифры докручиваются -->
+        <GlitchText v-else :text="mainButton.state.text" />
         <span v-if="mainButton.state.loading" class="visually-hidden">{{
           mainButton.state.text
         }}</span>
@@ -49,6 +47,7 @@
 
 <script setup lang="ts">
 import AppIcon from '@/shared/ui/components/AppIcon.vue';
+import GlitchText from '@/shared/ui/components/GlitchText.vue';
 import { useToast } from '@/shared/ui/composables/useToast';
 
 import { useBackButtonStore } from '../stores/backButtonStore';
@@ -169,16 +168,6 @@ const closeHandler = (): void => {
 .dev-chrome-bottom-enter-from,
 .dev-chrome-bottom-leave-to {
   transform: translateY(100%);
-}
-
-.dev-chrome-text-enter-active,
-.dev-chrome-text-leave-active {
-  transition: opacity var(--duration-fast) var(--ease-out);
-}
-
-.dev-chrome-text-enter-from,
-.dev-chrome-text-leave-to {
-  opacity: 0;
 }
 
 /* Как нативная кнопка в неактивном состоянии: THEME_COLORS.disabled / disabledText */

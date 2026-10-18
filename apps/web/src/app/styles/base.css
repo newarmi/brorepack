@@ -205,26 +205,6 @@ a {
   opacity: 0;
 }
 
-/* Смена значения на месте: цена, подпись строки. Старое гаснет, новое поднимается снизу */
-.value-enter-active {
-  transition:
-    opacity var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out);
-}
-
-.value-leave-active {
-  transition: opacity var(--duration-fast) var(--ease-in);
-}
-
-.value-enter-from {
-  opacity: 0;
-  transform: translateY(var(--motion-shift));
-}
-
-.value-leave-to {
-  opacity: 0;
-}
-
 /* Отклик выбора: вкладка, чип или шаблон чуть «вдавливается» и встаёт на место. Без перелёта за 1 */
 @keyframes select-pop {
   40% {

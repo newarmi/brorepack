@@ -8,6 +8,7 @@ export { default as AppIcon } from './components/AppIcon.vue';
 export { default as AppToast } from './components/AppToast.vue';
 export { default as AsyncState } from './components/AsyncState.vue';
 export { default as BottomSheet } from './components/BottomSheet.vue';
+export { default as GlitchText } from './components/GlitchText.vue';
 export { default as SegmentedControl } from './components/SegmentedControl.vue';
 export { default as SkeletonBlock } from './components/SkeletonBlock.vue';
 export { default as StepProgress } from './components/StepProgress.vue';
