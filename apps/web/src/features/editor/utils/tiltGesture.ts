@@ -18,6 +18,9 @@ export const bindTiltGesture = (element: HTMLElement, settings: TiltOptions): ((
     if (activePointerId !== null || !event.isPrimary || event.button !== 0) {
       return;
     }
+    // Safari и Telegram Desktop (WebKit) иначе начинают выделять текст под плашкой или тащить картинку,
+    // хотя у плашки user-select: none. Прокрутку это не трогает — её на плашке отключает touch-action
+    event.preventDefault();
     activePointerId = event.pointerId;
     startX = event.clientX;
     startY = event.clientY;

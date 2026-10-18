@@ -93,6 +93,8 @@ export const bindImageGesture = (
     if (event.pointerType === 'mouse' && event.button !== 0) {
       return;
     }
+    // WebKit иначе начинает выделение текста или перетаскивание картинки мышью
+    event.preventDefault();
     // Захват: палец может уйти за край плашки, а жест продолжится
     element.setPointerCapture(event.pointerId);
     pointers.set(event.pointerId, toPlaquePoint(options.frame, event));
