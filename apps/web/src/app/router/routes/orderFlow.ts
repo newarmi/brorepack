@@ -11,7 +11,7 @@ const getConstructorBack = () => {
     : { name: ROUTE_NAMES.start };
 };
 
-/** Путь клиента к заказу: дизайн → ник → профиль FACEIT → конструктор → оформление */
+/** Путь клиента к заказу: дизайн → ник → профиль FACEIT → конструктор (→ своя картинка) → оформление */
 export const orderFlowRoutes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -36,6 +36,12 @@ export const orderFlowRoutes: RouteRecordRaw[] = [
     name: ROUTE_NAMES.constructor,
     component: () => import('@/pages/orderFlow/ConstructorPage.vue'),
     meta: { requiresProfile: true, back: getConstructorBack },
+  },
+  {
+    path: '/constructor/image',
+    name: ROUTE_NAMES.imageEditor,
+    component: () => import('@/pages/orderFlow/ImageEditorPage.vue'),
+    meta: { requiresProfile: true, back: () => ({ name: ROUTE_NAMES.constructor }) },
   },
   {
     path: '/checkout',

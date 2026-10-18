@@ -31,7 +31,12 @@ export type IconName =
   | 'send'
   | 'phone'
   | 'refresh'
-  | 'box';
+  | 'box'
+  | 'image'
+  | 'target'
+  | 'trash'
+  | 'move'
+  | 'undo';
 
 const props = withDefaults(defineProps<{ name: IconName; size?: number }>(), { size: 20 });
 
@@ -50,6 +55,11 @@ const PATHS: Record<IconName, string> = {
     'M6 3h3l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2Z',
   refresh: 'M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7',
   box: 'M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Zm0 0L12 12m0 0 9-4.5M12 12v9',
+  image: 'M4 5h16v14H4V5Zm0 11 5-5 5 5m-2-2 3-3 5 5M15 9h.01',
+  target: 'M12 3v4m0 10v4M3 12h4m10 0h4m-9-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z',
+  trash: 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6m4-6v6',
+  move: 'M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3',
+  undo: 'M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3',
 };
 
 const path = computed(() => PATHS[props.name]);

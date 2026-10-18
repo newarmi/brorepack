@@ -3,10 +3,13 @@ import { DELIVERY_METHOD_IDS, normalizeTemplateId } from '@brorepack/shared';
 import { DELIVERY_METHOD } from '@/entities/order';
 import { isOneOf } from '@/shared/lib';
 
+import type { CustomImagePlacement } from '../types/customImage';
 import type { DraftState } from '../types/draft';
 
 // v2: формат только A5, подпись с рейтингом больше не редактируется — старые черновики не подхватываем
 const STORAGE_KEY = 'brorepack:draft:v2';
+// Положение своей картинки — отдельно: жест пишет его каждый кадр, весь черновик сериализовать незачем
+const IMAGE_PLACEMENT_KEY = 'brorepack:custom-image:v1';
 
 export const getDefaultDraftState = (): DraftState => {
   return {
@@ -53,5 +56,26 @@ export const writeDraftState = (state: DraftState): void => {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
     // sessionStorage может быть недоступен (приватный режим) — черновик просто не переживёт перезагрузку
+  }
+};
+
+export const readImagePlacement = (): CustomImagePlacement | null => {
+  try {
+    const raw = sessionStorage.getItem(IMAGE_PLACEMENT_KEY);
+    return raw ? (JSON.parse(raw) as CustomImagePlacement) : null;
+  } catch {
+    return null;
+  }
+};
+
+export const writeImagePlacement = (placement: CustomImagePlacement | null): void => {
+  try {
+    if (placement) {
+      sessionStorage.setItem(IMAGE_PLACEMENT_KEY, JSON.stringify(placement));
+      return;
+    }
+    sessionStorage.removeItem(IMAGE_PLACEMENT_KEY);
+  } catch {
+    // sessionStorage недоступен — положение не переживёт перезагрузку
   }
 };

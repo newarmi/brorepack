@@ -3,6 +3,7 @@
  */
 
 export { default as AppButton } from './components/AppButton.vue';
+export type { IconName } from './components/AppIcon.vue';
 export { default as AppIcon } from './components/AppIcon.vue';
 export { default as AppToast } from './components/AppToast.vue';
 export { default as AsyncState } from './components/AsyncState.vue';

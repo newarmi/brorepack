@@ -6,6 +6,7 @@ import type { FaceitProfile } from '@brorepack/shared';
 import type { DraftState } from '../types/draft';
 import { buildDraftDesign, buildOrderInput, calcDraftPrice } from '../utils/mappers';
 import { getDefaultDraftState, readDraftState, writeDraftState } from '../utils/storage';
+import { useCustomImageStore } from './customImageStore';
 
 export const useDraftStore = defineStore('draft', () => {
   const state = reactive<DraftState>(readDraftState());
@@ -48,6 +49,7 @@ export const useDraftStore = defineStore('draft', () => {
   };
 
   const reset = (): void => {
+    useCustomImageStore().removeImage();
     Object.assign(state, getDefaultDraftState());
   };
 

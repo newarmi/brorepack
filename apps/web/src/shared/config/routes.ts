@@ -4,6 +4,7 @@ export const ROUTE_NAMES = {
   nickname: 'nickname',
   profile: 'profile',
   constructor: 'constructor',
+  imageEditor: 'image-editor',
   checkout: 'checkout',
   orders: 'orders',
   order: 'order',

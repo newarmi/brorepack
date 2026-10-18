@@ -35,8 +35,11 @@ const appClasses = computed(() => ({
 </script>
 
 <style scoped>
+/* Отступы контента — переменными: их же берут экраны на весь вьюпорт (ImageEditorPage) */
 .app {
   --toast-offset: 16px;
+  --content-top: calc(16px + var(--safe-top) + var(--content-safe-top));
+  --content-bottom: calc(24px + var(--safe-bottom));
 
   min-height: var(--viewport-height);
   overflow-x: clip;
@@ -46,20 +49,16 @@ const appClasses = computed(() => ({
   width: 100%;
   max-width: 560px;
   margin: 0 auto;
-  padding: calc(16px + var(--safe-top) + var(--content-safe-top))
-    calc(var(--screen-padding) + var(--safe-right)) calc(24px + var(--safe-bottom))
+  padding: var(--content-top) calc(var(--screen-padding) + var(--safe-right)) var(--content-bottom)
     calc(var(--screen-padding) + var(--safe-left));
 }
 
-.app--dev .app__content {
-  padding-top: calc(var(--dev-header-height) + var(--safe-top) + 16px);
+.app--dev {
+  --content-top: calc(var(--dev-header-height) + var(--safe-top) + 16px);
 }
 
 .app--dev-main-button {
   --toast-offset: calc(var(--main-button-height) + 28px);
-}
-
-.app--dev-main-button .app__content {
-  padding-bottom: calc(var(--main-button-height) + 40px + var(--safe-bottom));
+  --content-bottom: calc(var(--main-button-height) + 40px + var(--safe-bottom));
 }
 </style>

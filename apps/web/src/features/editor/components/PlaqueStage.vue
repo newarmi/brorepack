@@ -11,9 +11,16 @@
         <span class="plaque-stage__glow" aria-hidden="true" />
         <!-- Ключ — шаблон: смена шаблона перекрёстно растворяет плашки, правка ника перерисовывает без анимации -->
         <Transition name="plaque-swap">
-          <PlaquePreview :key="props.design.templateId" :design="props.design" glow />
+          <PlaquePreview
+            :key="props.design.templateId"
+            :design="props.design"
+            :image="props.image"
+            glow
+          />
         </Transition>
-        <span v-if="isCustom" class="plaque-stage__sketch">Эскиз · макет нарисует дизайнер</span>
+        <span v-if="isCustom && !props.image" class="plaque-stage__sketch">
+          Эскиз · макет нарисует дизайнер
+        </span>
       </div>
       <!-- Подставка всегда занимает место: при переключении меняется только прозрачность, без скачка -->
       <PlaqueStand :isLit="props.lightStand" />
@@ -32,7 +39,7 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue';
 
-import type { PlaqueDesign } from '@brorepack/shared';
+import type { PlaqueDesign, PlaqueImage } from '@brorepack/shared';
 import { getSize } from '@brorepack/shared';
 
 import { CUSTOM_TEMPLATE_ID, PlaquePreview } from '@/entities/plaque';
@@ -48,8 +55,10 @@ const props = withDefaults(
     lightStand?: boolean;
     /** Уровень и ELO уже из FACEIT — показываем, что их не поменять */
     isRatingVisible?: boolean;
+    /** Картинка клиента поверх фона; двигают её на отдельном экране — ImageEditorStage */
+    image?: PlaqueImage | null;
   }>(),
-  { lightStand: false, isRatingVisible: false },
+  { lightStand: false, isRatingVisible: false, image: null },
 );
 
 const product = useTemplateRef<HTMLElement>('product');

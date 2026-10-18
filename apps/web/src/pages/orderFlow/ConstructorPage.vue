@@ -4,9 +4,16 @@
 
     <MockDataNotice v-if="isMockProfile" />
 
-    <PlaqueStage :design="draft.design" :lightStand="draft.lightStand" isRatingVisible />
+    <PlaqueStage
+      :design="draft.design"
+      :lightStand="draft.lightStand"
+      :image="isCustomTemplate ? customImage.image : null"
+      isRatingVisible
+    />
 
     <TemplatePicker v-model="draft.templateId" :design="draft.design" />
+
+    <CustomImageCard v-if="isCustomTemplate" class="appear" />
 
     <TextField
       v-if="isCustomTemplate"
@@ -39,10 +46,16 @@ import { useRouter } from 'vue-router';
 
 import { DISPLAY_NAME_MAX, formatPrice, getTemplate } from '@brorepack/shared';
 
-import { ORDER_FLOW_STEP, ORDER_FLOW_STEPS, useDraftStore } from '@/entities/draft';
+import {
+  ORDER_FLOW_STEP,
+  ORDER_FLOW_STEPS,
+  useCustomImageStore,
+  useDraftStore,
+} from '@/entities/draft';
 import { CUSTOM_TEMPLATE_ID } from '@/entities/plaque';
 import { MockDataNotice } from '@/entities/player';
 import {
+  CustomImageCard,
   LightStandRow,
   PlaqueStage,
   TemplatePicker,
@@ -55,6 +68,7 @@ import { StepProgress, TextField } from '@/shared/ui';
 const router = useRouter();
 const telegram = useTelegram();
 const draft = useDraftStore();
+const customImage = useCustomImageStore();
 const { isDesignValid, displayNameError } = useDesignValidation();
 
 const customTemplateHint = getTemplate(CUSTOM_TEMPLATE_ID).description;
