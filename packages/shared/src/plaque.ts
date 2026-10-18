@@ -141,11 +141,22 @@ function renderArt(art: PlaqueArt | undefined): string {
   return `<image href="${escapeXml(art.href)}" width="${PLAQUE_VIEWBOX.width}" height="${PLAQUE_VIEWBOX.height}"/>`
 }
 
-function renderImage(image: PlaqueImage): string {
-  const { href, width, height, x, y, scale, rotation } = image
+/** SVG transform картинки клиента: центр → поворот → масштаб. Тот же, что в файле для печати */
+export function formatPlaqueImageTransform(transform: PlaqueImageTransform): string {
+  const { x, y, scale, rotation } = transform
+  return `translate(${round(x)} ${round(y)}) rotate(${round(rotation)}) scale(${scale})`
+}
+
+/** id группы с картинкой клиента: превью двигает её, меняя только transform, без пересборки SVG */
+export function getPlaqueImageId(idPrefix: string): string {
+  return `${idPrefix}-image`
+}
+
+function renderImage(image: PlaqueImage, idPrefix: string): string {
+  const { href, width, height } = image
   // Картинка стоит центром в начале координат, поэтому поворот и масштаб идут вокруг её центра
   return [
-    `<g transform="translate(${round(x)} ${round(y)}) rotate(${round(rotation)}) scale(${scale})">`,
+    `<g id="${getPlaqueImageId(idPrefix)}" transform="${formatPlaqueImageTransform(image)}">`,
     `<image href="${escapeXml(href)}" x="${-width / 2}" y="${-height / 2}" width="${width}" height="${height}"/>`,
     '</g>',
   ].join('')
@@ -207,7 +218,7 @@ export function renderPlaqueSvg(design: PlaqueDesign, options: RenderPlaqueOptio
     `<rect width="${w}" height="${h}" fill="${getTemplate(design.templateId).baseColor}"/>`,
     `<g transform="${ART_TRANSFORM}">${renderArt(art)}</g>`,
     // Картинка клиента — между фоном и всем, что должно остаться читаемым: знаком FACEIT, кольцом, ником
-    image ? renderImage(image) : '',
+    image ? renderImage(image, idPrefix) : '',
     `<g transform="${ART_TRANSFORM}">`,
     image ? renderArt(frontArt) : '',
     renderPlayerLayer(design),

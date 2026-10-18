@@ -27,7 +27,7 @@
 import { computed, useTemplateRef } from 'vue';
 
 import type { PlaqueDesign, PlaqueImage, PlaqueImageTransform } from '@brorepack/shared';
-import { PLAQUE_VIEWBOX } from '@brorepack/shared';
+import { formatPlaqueImageTransform, PLAQUE_VIEWBOX } from '@brorepack/shared';
 
 import { PlaquePreview } from '@/entities/plaque';
 
@@ -54,8 +54,7 @@ const imageTransform = computed(() => {
   if (!props.image) {
     return '';
   }
-  const { x, y, rotation, scale } = props.image;
-  return `translate(${x} ${y}) rotate(${rotation}) scale(${scale})`;
+  return formatPlaqueImageTransform(props.image);
 });
 </script>
 
