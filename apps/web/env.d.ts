@@ -13,6 +13,9 @@ interface ImportMetaEnv {
   readonly VITE_GEOCODER_URL?: string;
 }
 
+/** Номер сборки фронта, подставляет vite.config.ts (define) */
+declare const __BUILD_ID__: string;
+
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }

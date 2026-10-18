@@ -64,6 +64,8 @@ export const restrictedSyntaxExceptions = [
     allow: ['fetch'],
   },
   { files: ['src/entities/draft/utils/storage.ts'], allow: ['storage'] },
+  // Проверка свежей сборки: version.json — статический файл, а номер перезагрузки — не черновик
+  { files: ['src/app/update/reloadIfOutdated.ts'], allow: ['fetch', 'storage'] },
   {
     files: ['src/**/*.test.ts', 'src/shared/testing/**'],
     allow: ['storage', 'telegram', 'domainLiteral', 'fetch'],

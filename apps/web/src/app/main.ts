@@ -12,6 +12,12 @@ import { useToast } from '@/shared/ui';
 import App from './App.vue';
 import { router } from './router';
 import { goBack } from './router/navigation/goBack';
+import { reloadIfOutdated } from './update/reloadIfOutdated';
+
+// Старая копия из кэша Telegram: обновляемся сразу при запуске. Ошибка загрузки экрана (чанк старой
+// сборки уже удалён с сервера) — тот же случай
+void reloadIfOutdated();
+window.addEventListener('vite:preloadError', () => void reloadIfOutdated());
 
 const app = createApp(App);
 app.use(createPinia());
