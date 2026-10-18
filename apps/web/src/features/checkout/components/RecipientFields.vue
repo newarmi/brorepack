@@ -20,6 +20,7 @@
       inputmode="tel"
       autocomplete="tel"
       placeholder="+7 (___) ___-__-__"
+      :inputAttrs="phoneMask"
       :maxlength="24"
       :error="props.phoneError"
       @blur="emits('blur', 'phone')"
@@ -39,7 +40,9 @@
 </template>
 
 <script setup lang="ts">
-import { TextField } from '@/shared/ui';
+import { TextField, useInputMask } from '@/shared/ui';
+
+import { formatPhone } from '../utils/phoneMask';
 
 const emits = defineEmits<{ blur: [field: 'name' | 'phone']; requestPhone: [] }>();
 const name = defineModel<string>('name', { required: true });
@@ -50,6 +53,10 @@ const props = defineProps<{
   phoneError: string | null;
   isPhoneRequesting: boolean;
 }>();
+
+const phoneMask = useInputMask(formatPhone, (value) => {
+  phone.value = value;
+});
 </script>
 
 <style scoped>

@@ -3,6 +3,8 @@ import { shallowRef } from 'vue';
 import { useTelegram } from '@/shared/telegram';
 import { useToast } from '@/shared/ui';
 
+import { formatPhone } from '../utils/phoneMask';
+
 /** Телефон получателя из Telegram в один тап */
 export const usePhoneFromTelegram = (onPhoneReceived: (phone: string) => void) => {
   const telegram = useTelegram();
@@ -18,7 +20,8 @@ export const usePhoneFromTelegram = (onPhoneReceived: (phone: string) => void) =
         showToast('Номер не получили — введи его вручную');
         return;
       }
-      onPhoneReceived(phone);
+      // Telegram отдаёт «+79001234567» — показываем в той же маске, что и при ручном вводе
+      onPhoneReceived(formatPhone(phone));
     } finally {
       isPhoneRequesting.value = false;
     }

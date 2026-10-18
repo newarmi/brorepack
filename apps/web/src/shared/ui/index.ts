@@ -13,5 +13,6 @@ export { default as SkeletonBlock } from './components/SkeletonBlock.vue';
 export { default as StepProgress } from './components/StepProgress.vue';
 export { default as TextField } from './components/TextField.vue';
 export { default as ToggleSwitch } from './components/ToggleSwitch.vue';
+export { useInputMask } from './composables/useInputMask';
 export { useToast } from './composables/useToast';
 export type { SegmentedOption } from './types/segmented';
