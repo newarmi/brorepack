@@ -56,16 +56,29 @@ const { toast, hideToast } = useToast();
   border-color: var(--color-danger);
 }
 
-.toast-enter-active,
+.toast-enter-active {
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+
 .toast-leave-active {
   transition:
-    opacity 180ms ease,
-    transform 180ms ease;
+    opacity var(--duration-fast) var(--ease-in),
+    transform var(--duration-fast) var(--ease-in);
+}
+
+/* Новый тост заменяет старый: уходящий снимаем из потока, чтобы на миг не встали два тоста друг над другом.
+   Абсолютный элемент во flex-контейнере остаётся по центру */
+.toast-leave-active {
+  position: absolute;
+  /* Ширина как в потоке, с учётом полей экрана: иначе текст перенесётся иначе прямо во время ухода */
+  max-width: min(440px, calc(100% - 2 * var(--screen-padding)));
 }
 
 .toast-enter-from,
 .toast-leave-to {
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(var(--motion-shift));
 }
 </style>

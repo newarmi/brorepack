@@ -11,6 +11,7 @@
     <TextField
       v-if="isCustomTemplate"
       v-model="draft.comment"
+      class="appear"
       label="Что хочешь на плашке?"
       multiline
       :rows="3"

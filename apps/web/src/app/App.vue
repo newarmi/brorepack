@@ -2,7 +2,12 @@
   <div class="app" :class="appClasses">
     <DevTelegramChrome v-if="isDevChrome" />
     <main class="app__content">
-      <RouterView />
+      <!-- Без key: при смене параметра (заказ №1 → №2) экран не пересоздаётся, анимируется только смена экрана -->
+      <RouterView v-slot="{ Component }">
+        <Transition :name="pageTransitionName" mode="out-in" @afterLeave="pageLeaveHandler">
+          <component :is="Component" />
+        </Transition>
+      </RouterView>
     </main>
     <AppToast />
   </div>
@@ -14,6 +19,8 @@ import { RouterView } from 'vue-router';
 
 import { DevTelegramChrome, useMainButtonStore, useTelegram } from '@/shared/telegram';
 import { AppToast } from '@/shared/ui';
+
+import { pageLeaveHandler, pageTransitionName } from './router/navigation/pageTransition';
 
 const telegram = useTelegram();
 const mainButton = useMainButtonStore();

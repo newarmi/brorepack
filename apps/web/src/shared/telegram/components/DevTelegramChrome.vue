@@ -21,21 +21,30 @@
     <span class="dev-chrome__more" aria-hidden="true">⋯</span>
   </header>
 
-  <div v-if="mainButton.state.visible" class="dev-chrome__bottom">
-    <button
-      type="button"
-      class="dev-chrome__main-button"
-      :disabled="mainButton.state.disabled"
-      :aria-busy="mainButton.state.loading || undefined"
-      @click="mainButton.click"
-    >
-      <span v-if="mainButton.state.loading" class="dev-chrome__spinner" aria-hidden="true" />
-      <span v-else>{{ mainButton.state.text }}</span>
-      <span v-if="mainButton.state.loading" class="visually-hidden">{{
-        mainButton.state.text
-      }}</span>
-    </button>
-  </div>
+  <Transition name="dev-chrome-bottom">
+    <div v-if="mainButton.state.visible" class="dev-chrome__bottom">
+      <button
+        type="button"
+        class="dev-chrome__main-button"
+        :disabled="mainButton.state.disabled"
+        :aria-busy="mainButton.state.loading || undefined"
+        @click="mainButton.click"
+      >
+        <span
+          v-if="mainButton.state.loading"
+          class="dev-chrome__spinner spinner"
+          aria-hidden="true"
+        />
+        <!-- Текст меняется вместе с экраном: старый растворяется, новый проявляется -->
+        <Transition v-else name="dev-chrome-text" mode="out-in">
+          <span :key="mainButton.state.text">{{ mainButton.state.text }}</span>
+        </Transition>
+        <span v-if="mainButton.state.loading" class="visually-hidden">{{
+          mainButton.state.text
+        }}</span>
+      </button>
+    </div>
+  </Transition>
 </template>
 
 <script setup lang="ts">
@@ -82,6 +91,11 @@ const closeHandler = (): void => {
   border-radius: 10px;
   color: var(--color-accent-hi);
   font-size: 16px;
+  transition: opacity var(--transition-fast);
+}
+
+.dev-chrome__side-button:active {
+  opacity: 0.6;
 }
 
 .dev-chrome__title {
@@ -133,7 +147,38 @@ const closeHandler = (): void => {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  transition: opacity var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.dev-chrome__main-button:active:not(:disabled) {
+  background: var(--color-accent-hi);
+  transform: scale(var(--press-scale));
+}
+
+.dev-chrome-bottom-enter-active {
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.dev-chrome-bottom-leave-active {
+  transition: transform var(--duration-base) var(--ease-in);
+}
+
+.dev-chrome-bottom-enter-from,
+.dev-chrome-bottom-leave-to {
+  transform: translateY(100%);
+}
+
+.dev-chrome-text-enter-active,
+.dev-chrome-text-leave-active {
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.dev-chrome-text-enter-from,
+.dev-chrome-text-leave-to {
+  opacity: 0;
 }
 
 /* Как нативная кнопка в неактивном состоянии: THEME_COLORS.disabled / disabledText */

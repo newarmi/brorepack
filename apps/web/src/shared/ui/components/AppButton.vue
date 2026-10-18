@@ -6,7 +6,7 @@
     :aria-busy="props.loading || undefined"
     @click="emits('click', $event)"
   >
-    <span v-if="props.loading" class="app-button__spinner" aria-hidden="true" />
+    <span v-if="props.loading" class="app-button__spinner spinner" aria-hidden="true" />
     <AppIcon v-else-if="props.icon" :name="props.icon" :size="18" />
     <span class="app-button__label"><slot /></span>
   </button>
@@ -61,6 +61,7 @@ const classes = computed(() => [
   letter-spacing: 0.04em;
   text-transform: uppercase;
   transition:
+    color var(--transition-fast),
     background-color var(--transition-fast),
     border-color var(--transition-fast),
     box-shadow var(--transition-fast),
@@ -69,7 +70,7 @@ const classes = computed(() => [
 }
 
 .app-button:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: scale(var(--press-scale));
 }
 
 .app-button:disabled {
@@ -86,19 +87,11 @@ const classes = computed(() => [
   color: var(--color-on-accent);
 }
 
-.app-button--primary:hover:not(:disabled) {
-  box-shadow: var(--glow-accent);
-}
-
 /* Контурная: не путается с карточками */
 .app-button--secondary {
   background: transparent;
   border: 1px solid var(--color-line-strong);
   color: var(--color-text);
-}
-
-.app-button--secondary:hover:not(:disabled) {
-  border-color: var(--color-accent);
 }
 
 .app-button--link {
@@ -107,6 +100,35 @@ const classes = computed(() => [
   color: var(--color-accent-hi);
   letter-spacing: 0;
   text-transform: none;
+}
+
+/* Hover только там, где есть курсор: на тач-экране он «залипает» после тапа */
+@media (hover: hover) {
+  .app-button--primary:hover:not(:disabled) {
+    box-shadow: var(--glow-accent);
+  }
+
+  .app-button--secondary:hover:not(:disabled) {
+    border-color: var(--color-accent);
+  }
+
+  .app-button--link:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+}
+
+.app-button--primary:active:not(:disabled) {
+  background: var(--color-accent-hi);
+  box-shadow: var(--glow-accent);
+}
+
+.app-button--secondary:active:not(:disabled) {
+  border-color: var(--color-accent);
+  background: var(--color-surface-2);
+}
+
+.app-button--link:active:not(:disabled) {
+  opacity: 0.6;
 }
 
 .app-button--loading {

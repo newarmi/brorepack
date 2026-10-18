@@ -122,14 +122,21 @@ onBeforeUnmount(() => document.removeEventListener('keydown', keydownHandler));
   text-transform: uppercase;
 }
 
-.sheet-enter-active,
-.sheet-leave-active {
-  transition: background-color 220ms ease;
+/* Открытие — с мягкой остановкой, закрытие — чуть быстрее и с разгоном: шторка «уходит», а не тормозит */
+.sheet-enter-active {
+  transition: background-color var(--duration-slow) var(--ease-out);
 }
 
-.sheet-enter-active .bottom-sheet__panel,
+.sheet-enter-active .bottom-sheet__panel {
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.sheet-leave-active {
+  transition: background-color var(--duration-base) var(--ease-in);
+}
+
 .sheet-leave-active .bottom-sheet__panel {
-  transition: transform 220ms ease;
+  transition: transform var(--duration-base) var(--ease-in);
 }
 
 .sheet-enter-from,

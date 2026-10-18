@@ -1,5 +1,5 @@
 <template>
-  <header v-if="props.isJustPaid" class="order-header order-header--success">
+  <header v-if="props.isJustPaid" class="order-header order-header--success appear">
     <div class="order-header__plaque">
       <PlaquePreview :design="props.order.design" glow decorative />
       <span class="order-header__check" aria-hidden="true">

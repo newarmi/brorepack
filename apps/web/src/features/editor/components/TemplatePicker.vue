@@ -96,7 +96,12 @@ watch(model, () => telegram.haptic.selection());
   transition:
     border-color var(--transition-fast),
     box-shadow var(--transition-fast),
-    color var(--transition-fast);
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.template-picker__option:active {
+  transform: scale(var(--press-scale));
 }
 
 .template-picker__option--custom {
@@ -108,6 +113,7 @@ watch(model, () => telegram.haptic.selection());
   border-style: solid;
   box-shadow: var(--glow-accent);
   color: var(--color-text);
+  animation: select-pop var(--duration-base) var(--ease-out);
 }
 
 .template-picker__option:has(:focus-visible) {

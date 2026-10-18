@@ -12,22 +12,28 @@
       :error="props.cityError"
       @blur="emits('blur', 'city')"
     />
-    <TextField
-      v-model="address"
-      :label="addressLabel"
-      name="address"
-      autocomplete="street-address"
-      :placeholder="addressPlaceholder"
-      :maxlength="200"
-      :error="props.addressError"
-      :hint="addressHint"
-      @blur="emits('blur', 'address')"
-    />
+    <!-- Поле адреса зависит от способа доставки: при переключении вкладки оно сменяется слайдом в её сторону -->
+    <div class="delivery-fields__address">
+      <Transition :name="addressTransition">
+        <TextField
+          :key="method"
+          v-model="address"
+          :label="addressLabel"
+          name="address"
+          autocomplete="street-address"
+          :placeholder="addressPlaceholder"
+          :maxlength="200"
+          :error="props.addressError"
+          :hint="addressHint"
+          @blur="emits('blur', 'address')"
+        />
+      </Transition>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, shallowRef, watch } from 'vue';
 
 import type { DeliveryMethod } from '@brorepack/shared';
 import { DELIVERY_METHODS, formatPrice, getDeliveryMethod } from '@brorepack/shared';
@@ -64,12 +70,27 @@ const addressHint = computed(() => {
     : `${eta} · курьер позвонит перед доставкой`;
 });
 
-watch(method, () => telegram.haptic.selection());
+const addressTransition = shallowRef<'tab-forward' | 'tab-back'>('tab-forward');
+
+const getMethodIndex = (value: DeliveryMethod): number => {
+  return DELIVERY_METHODS.findIndex((item) => item.id === value);
+};
+
+// Watch срабатывает до перерисовки, поэтому направление успевает попасть в <Transition>
+watch(method, (nextMethod, previousMethod) => {
+  telegram.haptic.selection();
+  addressTransition.value =
+    getMethodIndex(nextMethod) > getMethodIndex(previousMethod) ? 'tab-forward' : 'tab-back';
+});
 </script>
 
 <style scoped>
 .delivery-fields {
   display: grid;
   gap: 14px;
+}
+
+.delivery-fields__address {
+  position: relative;
 }
 </style>

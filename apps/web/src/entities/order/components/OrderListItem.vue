@@ -45,12 +45,23 @@ const details = computed(() =>
   gap: 14px;
   padding: 14px 16px;
   color: inherit;
-  transition: border-color var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
 }
 
-.order-item:hover {
+/* Hover только там, где есть курсор: на тач-экране он «залипает» после тапа */
+@media (hover: hover) {
+  .order-item:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--glow-accent);
+  }
+}
+
+.order-item:active {
   border-color: var(--color-accent);
-  box-shadow: var(--glow-accent);
+  transform: scale(var(--press-scale));
 }
 
 .order-item__thumb {

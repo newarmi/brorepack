@@ -24,7 +24,7 @@
     <TextField
       v-if="isShipped"
       v-model="trackingNumber"
-      class="status-control__tracking"
+      class="status-control__tracking appear"
       label="Трек-номер СДЭК"
       autocapitalize="off"
       placeholder="Например, 1234567890"
@@ -78,12 +78,22 @@ const isShipped = computed(() => status.value === ORDER_STATUS.shipped);
   font-weight: 700;
   text-align: center;
   cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.status-control__option:active {
+  transform: scale(var(--press-scale));
 }
 
 .status-control__option--active {
   border-color: var(--color-accent);
   background: var(--color-accent-soft);
   color: var(--color-text);
+  animation: select-pop var(--duration-base) var(--ease-out);
 }
 
 .status-control__option:has(:focus-visible) {

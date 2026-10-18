@@ -50,7 +50,10 @@ const props = withDefaults(defineProps<{ id?: string; label?: string }>(), {
   border-radius: 999px;
   background: var(--color-surface-2);
   border: 1px solid var(--color-line);
-  transition: background-color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .toggle-switch__thumb {
@@ -59,7 +62,9 @@ const props = withDefaults(defineProps<{ id?: string; label?: string }>(), {
   height: 24px;
   border-radius: 50%;
   background: var(--color-text);
-  transition: transform var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .toggle-switch__input:checked + .toggle-switch__track {

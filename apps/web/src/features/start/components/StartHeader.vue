@@ -75,5 +75,19 @@ const props = defineProps<{ isAdmin: boolean }>();
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
+  transition:
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .start-header__link:hover {
+    border-color: var(--color-accent);
+  }
+}
+
+.start-header__link:active {
+  border-color: var(--color-accent);
+  transform: scale(var(--press-scale));
 }
 </style>

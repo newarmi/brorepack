@@ -52,12 +52,22 @@ const name = `status-filter-${useId()}`;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.status-filter__chip:active {
+  transform: scale(var(--press-scale));
 }
 
 .status-filter__chip--active {
   border-color: var(--color-accent);
   background: var(--color-accent-soft);
   color: var(--color-text);
+  animation: select-pop var(--duration-base) var(--ease-out);
 }
 
 .status-filter__chip:has(:focus-visible) {

@@ -18,7 +18,7 @@
         <AppButton variant="link" block @click="openOrdersHandler">Мои заказы</AppButton>
       </template>
 
-      <template v-if="order">
+      <div v-if="order" class="order-page__content appear">
         <OrderHeader :order :isJustPaid />
 
         <OrderSummaryCard :design="order.design" :amount="order.price.total" />
@@ -29,7 +29,7 @@
         <AppButton v-if="isShareVisible" icon="share" block @click="shareOrder(order)">
           Поделиться превью
         </AppButton>
-      </template>
+      </div>
     </AsyncState>
 
     <MockPaySheet
@@ -130,7 +130,8 @@ useBackButton(() => {
 
 <style scoped>
 .order-page,
-.order-page__skeleton {
+.order-page__skeleton,
+.order-page__content {
   display: grid;
   gap: 16px;
 }

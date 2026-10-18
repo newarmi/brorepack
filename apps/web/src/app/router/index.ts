@@ -5,13 +5,18 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
 import { installGuards } from './guards';
+import { installPageTransition, waitForPageLeave } from './navigation/pageTransition';
 import { routes } from './routes';
 
 // Hash-история: фронт раздаётся и с GitHub Pages, и Node-сервером без настройки rewrite
 export const router = createRouter({
   history: createWebHashHistory(),
-  scrollBehavior: (_to, _from, savedPosition) => savedPosition ?? { top: 0 },
+  scrollBehavior: async (_to, _from, savedPosition) => {
+    await waitForPageLeave();
+    return savedPosition ?? { top: 0 };
+  },
   routes,
 });
 
 installGuards(router);
+installPageTransition(router);

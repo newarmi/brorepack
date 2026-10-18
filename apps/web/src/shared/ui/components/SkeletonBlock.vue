@@ -31,6 +31,13 @@ const style = computed(() => ({
   animation: skeleton-shimmer 1.4s ease-in-out infinite;
 }
 
+/* Глобальное правило сокращает анимации до 1ms — бесконечный перелив мерцал бы, поэтому скелетон статичен */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-block {
+    animation: none;
+  }
+}
+
 @keyframes skeleton-shimmer {
   from {
     background-position: 100% 0;

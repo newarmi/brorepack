@@ -57,5 +57,22 @@
   --content-safe-top: var(--tg-content-safe-area-inset-top, 0px);
   --viewport-height: var(--tg-viewport-stable-height, 100dvh);
 
-  --transition-fast: 160ms ease;
+  /* Движение: короткие переходы без пружин и перелётов.
+     fast — отклик на нажатие и смену состояния, base — появление небольших элементов, slow — крупные блоки */
+  --duration-fast: 160ms;
+  --duration-base: 220ms;
+  --duration-slow: 280ms;
+  /* Смена экрана: старый уходит быстро, новый въезжает заметно, но без задержки работы */
+  --duration-page-out: 180ms;
+  --duration-page-in: 340ms;
+  /* Появление: быстрый старт и мягкая остановка. Уход: плавный старт, чтобы элемент не «дёргался» */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  /* Сдвиг при появлении и сжатие при нажатии — едва заметные, только для подсказки движения */
+  --motion-shift: 8px;
+  --page-shift: 40px;
+  --tab-shift: 24px;
+  --press-scale: 0.97;
+
+  --transition-fast: var(--duration-fast) var(--ease-out);
 }

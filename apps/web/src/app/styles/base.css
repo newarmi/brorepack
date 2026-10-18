@@ -143,11 +143,139 @@ a {
   -webkit-user-select: text;
 }
 
+/* Мягкое появление блока при вставке в DOM: ошибка, пустое состояние, данные после скелетона.
+   Проигрывается один раз при монтировании — обычный ререндер его не повторяет. Контент сразу кликабелен */
+.appear {
+  /* backwards, а не both: после анимации transform не остаётся висеть и не создаёт лишний слой */
+  animation: appear var(--duration-base) var(--ease-out) backwards;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-shift));
+  }
+}
+
+/* Переход между экранами (app/App.vue, имя — router/navigation/pageTransition.ts).
+   Вперёд — новый экран въезжает справа, назад — слева, как стек экранов в Telegram.
+   Замена на месте (replace) — просто проявление снизу */
+.page-forward-enter-active,
+.page-back-enter-active,
+.page-fade-enter-active {
+  transition:
+    opacity var(--duration-page-in) var(--ease-out),
+    transform var(--duration-page-in) var(--ease-out);
+}
+
+.page-forward-leave-active,
+.page-back-leave-active,
+.page-fade-leave-active {
+  transition:
+    opacity var(--duration-page-out) var(--ease-in),
+    transform var(--duration-page-out) var(--ease-in);
+}
+
+.page-forward-enter-from {
+  opacity: 0;
+  transform: translateX(var(--page-shift));
+}
+
+.page-forward-leave-to {
+  opacity: 0;
+  transform: translateX(calc(var(--page-shift) / -2)) scale(0.98);
+}
+
+.page-back-enter-from {
+  opacity: 0;
+  transform: translateX(calc(var(--page-shift) * -1));
+}
+
+.page-back-leave-to {
+  opacity: 0;
+  transform: translateX(calc(var(--page-shift) / 2)) scale(0.98);
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(var(--motion-shift));
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+}
+
+/* Смена содержимого вкладки: уезжает в сторону, противоположную переключению, новое въезжает следом.
+   Уходящий блок снят из потока и лежит поверх нового — высота не скачет.
+   Родителю нужен position: relative */
+.tab-forward-enter-active,
+.tab-back-enter-active {
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
+}
+
+.tab-forward-leave-active,
+.tab-back-leave-active {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transition:
+    opacity var(--duration-fast) var(--ease-in),
+    transform var(--duration-fast) var(--ease-in);
+}
+
+.tab-forward-enter-from,
+.tab-back-leave-to {
+  opacity: 0;
+  transform: translateX(var(--tab-shift));
+}
+
+.tab-forward-leave-to,
+.tab-back-enter-from {
+  opacity: 0;
+  transform: translateX(calc(var(--tab-shift) * -1));
+}
+
+/* Смена значения на месте: цена, подпись строки. Старое гаснет, новое поднимается снизу */
+.value-enter-active {
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+
+.value-leave-active {
+  transition: opacity var(--duration-fast) var(--ease-in);
+}
+
+.value-enter-from {
+  opacity: 0;
+  transform: translateY(var(--motion-shift));
+}
+
+.value-leave-to {
+  opacity: 0;
+}
+
+/* Отклик выбора: вкладка, чип или шаблон чуть «вдавливается» и встаёт на место. Без перелёта за 1 */
+@keyframes select-pop {
+  40% {
+    transform: scale(0.95);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 1ms !important;
     transition-duration: 1ms !important;
+  }
+
+  /* Спиннер — единственный признак загрузки, поэтому крутится и здесь, только медленнее.
+     При 1ms бесконечная анимация мерцала бы */
+  .spinner {
+    animation-duration: 1.6s !important;
   }
 }

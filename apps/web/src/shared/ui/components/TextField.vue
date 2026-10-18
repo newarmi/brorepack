@@ -47,7 +47,7 @@
       }}</span>
       <slot name="suffix" />
     </div>
-    <p v-if="props.error" :id="errorId" class="text-field__error" role="alert">{{ props.error }}</p>
+    <p v-if="props.error" :id="errorId" class="text-field__error appear" role="alert">{{ props.error }}</p>
     <p v-if="props.hint" :id="hintId" class="text-field__hint">{{ props.hint }}</p>
   </div>
 </template>

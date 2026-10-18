@@ -66,6 +66,11 @@ const props = defineProps<{
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
+  transition: opacity var(--transition-fast);
+}
+
+.recipient-fields__contact:active:not(:disabled) {
+  opacity: 0.6;
 }
 
 .recipient-fields__contact:disabled {

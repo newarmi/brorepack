@@ -21,7 +21,7 @@
         <AppButton variant="primary" block @click="startNewOrderHandler">Собрать плашку</AppButton>
       </template>
 
-      <ul class="my-orders-page__list">
+      <ul class="my-orders-page__list appear">
         <li v-for="order in orders" :key="order.id">
           <OrderListItem :order :to="{ name: ROUTE_NAMES.order, params: { id: order.id } }" />
         </li>

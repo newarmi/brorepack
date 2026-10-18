@@ -3,7 +3,9 @@
     <legend :class="props.hideLabel ? 'visually-hidden' : 'section-label'">
       {{ props.label }}
     </legend>
-    <div class="segmented__track">
+    <div class="segmented__track" :style="trackStyle">
+      <!-- Подсветка выбранного пункта одна на всю дорожку и переезжает к новому — видно, откуда куда переключились -->
+      <span v-if="activeIndex >= 0" class="segmented__thumb" aria-hidden="true" />
       <label
         v-for="option in props.options"
         :key="option.value"
@@ -19,7 +21,7 @@
 </template>
 
 <script setup lang="ts" generic="T extends string">
-import { useId } from 'vue';
+import { computed, useId } from 'vue';
 
 import type { SegmentedOption } from '../types/segmented';
 
@@ -33,22 +35,51 @@ const props = withDefaults(
 );
 
 const name = `segmented-${useId()}`;
+
+const activeIndex = computed(() =>
+  props.options.findIndex((option) => option.value === model.value),
+);
+const trackStyle = computed(() => ({
+  '--segmented-count': props.options.length,
+  '--segmented-index': activeIndex.value,
+}));
 </script>
 
 <style scoped>
 .segmented__track {
+  --segmented-gap: 4px;
+
+  position: relative;
   display: grid;
   grid-auto-columns: 1fr;
   grid-auto-flow: column;
-  gap: 4px;
-  padding: 4px;
+  gap: var(--segmented-gap);
+  padding: var(--segmented-gap);
   background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-card);
 }
 
+/* Ширина — один столбец сетки, сдвиг — номер столбца × (столбец + зазор) */
+.segmented__thumb {
+  position: absolute;
+  top: var(--segmented-gap);
+  bottom: var(--segmented-gap);
+  left: var(--segmented-gap);
+  width: calc(
+    (100% - 2 * var(--segmented-gap) - (var(--segmented-count) - 1) * var(--segmented-gap)) /
+      var(--segmented-count)
+  );
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  transform: translateX(calc(var(--segmented-index) * (100% + var(--segmented-gap))));
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
 .segmented__option {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -61,14 +92,15 @@ const name = `segmented-${useId()}`;
   text-align: center;
   cursor: pointer;
   transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast);
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.segmented__option:active {
+  transform: scale(var(--press-scale));
 }
 
 .segmented__option--active {
-  background: var(--color-accent-soft);
-  border-color: var(--color-accent);
   color: var(--color-text);
 }
 

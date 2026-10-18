@@ -14,7 +14,7 @@
         </div>
       </template>
 
-      <div v-if="order" class="admin-order-page__stack">
+      <div v-if="order" class="admin-order-page__stack appear">
         <header class="admin-order-page__header">
           <h1 class="page-title">Заказ №{{ order.number }}</h1>
           <StatusPill :status="order.status" />

@@ -25,7 +25,7 @@
         </template>
       </template>
 
-      <ProfileDetails v-if="profile" :profile @changeNickname="changeNicknameHandler" />
+      <ProfileDetails v-if="profile" class="appear" :profile @changeNickname="changeNicknameHandler" />
     </AsyncState>
   </div>
 </template>
