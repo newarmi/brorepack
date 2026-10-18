@@ -66,6 +66,22 @@ describe('renderPlaqueSvg', () => {
     assert.ok(print.includes('width="148mm" height="210mm"'))
     assert.ok(print.includes('<rect id="x"/>'))
   })
+
+  it('кладёт картинку клиента между фоном и знаком FACEIT, внутри обрезки', () => {
+    const image = { href: 'blob:1', width: 200, height: 100, x: 210, y: 300, scale: 2, rotation: 15 }
+    const svg = renderPlaqueSvg(design, { art: { href: '/a.svg' }, frontArt: { href: '/front.svg' }, image })
+    const imageIndex = svg.indexOf('href="blob:1"')
+    assert.ok(svg.indexOf('href="/a.svg"') < imageIndex)
+    assert.ok(imageIndex < svg.indexOf('href="/front.svg"'))
+    assert.ok(svg.indexOf('clip-path=') < imageIndex)
+    assert.ok(svg.includes('translate(210 300) rotate(15) scale(2)'))
+    assert.ok(svg.includes('x="-100" y="-50" width="200" height="100"'))
+  })
+
+  it('без картинки клиента верхний слой арта не рисует', () => {
+    const svg = renderPlaqueSvg(design, { frontArt: { href: '/front.svg' } })
+    assert.ok(!svg.includes('/front.svg'))
+  })
 })
 
 describe('неизвестный уровень', () => {

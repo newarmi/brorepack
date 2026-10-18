@@ -13,19 +13,21 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue';
 
-import type { PlaqueDesign } from '@brorepack/shared';
+import type { PlaqueDesign, PlaqueImage } from '@brorepack/shared';
 import { getTemplate, renderPlaqueSvg } from '@brorepack/shared';
 
-import { getPreviewArt } from '../utils/art';
+import { getFrontArt, getPreviewArt } from '../utils/art';
 
 const props = withDefaults(
   defineProps<{
     design: PlaqueDesign;
     glow?: boolean;
+    /** Картинка клиента поверх фона шаблона */
+    image?: PlaqueImage | null;
     /** Миниатюра рядом с текстом — скрыть от скринридеров, чтобы не дублировать подпись */
     decorative?: boolean;
   }>(),
-  { glow: false, decorative: false },
+  { glow: false, image: null, decorative: false },
 );
 
 // id внутри SVG должны быть уникальны на странице: превью бывает несколько
@@ -37,7 +39,12 @@ const idPrefix = `plaque-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
 const glowColor = computed(() => getTemplate(props.design.templateId).glowColor);
 
 const svg = computed(() =>
-  renderPlaqueSvg(props.design, { idPrefix, art: getPreviewArt(props.design.templateId) }),
+  renderPlaqueSvg(props.design, {
+    idPrefix,
+    art: getPreviewArt(props.design.templateId),
+    image: props.image ?? undefined,
+    frontArt: getFrontArt(props.design.templateId),
+  }),
 );
 </script>
 

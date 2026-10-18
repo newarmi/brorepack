@@ -10,6 +10,8 @@
   <id>.svg          — для печати, растр в исходном разрешении (JPEG q92)
   <id>.preview.svg  — для превью в приложении, растр в половину размера (WebP q75):
                       JPEG не сжимается gzip'ом, а превью — самая крупная картинка экрана (LCP)
+  <id>.front.svg    — только буквы FACEIT и стрелка (вектор): их кладут поверх картинки клиента,
+                      чтобы она не закрыла фирменные элементы
 
 Запуск (нужны poppler — pdftocairo — и Pillow):
   python3 packages/shared/scripts/extract_plaque_art.py ~/Downloads
@@ -48,6 +50,13 @@ DYNAMIC = {
     'звезда': ((238, 513, 256, 528), 10),
     'цифра': ((195, 348, 225, 384), 10),
     'кольцо': ((160, 318, 258, 406), 80),
+}
+
+# Фирменные элементы для верхнего слоя: рамка (pt), минимальная ширина и сколько объектов ждём.
+# Буквы F, A, C, E, T и ножка «I» под звездой — шесть объектов
+FRONT = {
+    'буквы FACEIT': ((130, 518, 290, 539), 5, 6),
+    'стрелка': ((80, 50, 335, 250), 150, 1),
 }
 
 OUT_DIR = Path(__file__).resolve().parent.parent / 'assets' / 'plaques'
@@ -123,6 +132,19 @@ def build_art(root, template_id, scale, quality, is_webp):
     return re.sub(r'(id="|url\(#|href="#)([\w-]+)', lambda m: f'{m.group(1)}{template_id}-{m.group(2)}', text)
 
 
+def build_front(root, template_id):
+    defs = root.find(f'{{{SVG_NS}}}defs')
+    body = [child for child in root if child is not defs]
+
+    front = ET.Element(f'{{{SVG_NS}}}svg', {'viewBox': '0 0 419.5276 595.2756', 'width': '419.5276', 'height': '595.2756'})
+    for name, (frame, min_width, count) in FRONT.items():
+        found = [element for element in body if check_match(path_bbox(element), frame, min_width)]
+        if len(found) != count:
+            raise SystemExit(f'{template_id}: «{name}» найдено {len(found)} вместо {count} — макет изменил структуру')
+        front.extend(found)
+    return ET.tostring(front, encoding='unicode')
+
+
 def main():
     source_dir = Path(sys.argv[1] if len(sys.argv) > 1 else '.').expanduser()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -132,6 +154,9 @@ def main():
             out = OUT_DIR / f'{template_id}{suffix}.svg'
             out.write_text(build_art(root, template_id, scale, quality, is_webp), encoding='utf-8')
             print(f'✓ {out.name}: {out.stat().st_size // 1024} КБ')
+        out = OUT_DIR / f'{template_id}.front.svg'
+        out.write_text(build_front(pdf_page_to_svg(source_dir / file_name, 2), template_id), encoding='utf-8')
+        print(f'✓ {out.name}: {out.stat().st_size // 1024} КБ')
 
 
 if __name__ == '__main__':

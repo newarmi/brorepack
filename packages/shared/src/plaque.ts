@@ -18,11 +18,33 @@ export const PLAQUE_FONT = "Play, 'Arial Narrow', Arial, sans-serif"
 /** Арт шаблона: ссылка на файл (превью) или его разметка, встроенная в SVG (печать) */
 export type PlaqueArt = { href: string } | { markup: string }
 
+/** Положение картинки клиента на плашке — в координатах листа (pt), поэтому не зависит от размера экрана */
+export interface PlaqueImageTransform {
+  /** Центр картинки */
+  x: number
+  y: number
+  /** Пунктов на пиксель картинки */
+  scale: number
+  /** Поворот вокруг центра, градусы по часовой */
+  rotation: number
+}
+
+/** Картинка клиента поверх фона шаблона; width и height — размер в пикселях */
+export interface PlaqueImage extends PlaqueImageTransform {
+  href: string
+  width: number
+  height: number
+}
+
 export interface RenderPlaqueOptions {
   /** preview тянется по контейнеру, со скруглением и кантом акрила; print — размеры в мм, без канта */
   mode?: 'preview' | 'print'
   /** Без арта рисуется только цвет фона шаблона */
   art?: PlaqueArt
+  /** Картинка клиента: ложится на фон и обрезается по форме плашки */
+  image?: PlaqueImage
+  /** Буквы FACEIT и стрелка из арта — рисуются поверх картинки клиента, чтобы она их не закрыла */
+  frontArt?: PlaqueArt
   /** CSS с @font-face в base64, чтобы файл для печати был самодостаточным */
   embeddedFontCss?: string
   /** Префикс для id внутри SVG, если на странице несколько плашек */
@@ -119,6 +141,16 @@ function renderArt(art: PlaqueArt | undefined): string {
   return `<image href="${escapeXml(art.href)}" width="${PLAQUE_VIEWBOX.width}" height="${PLAQUE_VIEWBOX.height}"/>`
 }
 
+function renderImage(image: PlaqueImage): string {
+  const { href, width, height, x, y, scale, rotation } = image
+  // Картинка стоит центром в начале координат, поэтому поворот и масштаб идут вокруг её центра
+  return [
+    `<g transform="translate(${round(x)} ${round(y)}) rotate(${round(rotation)}) scale(${scale})">`,
+    `<image href="${escapeXml(href)}" x="${-width / 2}" y="${-height / 2}" width="${width}" height="${height}"/>`,
+    '</g>',
+  ].join('')
+}
+
 /** Уровень 0 — ещё неизвестен (экран ввода ника): кольцо во весь ход полупрозрачное, вместо цифры «?» */
 const UNKNOWN_LEVEL = 0
 
@@ -152,7 +184,7 @@ function renderPlayerLayer(design: PlaqueDesign): string {
 }
 
 export function renderPlaqueSvg(design: PlaqueDesign, options: RenderPlaqueOptions = {}): string {
-  const { mode = 'preview', art, embeddedFontCss, idPrefix = 'plaque' } = options
+  const { mode = 'preview', art, image, frontArt, embeddedFontCss, idPrefix = 'plaque' } = options
   const { width: w, height: h } = PLAQUE_VIEWBOX
   const isPrint = mode === 'print'
   const printSize = PLAQUE_PRINT_SIZE_MM[design.size]
@@ -173,8 +205,11 @@ export function renderPlaqueSvg(design: PlaqueDesign, options: RenderPlaqueOptio
     `<defs>${defs.join('')}</defs>`,
     `<g clip-path="url(#${clipId})">`,
     `<rect width="${w}" height="${h}" fill="${getTemplate(design.templateId).baseColor}"/>`,
+    `<g transform="${ART_TRANSFORM}">${renderArt(art)}</g>`,
+    // Картинка клиента — между фоном и всем, что должно остаться читаемым: знаком FACEIT, кольцом, ником
+    image ? renderImage(image) : '',
     `<g transform="${ART_TRANSFORM}">`,
-    renderArt(art),
+    image ? renderArt(frontArt) : '',
     renderPlayerLayer(design),
     '</g>',
     '</g>',

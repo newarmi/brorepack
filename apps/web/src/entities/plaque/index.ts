@@ -4,5 +4,5 @@
 
 export { default as PlaquePreview } from './components/PlaquePreview.vue';
 export { CUSTOM_TEMPLATE_ID } from './constants/template';
-export { getPreviewArt, loadPrintArt } from './utils/art';
+export { getFrontArt, getPreviewArt, loadPrintArt } from './utils/art';
 export { formatDesignSummary, formatPlaqueTitle } from './utils/format';
