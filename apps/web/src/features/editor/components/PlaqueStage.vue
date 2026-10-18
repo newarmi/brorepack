@@ -63,7 +63,7 @@ const { isTiltEnabled } = usePointerTilt(product);
 
 const sizeCaption = computed(() => {
   const size = getSize(props.design.size);
-  return `${size.label} · ${size.dimensions} · акрил 3 мм`;
+  return `${size.label} · ${size.dimensions} · акрил 5 мм`;
 });
 </script>
 
