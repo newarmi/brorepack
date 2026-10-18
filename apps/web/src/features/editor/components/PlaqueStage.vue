@@ -9,15 +9,22 @@
     >
       <div class="plaque-stage__plaque">
         <span class="plaque-stage__glow" aria-hidden="true" />
-        <!-- Ключ — шаблон: смена шаблона перекрёстно растворяет плашки, правка ника перерисовывает без анимации -->
-        <Transition name="plaque-swap">
-          <PlaquePreview
-            :key="props.design.templateId"
-            :design="props.design"
-            :image="props.image"
-            glow
-          />
-        </Transition>
+        <!-- Торцы акрила толщиной 5 мм: лицевая сторона вынесена вперёд, торцы видны при наклоне -->
+        <span class="plaque-stage__edge plaque-stage__edge--left" aria-hidden="true" />
+        <span class="plaque-stage__edge plaque-stage__edge--right" aria-hidden="true" />
+        <span class="plaque-stage__edge plaque-stage__edge--top" aria-hidden="true" />
+        <span class="plaque-stage__edge plaque-stage__edge--bottom" aria-hidden="true" />
+        <div class="plaque-stage__front">
+          <!-- Ключ — шаблон: смена шаблона перекрёстно растворяет плашки, правка ника перерисовывает без анимации -->
+          <Transition name="plaque-swap">
+            <PlaquePreview
+              :key="props.design.templateId"
+              :design="props.design"
+              :image="props.image"
+              glow
+            />
+          </Transition>
+        </div>
       </div>
       <!-- Подставка всегда занимает место: при переключении меняется только прозрачность, без скачка -->
       <PlaqueStand :isLit="props.lightStand" />
@@ -73,6 +80,9 @@ const sizeCaption = computed(() => {
      Размеры самой подставки — в PlaqueStand.vue */
   --stage-perspective: 900px;
   --stage-camera-y: 5%;
+  /* Толщина акрила 5 мм в масштабе плашки: её ширина (как у __plaque) × 5 / 148 мм листа.
+     cqw — от ширины сцены, потому что translateZ не принимает проценты. Ширину паза берёт PlaqueStand */
+  --plaque-depth: calc(min(70cqw, 268px) * 230 / 268 * 5 / 148);
 
   position: relative;
   z-index: 0;
@@ -86,6 +96,7 @@ const sizeCaption = computed(() => {
   border-radius: var(--radius-card);
   perspective: var(--stage-perspective);
   perspective-origin: 50% var(--stage-camera-y);
+  container-type: inline-size;
 }
 
 /* Ширина — по подставке, она шире плашки. Так область касания не выходит за предмет */
@@ -115,6 +126,56 @@ const sizeCaption = computed(() => {
 .plaque-stage__plaque {
   position: relative;
   width: calc(100% * 230 / 268);
+  transform-style: preserve-3d;
+}
+
+/* Середина толщины — в плоскости паза подставки (z = 0), лицевая сторона — на полтолщины ближе */
+.plaque-stage__front {
+  position: relative;
+  transform: translateZ(calc(var(--plaque-depth) / 2));
+}
+
+/* Торец стоит ребром в середине толщины. Отступы — на скругление углов плашки (1.9% / 1.35%) */
+.plaque-stage__edge {
+  position: absolute;
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 45%),
+    rgb(200 220 220 / 18%) 50%,
+    rgb(255 255 255 / 35%)
+  );
+}
+
+.plaque-stage__edge--left,
+.plaque-stage__edge--right {
+  top: 1.35%;
+  bottom: 1.35%;
+  left: calc(var(--plaque-depth) / -2);
+  width: var(--plaque-depth);
+  transform: rotateY(90deg);
+}
+
+.plaque-stage__edge--right {
+  left: calc(100% - var(--plaque-depth) / 2);
+}
+
+.plaque-stage__edge--top,
+.plaque-stage__edge--bottom {
+  top: calc(var(--plaque-depth) / -2);
+  left: 1.9%;
+  right: 1.9%;
+  height: var(--plaque-depth);
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 45%),
+    rgb(200 220 220 / 18%) 50%,
+    rgb(255 255 255 / 35%)
+  );
+  transform: rotateX(90deg);
+}
+
+.plaque-stage__edge--bottom {
+  top: calc(100% - var(--plaque-depth) / 2);
 }
 
 .plaque-swap-enter-active,
@@ -150,6 +211,8 @@ const sizeCaption = computed(() => {
   border-radius: 10px;
   filter: blur(6px);
   opacity: 0;
+  /* Свет идёт из-за плашки: свечение — у задней стороны */
+  transform: translateZ(calc(var(--plaque-depth) / -2));
   transition: opacity 300ms ease;
 }
 

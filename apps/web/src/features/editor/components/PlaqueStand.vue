@@ -49,7 +49,8 @@ const props = withDefaults(
 }
 
 /* Верх и низ: лежат горизонтально, по глубине от задней грани до передней.
-   На верхней грани посередине — паз, в котором стоит плашка */
+   На верхней грани посередине — паз, в котором стоит плашка. Ширина паза — толщина плашки
+   (--plaque-depth из PlaqueStage) с зазором 1px с каждой стороны */
 .plaque-stand__face--top,
 .plaque-stand__face--bottom {
   height: var(--stand-depth);
@@ -58,14 +59,16 @@ const props = withDefaults(
 }
 
 .plaque-stand__face--top {
+  --slot-half: calc(var(--plaque-depth, 3px) / 2 + 1px);
+
   border-radius: 3px;
   background: linear-gradient(
     180deg,
     #3a3a3a 0%,
-    #262626 44%,
-    #050505 47%,
-    #050505 53%,
-    #1c1c1c 56%,
+    #262626 calc(50% - var(--slot-half) - 1.5px),
+    #050505 calc(50% - var(--slot-half)),
+    #050505 calc(50% + var(--slot-half)),
+    #1c1c1c calc(50% + var(--slot-half) + 1.5px),
     #2a2a2a 100%
   );
 }
