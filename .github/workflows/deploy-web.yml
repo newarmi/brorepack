@@ -1,6 +1,7 @@
 # Mini App → GitHub Pages, бэкенд — Google Apps Script (apps/gas).
 # Перед первым запуском: Settings → Pages → Source: GitHub Actions;
-# Settings → Secrets and variables → Actions → Variables: GAS_URL (адрес …/exec), BOT_URL (https://t.me/<бот>).
+# Settings → Secrets and variables → Actions → Variables: GAS_URL (адрес …/exec), BOT_URL (https://t.me/<бот>),
+# GEOCODER_URL (необязательно, подсказки адреса).
 name: Deploy Mini App
 
 on:
