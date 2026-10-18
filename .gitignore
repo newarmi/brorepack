@@ -6,3 +6,9 @@ dist
 *.db-journal
 apps/server/fonts/*.ttf
 .DS_Store
+.env.*
+!.env.example
+
+# Макеты дизайнера и отчёты Lighthouse — локальные файлы, не для репозитория
+/*.pdf
+/localhost_*.json
