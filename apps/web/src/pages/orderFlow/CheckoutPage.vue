@@ -4,14 +4,6 @@
 
     <OrderSummaryCard :design="draft.design" :amount="draft.plaquePrice.total" />
 
-    <DeliveryFields
-      v-model:method="draft.delivery.method"
-      v-model:address="draft.deliveryAddress"
-      v-model:manual="draft.delivery.isManualAddress"
-      :addressError="validation.errorFor('delivery.address')"
-      @blur="validation.touch(`delivery.${$event}`)"
-    />
-
     <RecipientFields
       v-model:name="draft.recipient.name"
       v-model:phone="draft.recipient.phone"
@@ -20,6 +12,15 @@
       :isPhoneRequesting
       @blur="validation.touch(`recipient.${$event}`)"
       @requestPhone="requestPhone"
+    />
+
+    <!-- Доставка — прямо над итогом: при смене способа видно, как меняется цена -->
+    <DeliveryFields
+      v-model:method="draft.delivery.method"
+      v-model:address="draft.deliveryAddress"
+      v-model:manual="draft.delivery.isManualAddress"
+      :addressError="validation.errorFor('delivery.address')"
+      @blur="validation.touch(`delivery.${$event}`)"
     />
 
     <PriceTotals :lines="draft.orderPrice.lines" :total="draft.orderPrice.total" />
