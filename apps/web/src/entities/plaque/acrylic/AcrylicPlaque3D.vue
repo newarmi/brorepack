@@ -6,20 +6,7 @@
     class="acrylic-plaque"
     :class="{ 'acrylic-plaque--ready': isReady }"
     :style="overflowStyle"
-  >
-    <!-- Пока грузится Three.js и рисуется текстура, плашку не повернуть — показываем, что 3D в пути.
-         Если 3D недоступно, компонент убирают целиком, и лоадер уходит вместе с ним -->
-    <Transition name="acrylic-plaque-loader">
-      <span
-        v-if="!isReady"
-        class="acrylic-plaque__loader"
-        role="status"
-        aria-label="Загружаем 3D-плашку"
-      >
-        <span class="acrylic-plaque__spinner spinner" aria-hidden="true" />
-      </span>
-    </Transition>
-  </div>
+  />
 </template>
 
 <script setup lang="ts">
@@ -170,44 +157,5 @@ onBeforeUnmount(() => {
 
 .acrylic-plaque--ready:active {
   cursor: grabbing;
-}
-
-/* Посередине плашки, поверх холста (его кладут в DOM позже). Тёмная подложка — чтобы кольцо
-   читалось и на светлом шаблоне */
-.acrylic-plaque__loader {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgb(0 0 0 / 55%);
-  transform: translate(-50%, -50%);
-}
-
-.acrylic-plaque__spinner {
-  width: 22px;
-  height: 22px;
-  border: 2px solid var(--color-accent);
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: acrylic-plaque-spin 0.8s linear infinite;
-}
-
-.acrylic-plaque-loader-leave-active {
-  transition: opacity var(--duration-base) var(--ease-out);
-}
-
-.acrylic-plaque-loader-leave-to {
-  opacity: 0;
-}
-
-@keyframes acrylic-plaque-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>

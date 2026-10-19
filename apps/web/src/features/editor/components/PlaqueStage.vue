@@ -24,6 +24,10 @@
               glow
             />
           </Transition>
+          <!-- Пока 3D не стало интерактивным. Лоадер — на лицевой стороне CSS-плашки: лежи он глубже,
+               на iPhone его закрыла бы сама плашка (3D-слои сортируются по глубине, z-index не помогает).
+               Готово 3D — лоадер прячется вместе с CSS-плашкой; 3D недоступно — убирается -->
+          <PlaqueLoader v-if="is3dLoading" />
         </div>
       </div>
       <!-- Подставка всегда занимает место: при переключении меняется только прозрачность, без скачка -->
@@ -61,6 +65,7 @@ import { AppIcon } from '@/shared/ui';
 
 import { useAcrylicPreview } from '../composables/useAcrylicPreview';
 import PlaqueEdges from './PlaqueEdges.vue';
+import PlaqueLoader from './PlaqueLoader.vue';
 import PlaqueStand from './PlaqueStand.vue';
 
 const props = withDefaults(
@@ -79,6 +84,8 @@ const props = withDefaults(
 const product = useTemplateRef<HTMLElement>('product');
 const { isTiltEnabled, is3dReady, is3dFailed, acrylicReadyHandler, acrylicFailHandler } =
   useAcrylicPreview(product);
+
+const is3dLoading = computed(() => !is3dReady.value && !is3dFailed.value);
 
 const sizeCaption = computed(() => {
   const size = getSize(props.design.size);
