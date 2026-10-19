@@ -23,16 +23,16 @@ export const getTiltAngle = (shift: number, range: number, maxAngle: number): nu
 };
 
 /**
- * Наклон по сдвигу пальца от точки касания: плашка поворачивается к пальцу.
- * Палец вниз — верх уходит назад, вправо — правый край выходит вперёд
+ * Наклон по сдвигу пальца от точки касания: плашка поворачивается вслед за пальцем, как будто её толкают.
+ * Палец вниз — верх выходит вперёд, вправо — правый край уходит назад. Так же вращается 3D-версия
  */
 export const getDragTilt = (
   shift: { x: number; y: number },
   size: { width: number; height: number },
   settings: Pick<TiltOptions, 'dragRange' | 'maxRotateX' | 'maxRotateY'>,
 ): TiltAngles => ({
-  x: getTiltAngle(shift.y, size.height * settings.dragRange, settings.maxRotateX),
-  y: -getTiltAngle(shift.x, size.width * settings.dragRange, settings.maxRotateY),
+  x: -getTiltAngle(shift.y, size.height * settings.dragRange, settings.maxRotateX),
+  y: getTiltAngle(shift.x, size.width * settings.dragRange, settings.maxRotateY),
 });
 
 /**

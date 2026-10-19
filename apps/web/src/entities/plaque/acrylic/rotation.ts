@@ -41,8 +41,8 @@ const unsoftLimit = (angle: number, limit: number): number => {
 };
 
 /**
- * Поворот к пальцу, как в прежней CSS-версии: палец вправо — правый край выходит вперёд,
- * палец вниз — верх уходит назад. В Three.js ось Y направлена вверх, поэтому оба знака минус
+ * Плашка поворачивается вслед за пальцем, как будто её толкают: палец вправо — правый край уходит назад,
+ * палец вниз — верх выходит вперёд. Так же наклоняется CSS-версия (getDragTilt)
  */
 export const getDragRotation = (
   start: { x: number; y: number },
@@ -50,11 +50,11 @@ export const getDragRotation = (
   settings: RotationSettings,
 ): { x: number; y: number } => ({
   x: softLimit(
-    unsoftLimit(start.x, settings.maxDegreesX) - shift.y * settings.degreesPerPixel,
+    unsoftLimit(start.x, settings.maxDegreesX) + shift.y * settings.degreesPerPixel,
     settings.maxDegreesX,
   ),
   y: softLimit(
-    unsoftLimit(start.y, settings.maxDegreesY) - shift.x * settings.degreesPerPixel,
+    unsoftLimit(start.y, settings.maxDegreesY) + shift.x * settings.degreesPerPixel,
     settings.maxDegreesY,
   ),
 });

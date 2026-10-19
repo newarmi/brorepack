@@ -21,11 +21,12 @@ const run = (state: RotationState, seconds: number, isSwayEnabled = false): Rota
 };
 
 describe('rotation', () => {
-  it('turns towards the finger and never exceeds the limits', () => {
+  it('turns after the finger and never exceeds the limits', () => {
+    // Вправо — правый край уходит назад (rotation.y > 0), вниз — верх выходит вперёд (rotation.x > 0)
     const right = getDragRotation({ x: 0, y: 0 }, { x: 40, y: 0 }, ROTATION);
-    expect(right.y).toBeLessThan(0);
+    expect(right.y).toBeGreaterThan(0);
     const down = getDragRotation({ x: 0, y: 0 }, { x: 0, y: 40 }, ROTATION);
-    expect(down.x).toBeLessThan(0);
+    expect(down.x).toBeGreaterThan(0);
     const far = getDragRotation({ x: 0, y: 0 }, { x: 10_000, y: -10_000 }, ROTATION);
     expect(Math.abs(far.y)).toBeLessThanOrEqual(ROTATION.maxDegreesY);
     expect(Math.abs(far.x)).toBeLessThanOrEqual(ROTATION.maxDegreesX);
