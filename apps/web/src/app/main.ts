@@ -18,6 +18,13 @@ import { reloadIfOutdated } from './update/reloadIfOutdated';
 // сборки уже удалён с сервера) — тот же случай
 void reloadIfOutdated();
 window.addEventListener('vite:preloadError', () => void reloadIfOutdated());
+// Свёрнутое мини-приложение Telegram не перезапускается: проверяем свежесть и при возврате в него.
+// Черновик лежит в хранилище, маршрут сохраняется — перезагрузка ничего не теряет
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    void reloadIfOutdated();
+  }
+});
 
 const app = createApp(App);
 app.use(createPinia());
