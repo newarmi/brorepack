@@ -72,7 +72,7 @@ const errorText = shallowRef<string | null>(null);
 const hint = computed(() =>
   customImage.hasImage
     ? 'Картинка лежит под надписями и знаком FACEIT. Двигай, масштабируй и поворачивай её на отдельном экране'
-    : 'PNG, JPG или WebP до 20 МБ. Картинка ляжет под надписи и знак FACEIT, а всё, что выйдет за край плашки, обрежется',
+    : 'Без картинки дальше не пройти. PNG, JPG или WebP до 20 МБ — она ляжет под надписи и знак FACEIT, а всё, что выйдет за край плашки, обрежется',
 );
 
 const editHandler = (): void => {

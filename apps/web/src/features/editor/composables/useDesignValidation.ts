@@ -2,11 +2,16 @@ import { computed } from 'vue';
 
 import { designInputSchema } from '@brorepack/shared';
 
-import { useDraftStore } from '@/entities/draft';
+import { useCustomImageStore, useDraftStore } from '@/entities/draft';
+import { CUSTOM_TEMPLATE_ID } from '@/entities/plaque';
 
-/** Проверка дизайна той же схемой, что и на сервере; ошибка показывается только у надписи */
+/**
+ * Проверка дизайна той же схемой, что и на сервере; ошибка показывается только у надписи.
+ * На «Своём дизайне» дальше не пускаем без картинки — без неё дизайнеру не с чем работать
+ */
 export const useDesignValidation = () => {
   const draft = useDraftStore();
+  const customImage = useCustomImageStore();
 
   const designResult = computed(() =>
     designInputSchema.safeParse({
@@ -16,7 +21,11 @@ export const useDesignValidation = () => {
     }),
   );
 
-  const isDesignValid = computed(() => designResult.value.success);
+  const isImageMissing = computed(
+    () => draft.templateId === CUSTOM_TEMPLATE_ID && !customImage.hasImage,
+  );
+
+  const isDesignValid = computed(() => designResult.value.success && !isImageMissing.value);
 
   const displayNameError = computed(() => {
     const result = designResult.value;
