@@ -3,7 +3,6 @@ import { watchEffect } from 'vue';
 import { THEME_COLORS } from '@/shared/config/theme';
 
 import { useBackButtonStore } from '../stores/backButtonStore';
-import { useMainButtonStore } from '../stores/mainButtonStore';
 import type { TelegramWebApp } from '../types/telegram';
 import { checkTelegramVersion, isTelegram, webApp } from './webApp';
 
@@ -24,33 +23,11 @@ const setupAppearance = (app: TelegramWebApp): void => {
   }
 };
 
-// MainButton есть с 6.0. Клик сначала проходит через общее состояние: disabled/loading проверяются одинаково.
-// Неактивную кнопку красим сами: часть клиентов не меняет её вид при is_active=false
-const bindMainButton = (app: TelegramWebApp): void => {
-  const mainButton = useMainButtonStore();
-  const nativeButton = app.MainButton;
-  nativeButton.onClick(mainButton.click);
-
-  watchEffect(() => {
-    const { text, visible: isVisible, disabled: isDisabled, loading: isLoading } = mainButton.state;
-    if (!isVisible) {
-      nativeButton.hideProgress();
-      nativeButton.setParams({ is_visible: false });
-      return;
-    }
-    nativeButton.setParams({
-      text,
-      color: isDisabled ? THEME_COLORS.disabled : THEME_COLORS.accent,
-      text_color: isDisabled ? THEME_COLORS.disabledText : THEME_COLORS.accentText,
-      is_active: !isDisabled,
-      is_visible: true,
-    });
-    if (isLoading) {
-      nativeButton.showProgress(false);
-      return;
-    }
-    nativeButton.hideProgress();
-  });
+// Главная кнопка — своя (MainButtonBar.vue): нативную MainButton рисует клиент системным шрифтом,
+// и её текст нельзя анимировать. Нативную прячем — вдруг клиент оставил её видимой
+const hideNativeMainButton = (app: TelegramWebApp): void => {
+  app.MainButton.hideProgress();
+  app.MainButton.setParams({ is_visible: false });
 };
 
 const bindBackButton = (app: TelegramWebApp): void => {
@@ -77,6 +54,6 @@ export const initTelegram = (): void => {
   }
   isInitialized = true;
   setupAppearance(webApp);
-  bindMainButton(webApp);
+  hideNativeMainButton(webApp);
   bindBackButton(webApp);
 };

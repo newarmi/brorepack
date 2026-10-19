@@ -1,6 +1,7 @@
 <template>
   <div class="app" :class="appClasses">
     <DevTelegramChrome v-if="isDevChrome" />
+    <MainButtonBar />
     <main class="app__content">
       <!-- Без key: при смене параметра (заказ №1 → №2) экран не пересоздаётся, анимируется только смена экрана -->
       <RouterView v-slot="{ Component }">
@@ -17,7 +18,7 @@
 import { computed } from 'vue';
 import { RouterView } from 'vue-router';
 
-import { DevTelegramChrome, useMainButtonStore, useTelegram } from '@/shared/telegram';
+import { DevTelegramChrome, MainButtonBar, useMainButtonStore, useTelegram } from '@/shared/telegram';
 import { AppToast } from '@/shared/ui';
 
 import { pageLeaveHandler, pageTransitionName } from './router/navigation/pageTransition';
@@ -25,12 +26,12 @@ import { pageLeaveHandler, pageTransitionName } from './router/navigation/pageTr
 const telegram = useTelegram();
 const mainButton = useMainButtonStore();
 
-// Вне Telegram рисуем заглушки его шапки и главной кнопки
+// Вне Telegram рисуем заглушку его шапки. Главная кнопка своя везде — под неё нужен отступ снизу
 const isDevChrome = !telegram.isTelegram;
 
 const appClasses = computed(() => ({
   'app--dev': isDevChrome,
-  'app--dev-main-button': isDevChrome && mainButton.state.visible,
+  'app--main-button': mainButton.state.visible,
 }));
 </script>
 
@@ -57,7 +58,7 @@ const appClasses = computed(() => ({
   --content-top: calc(var(--dev-header-height) + var(--safe-top) + 16px);
 }
 
-.app--dev-main-button {
+.app--main-button {
   --toast-offset: calc(var(--main-button-height) + 28px);
   --content-bottom: calc(var(--main-button-height) + 40px + var(--safe-bottom));
 }

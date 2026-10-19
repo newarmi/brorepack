@@ -13,8 +13,8 @@ export interface UseMainButtonOptions {
 }
 
 /**
- * Главная кнопка экрана. Внутри Telegram — нативная WebApp.MainButton,
- * в браузере — её имитация в DevTelegramChrome. Кнопка принадлежит
+ * Главная кнопка экрана. И в Telegram, и в браузере её рисует MainButtonBar
+ * (своя кнопка: у нативной WebApp.MainButton текст не анимируется). Кнопка принадлежит
  * последнему смонтированному экрану и прячется при его размонтировании.
  */
 export const useMainButton = (options: UseMainButtonOptions): void => {

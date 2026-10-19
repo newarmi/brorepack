@@ -20,43 +20,18 @@
 
     <span class="dev-chrome__more" aria-hidden="true">⋯</span>
   </header>
-
-  <Transition name="dev-chrome-bottom">
-    <div v-if="mainButton.state.visible" class="dev-chrome__bottom">
-      <button
-        type="button"
-        class="dev-chrome__main-button"
-        :disabled="mainButton.state.disabled"
-        :aria-busy="mainButton.state.loading || undefined"
-        @click="mainButton.click"
-      >
-        <span
-          v-if="mainButton.state.loading"
-          class="dev-chrome__spinner spinner"
-          aria-hidden="true"
-        />
-        <!-- Сменилась надпись — буквы «расшифровываются», сменилась сумма — цифры докручиваются -->
-        <GlitchText v-else :text="mainButton.state.text" />
-        <span v-if="mainButton.state.loading" class="visually-hidden">{{
-          mainButton.state.text
-        }}</span>
-      </button>
-    </div>
-  </Transition>
 </template>
 
 <script setup lang="ts">
 import AppIcon from '@/shared/ui/components/AppIcon.vue';
-import GlitchText from '@/shared/ui/components/GlitchText.vue';
 import { useToast } from '@/shared/ui/composables/useToast';
 
 import { useBackButtonStore } from '../stores/backButtonStore';
-import { useMainButtonStore } from '../stores/mainButtonStore';
 
 // Имитация нативной шапки и MainButton Telegram — только вне Telegram,
 // чтобы весь флоу можно было пройти в обычном браузере.
+// Главная кнопка теперь своя и в Telegram — она в MainButtonBar.vue
 
-const mainButton = useMainButtonStore();
 const backButton = useBackButtonStore();
 const { showToast } = useToast();
 
@@ -119,75 +94,5 @@ const closeHandler = (): void => {
   padding: 0 8px;
   font-size: 22px;
   letter-spacing: -1px;
-}
-
-.dev-chrome__bottom {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 40;
-  padding: 8px 12px calc(8px + var(--safe-bottom));
-  background: var(--color-bg);
-}
-
-.dev-chrome__main-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 560px;
-  height: var(--main-button-height);
-  margin: 0 auto;
-  border-radius: var(--radius-control);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  font-size: var(--text-base);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  transition:
-    background-color var(--transition-fast),
-    color var(--transition-fast),
-    transform var(--transition-fast);
-}
-
-.dev-chrome__main-button:active:not(:disabled) {
-  background: var(--color-accent-hi);
-  transform: scale(var(--press-scale));
-}
-
-.dev-chrome-bottom-enter-active {
-  transition: transform var(--duration-slow) var(--ease-out);
-}
-
-.dev-chrome-bottom-leave-active {
-  transition: transform var(--duration-base) var(--ease-in);
-}
-
-.dev-chrome-bottom-enter-from,
-.dev-chrome-bottom-leave-to {
-  transform: translateY(100%);
-}
-
-/* Как нативная кнопка в неактивном состоянии: THEME_COLORS.disabled / disabledText */
-.dev-chrome__main-button:disabled {
-  background: var(--color-line);
-  color: var(--color-faint);
-}
-
-.dev-chrome__spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: dev-chrome-spin 0.8s linear infinite;
-}
-
-@keyframes dev-chrome-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>
