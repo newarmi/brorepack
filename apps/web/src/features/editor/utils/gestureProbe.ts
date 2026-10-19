@@ -1,6 +1,9 @@
 // Временная диагностика жеста на телефоне: что приходит от касаний и успевает ли основной поток.
 // Слушает документ пассивно и ничего не отменяет, поэтому на сам жест не влияет
 
+import type { Point } from './imageTransform';
+import { createTouchJournal } from './touchJournal';
+
 export interface GestureProbeStats {
   /** Кадров основного потока за последнюю секунду */
   fps: number;
@@ -12,56 +15,12 @@ export interface GestureProbeStats {
   maxMoveGap: number;
   /** Сколько раз приходили события, обрывающие касание, — за всё время */
   ends: Record<string, number>;
-  /** Последний pointercancel: куда и сколько вёл палец от касания до обрыва */
-  lastCancel: string;
-}
-
-interface Touch {
-  x: number;
-  y: number;
-  time: number;
-  lastX: number;
-  lastY: number;
+  /** Журнал касаний: палец, картинка, когда она встала */
+  records: string[];
 }
 
 const END_EVENTS = ['pointerup', 'pointercancel', 'lostpointercapture', 'touchcancel'];
 const LISTENER_OPTIONS = { capture: true, passive: true };
-
-/** Где начался каждый палец и где он сейчас — чтобы описать обрыв касания */
-const createTouchTracker = () => {
-  const touches = new Map<number, Touch>();
-
-  const down = (event: PointerEvent): void => {
-    const { clientX: x, clientY: y, timeStamp: time } = event;
-    touches.set(event.pointerId, { x, y, time, lastX: x, lastY: y });
-  };
-
-  const move = (event: PointerEvent): void => {
-    const touch = touches.get(event.pointerId);
-    if (touch) {
-      touch.lastX = event.clientX;
-      touch.lastY = event.clientY;
-    }
-  };
-
-  const describe = (event: PointerEvent): string => {
-    const touch = touches.get(event.pointerId);
-    if (!touch) {
-      return 'без pointerdown';
-    }
-    const dx = Math.round(touch.lastX - touch.x);
-    const dy = Math.round(touch.lastY - touch.y);
-    const time = Math.round(event.timeStamp - touch.time);
-    const start = `${Math.round(touch.x)},${Math.round(touch.y)}`;
-    return `dx ${dx} dy ${dy} за ${time} мс, старт ${start}, пальцев ${touches.size}`;
-  };
-
-  const end = (event: PointerEvent): void => {
-    touches.delete(event.pointerId);
-  };
-
-  return { down, move, describe, end };
-};
 
 /** Замер за одну секунду */
 interface Sample {
@@ -76,7 +35,7 @@ const createSample = (): Sample => ({ frames: 0, moves: 0, maxFrameGap: 0, maxMo
 const buildStats = (
   sample: Sample,
   ends: Record<string, number>,
-  lastCancel: string,
+  records: string[],
 ): GestureProbeStats => {
   return {
     fps: sample.frames,
@@ -84,7 +43,7 @@ const buildStats = (
     movesPerSecond: sample.moves,
     maxMoveGap: Math.round(sample.maxMoveGap),
     ends: { ...ends },
-    lastCancel,
+    records: [...records],
   };
 };
 
@@ -99,11 +58,16 @@ const listenDocument = (handlers: Record<string, (event: PointerEvent) => void>)
   };
 };
 
-/** Запускает замер; onUpdate получает сводку раз в секунду. Возвращает функцию остановки */
-export const startGestureProbe = (onUpdate: (stats: GestureProbeStats) => void): (() => void) => {
-  const tracker = createTouchTracker();
+/**
+ * Запускает замер; onUpdate получает сводку раз в секунду. getImagePoint — центр картинки на экране.
+ * Возвращает функцию остановки
+ */
+export const startGestureProbe = (
+  onUpdate: (stats: GestureProbeStats) => void,
+  getImagePoint: () => Point | null,
+): (() => void) => {
+  const journal = createTouchJournal(getImagePoint);
   const ends: Record<string, number> = {};
-  let lastCancel = '—';
   let sample = createSample();
   let lastFrame = performance.now();
   let lastMove = 0;
@@ -118,7 +82,7 @@ export const startGestureProbe = (onUpdate: (stats: GestureProbeStats) => void):
 
   const moveHandler = (event: PointerEvent): void => {
     sample.moves += 1;
-    tracker.move(event);
+    journal.move(event);
     if (lastMove && event.buttons) {
       sample.maxMoveGap = Math.max(sample.maxMoveGap, event.timeStamp - lastMove);
     }
@@ -128,22 +92,19 @@ export const startGestureProbe = (onUpdate: (stats: GestureProbeStats) => void):
   const endHandler = (event: PointerEvent): void => {
     ends[event.type] = (ends[event.type] ?? 0) + 1;
     lastMove = 0;
-    if (event instanceof PointerEvent && event.type === 'pointercancel') {
-      lastCancel = tracker.describe(event);
-    }
     if (event instanceof PointerEvent && event.type !== 'lostpointercapture') {
-      tracker.end(event);
+      journal.end(event);
     }
   };
 
   const intervalId = setInterval(() => {
-    onUpdate(buildStats(sample, ends, lastCancel));
+    onUpdate(buildStats(sample, ends, journal.records));
     sample = createSample();
   }, 1000);
 
   frameId = requestAnimationFrame(frameHandler);
   const unlisten = listenDocument({
-    pointerdown: tracker.down,
+    pointerdown: journal.down,
     pointermove: moveHandler,
     ...Object.fromEntries(END_EVENTS.map((type) => [type, endHandler])),
   });
