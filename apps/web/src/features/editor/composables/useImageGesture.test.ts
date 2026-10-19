@@ -9,14 +9,8 @@ import { withSetup } from '@/shared/testing';
 import { getFitScale } from '../utils/imageTransform';
 import { useImageGesture } from './useImageGesture';
 
-const createTouchEvent = (type: string, clientX: number): Event => {
-  const event = new Event(type, { bubbles: true, cancelable: true });
-  const touches = [{ identifier: 0, clientX, clientY: 0 }];
-  Object.defineProperties(event, {
-    changedTouches: { value: touches },
-    touches: { value: touches },
-  });
-  return event;
+const createPointerEvent = (type: string, clientX: number): PointerEvent => {
+  return new PointerEvent(type, { pointerId: 1, button: 0, clientX, bubbles: true });
 };
 
 const createImage = (): PlaqueImage => {
@@ -26,6 +20,7 @@ const createImage = (): PlaqueImage => {
 
 const setup = () => {
   const element = document.createElement('div');
+  element.setPointerCapture = () => {};
   document.body.append(element);
   // Рамка шириной в лист: экранный пиксель = пункт
   vi.spyOn(element, 'getBoundingClientRect').mockReturnValue(
@@ -56,12 +51,33 @@ describe('useImageGesture', () => {
   it('keeps following the finger after the image has moved', async () => {
     const { element, image, wrapper } = setup();
 
-    element.dispatchEvent(createTouchEvent('touchstart', 10));
-    element.dispatchEvent(createTouchEvent('touchmove', 20));
+    element.dispatchEvent(createPointerEvent('pointerdown', 10));
+    element.dispatchEvent(createPointerEvent('pointermove', 20));
     await nextTick();
-    element.dispatchEvent(createTouchEvent('touchmove', 210));
+    element.dispatchEvent(createPointerEvent('pointermove', 210));
 
     expect(image.value?.x).toBe(300);
     wrapper.unmount();
+  });
+
+  it('does nothing until the image is loaded', () => {
+    const { element, image, wrapper } = setup();
+    image.value = null;
+
+    element.dispatchEvent(createPointerEvent('pointerdown', 10));
+    element.dispatchEvent(createPointerEvent('pointermove', 30));
+
+    expect(image.value).toBeNull();
+    wrapper.unmount();
+  });
+
+  it('stops listening after unmount', () => {
+    const { element, image, wrapper } = setup();
+    wrapper.unmount();
+
+    element.dispatchEvent(createPointerEvent('pointerdown', 10));
+    element.dispatchEvent(createPointerEvent('pointermove', 30));
+
+    expect(image.value?.x).toBe(100);
   });
 });

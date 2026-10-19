@@ -1,4 +1,4 @@
-import { computed, onBeforeUnmount, watch } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 import type { Ref } from 'vue';
 
 import type { PlaqueImage, PlaqueImageTransform } from '@brorepack/shared';
@@ -17,6 +17,7 @@ export const useImageGesture = (
 ) => {
   let unbind: (() => void) | null = null;
 
+  // Картинки может ещё не быть (файл читается из IndexedDB) — тогда жест ничего не меняет
   const changeHandler = (transform: PlaqueImageTransform): void => {
     const image = getImage();
     if (image) {
@@ -29,27 +30,16 @@ export const useImageGesture = (
     return image ? pickTransform(image) : { x: 0, y: 0, scale: 1, rotation: 0 };
   };
 
-  // Следим только за фактом «картинка есть», а не за её положением: иначе жест перевешивался бы каждый кадр.
-  // Именно computed, а не функция в источниках watch: в продакшен-сборке useTemplateRef отдаёт shallowRef,
-  // и с ним watch зовёт обработчик при каждом изменении картинки, даже если результат функции тот же.
-  // Жест перевешивался с пустым списком пальцев — картинка сдвигалась на первый move и вставала
-  const hasImage = computed(() => getImage() !== null);
-
-  watch(
-    [elements.target, elements.frame, hasImage],
-    ([element, frameElement]) => {
-      unbind?.();
-      unbind =
-        element && frameElement && hasImage.value
-          ? bindImageGesture(element, {
-              frame: frameElement,
-              getTransform,
-              onChange: changeHandler,
-            })
-          : null;
-    },
-    { immediate: true },
-  );
+  // Один раз на всё время жизни экрана: сцена и рамка есть в разметке всегда.
+  // Раньше жест перевешивался из watch, и в продакшен-сборке это происходило на каждом сдвиге картинки:
+  // новый жест не знал о пальце на экране, и картинка вставала
+  onMounted(() => {
+    const target = elements.target.value;
+    const frame = elements.frame.value;
+    if (target && frame) {
+      unbind = bindImageGesture(target, { frame, getTransform, onChange: changeHandler });
+    }
+  });
 
   onBeforeUnmount(() => unbind?.());
 };
