@@ -213,6 +213,11 @@ const sizeCaption = computed(() => {
   animation-play-state: running;
 }
 
+/* У 3D своя кромка: скрытая CSS-кромка иначе крутилась бы впустую, перерисовывая размытие каждый кадр */
+.plaque-stage__product--3d .plaque-stage__glow::before {
+  animation-play-state: paused;
+}
+
 .plaque-stage__caption {
   display: flex;
   flex-direction: column;

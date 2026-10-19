@@ -1,9 +1,8 @@
 import type { PlaqueDesign } from '@brorepack/shared';
 import { PLAQUE_PRINT_SIZE_MM, renderPlaqueSvg } from '@brorepack/shared';
 
-import { loadPrintArt } from '@/entities/plaque';
+import { loadEmbeddedFontCss, loadPrintArt } from '@/entities/plaque';
 
-import { loadEmbeddedFontCss } from './embeddedFonts';
 import { setPngDpi } from './pngDpi';
 
 // Файлы для типографии в браузере: нужны, когда бэкенд на Apps Script — он не умеет PNG.
