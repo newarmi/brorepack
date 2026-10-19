@@ -19,12 +19,46 @@ export const countGesture = (name: string): void => {
   gestureCounters[name] = (gestureCounters[name] ?? 0) + 1;
 };
 
-/** Экранная точка → пункты листа */
-const toPlaquePoint = (frame: HTMLElement, event: MouseEvent): Point => {
+type ScreenPoint = Pick<MouseEvent, 'clientX' | 'clientY'>;
+
+/** Экранная точка (курсор или палец) → пункты листа */
+const toPlaquePoint = (frame: HTMLElement, point: ScreenPoint): Point => {
   const rect = frame.getBoundingClientRect();
   const ratio = PLAQUE_VIEWBOX.width / rect.width;
-  return { x: (event.clientX - rect.left) * ratio, y: (event.clientY - rect.top) * ratio };
+  return { x: (point.clientX - rect.left) * ratio, y: (point.clientY - rect.top) * ratio };
 };
+
+/**
+ * Пальцы и курсор, которые сейчас двигают картинку. Шаг считается от положения картинки и пальцев
+ * в начале жеста, а не накапливается по событиям
+ */
+const createGesture = (options: ImageGestureOptions) => {
+  const pointers = new Map<number, Point>();
+  let startTransform: PlaqueImageTransform | null = null;
+  let startPoints: Point[] = [];
+
+  // Палец добавился или убрался — новый отсчёт, иначе картинка прыгнет
+  const restart = (): void => {
+    startTransform = pointers.size > 0 ? options.getTransform() : null;
+    startPoints = [...pointers.values()].slice(0, 2);
+  };
+
+  // Было «не чаще кадра: каждое изменение перерисовывает SVG плашки».
+  // Теперь картинка двигается CSS-трансформацией, а WebKit и так присылает движение не чаще кадра, — поэтому
+  // сразу в обработчике, без requestAnimationFrame: в Telegram на iPhone отложенный кадр мог не дождаться
+  // следующего движения, и картинка стояла
+  const apply = (): void => {
+    countGesture(startTransform ? 'apply' : 'applyIdle');
+    if (startTransform) {
+      const points = [...pointers.values()].slice(0, 2);
+      options.onChange(applyGestureStep(startTransform, getPointersStep(startPoints, points)));
+    }
+  };
+
+  return { pointers, restart, apply };
+};
+
+type Gesture = ReturnType<typeof createGesture>;
 
 /** Колесо мыши масштабирует картинку вокруг курсора, а не прокручивает страницу */
 const createWheelHandler = (options: ImageGestureOptions) => {
@@ -36,143 +70,127 @@ const createWheelHandler = (options: ImageGestureOptions) => {
   };
 };
 
-type PointerHandler = (event: PointerEvent) => void;
-
-interface GestureHandlers {
-  down: PointerHandler;
-  move: PointerHandler;
-  end: PointerHandler;
-  wheel: (event: WheelEvent) => void;
-}
-
 /**
  * iOS (Safari и Telegram) на экране поверх страницы может забрать палец под прокрутку или «резиновый»
  * отскок, несмотря на touch-action: none, — тогда приходит pointercancel и картинка не двигается.
  * Отмена touchmove надёжно оставляет жест нам.
  * Отмены одного touchmove мало: в Telegram на iPhone веб-вью решает «это прокрутка» уже на первом
  * сдвиге пальца и обрывает касание через ~80 мс (замер на устройстве). Отменённый touchstart
- * сразу говорит WebKit, что касание наше, и прокрутка не начинается
+ * сразу говорит WebKit, что касание наше, и прокрутка не начинается.
+ *
+ * Пальцы — через Touch Events на самой сцене. Касание всегда приходит туда, где началось, даже если палец
+ * ушёл за край, поэтому захват и слушатели на window не нужны. Захват пальца (setPointerCapture)
+ * не используем — Telegram на iPhone снимает его через ~30 мс после начала движения (lostpointercapture,
+ * замер на устройстве), и картинка вставала, хотя палец ещё двигался. Без захвата Pointer Events для пальца
+ * в Telegram на iPhone всё равно двигали картинку только в первые ~30 мс касания, в Safari такого нет
  */
-const preventTouchScroll = (event: TouchEvent): void => {
-  event.preventDefault();
-};
-
-/**
- * Касание начинается на сцене, а движение и отпускание слушаются на window: палец может уйти за край
- * сцены, а жест продолжится. Захват пальца (setPointerCapture) не используем — Telegram на iPhone
- * снимает его через ~30 мс после начала движения (lostpointercapture, замер на устройстве),
- * и картинка вставала, хотя палец ещё двигался.
- * wheel, touchstart и touchmove — не passive, иначе preventDefault не остановит прокрутку
- */
-const listenGesture = (element: HTMLElement, handlers: GestureHandlers): (() => void) => {
-  element.addEventListener('touchstart', preventTouchScroll, { passive: false });
-  element.addEventListener('touchmove', preventTouchScroll, { passive: false });
-  element.addEventListener('pointerdown', handlers.down);
-  element.addEventListener('wheel', handlers.wheel, { passive: false });
-  window.addEventListener('pointermove', handlers.move);
-  window.addEventListener('pointerup', handlers.end);
-  window.addEventListener('pointercancel', handlers.end);
-  return () => {
-    element.removeEventListener('touchstart', preventTouchScroll);
-    element.removeEventListener('touchmove', preventTouchScroll);
-    element.removeEventListener('pointerdown', handlers.down);
-    element.removeEventListener('wheel', handlers.wheel);
-    window.removeEventListener('pointermove', handlers.move);
-    window.removeEventListener('pointerup', handlers.end);
-    window.removeEventListener('pointercancel', handlers.end);
+const createTouchHandlers = (gesture: Gesture, frame: HTMLElement) => {
+  const start = (event: TouchEvent): void => {
+    event.preventDefault();
+    countGesture('touchstart');
+    // Первый палец нового касания сбрасывает прежние: если отпускание прошлого потерялось, он не помешает
+    if (event.touches.length === event.changedTouches.length) {
+      gesture.pointers.clear();
+    }
+    Array.from(event.changedTouches).forEach((touch) => {
+      gesture.pointers.set(touch.identifier, toPlaquePoint(frame, touch));
+    });
+    gesture.restart();
   };
-};
 
-/** Первый палец нового касания сбрасывает прежние: если отпускание прошлого потерялось, он не помешает */
-const addPointer = (
-  pointers: Map<number, Point>,
-  event: PointerEvent,
-  frame: HTMLElement,
-): void => {
-  countGesture('down');
-  if (event.isPrimary) {
-    pointers.clear();
-  }
-  pointers.set(event.pointerId, toPlaquePoint(frame, event));
-};
+  const move = (event: TouchEvent): void => {
+    event.preventDefault();
+    countGesture('touchmove');
+    const touches = Array.from(event.changedTouches).filter((touch) =>
+      gesture.pointers.has(touch.identifier),
+    );
+    touches.forEach((touch) => {
+      gesture.pointers.set(touch.identifier, toPlaquePoint(frame, touch));
+    });
+    if (touches.length > 0) {
+      gesture.apply();
+    }
+  };
 
-/** Новое положение пальца, если он участвует в жесте; false — чужой палец */
-const updatePointer = (
-  pointers: Map<number, Point>,
-  event: PointerEvent,
-  frame: HTMLElement,
-): boolean => {
-  const isTracked = pointers.has(event.pointerId);
-  countGesture(isTracked ? 'move' : 'ignored');
-  if (isTracked) {
-    pointers.set(event.pointerId, toPlaquePoint(frame, event));
-  }
-  return isTracked;
+  const end = (event: TouchEvent): void => {
+    countGesture(`end:${event.type}`);
+    const removed = Array.from(event.changedTouches).filter((touch) =>
+      gesture.pointers.delete(touch.identifier),
+    );
+    if (removed.length > 0) {
+      gesture.restart();
+    }
+  };
+
+  return { start, move, end };
 };
 
 /**
- * Двигает картинку клиента по плашке через Pointer Events: мышь или один палец — сдвиг,
+ * Мышь и перо — через Pointer Events: нажатие на сцене, движение и отпускание на window,
+ * чтобы курсор мог уйти за край сцены. Пальцы здесь пропускаем — их ведут Touch Events
+ */
+const createPointerHandlers = (gesture: Gesture, frame: HTMLElement) => {
+  const down = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch' || event.button !== 0) {
+      return;
+    }
+    // WebKit иначе начинает выделение текста или перетаскивание картинки мышью
+    event.preventDefault();
+    gesture.pointers.clear();
+    gesture.pointers.set(event.pointerId, toPlaquePoint(frame, event));
+    gesture.restart();
+  };
+
+  const move = (event: PointerEvent): void => {
+    if (event.pointerType !== 'touch' && gesture.pointers.has(event.pointerId)) {
+      gesture.pointers.set(event.pointerId, toPlaquePoint(frame, event));
+      gesture.apply();
+    }
+  };
+
+  const end = (event: PointerEvent): void => {
+    if (event.pointerType !== 'touch' && gesture.pointers.delete(event.pointerId)) {
+      gesture.restart();
+    }
+  };
+
+  return { down, move, end };
+};
+
+/**
+ * Двигает картинку клиента по плашке: мышь или один палец — сдвиг,
  * два пальца — ещё масштаб и поворот, колесо мыши — масштаб вокруг курсора.
+ * touchstart, touchmove и wheel — не passive, иначе preventDefault не остановит прокрутку.
  * Возвращает функцию, которая снимает обработчики
  */
 export const bindImageGesture = (
   element: HTMLElement,
   options: ImageGestureOptions,
 ): (() => void) => {
-  const pointers = new Map<number, Point>();
-  // Положение картинки и пальцев в начале жеста: шаг считается от них, а не накапливается по кадрам
-  let startTransform: PlaqueImageTransform | null = null;
-  let startPoints: Point[] = [];
-  let frameId = 0;
+  const gesture = createGesture(options);
+  const touch = createTouchHandlers(gesture, options.frame);
+  const pointer = createPointerHandlers(gesture, options.frame);
+  const wheel = createWheelHandler(options);
 
-  // Палец добавился или убрался — новый отсчёт, иначе картинка прыгнет
-  const restartGesture = (): void => {
-    startTransform = pointers.size > 0 ? options.getTransform() : null;
-    startPoints = [...pointers.values()].slice(0, 2);
-  };
-
-  // Не чаще кадра: каждое изменение перерисовывает SVG плашки
-  const applyPointers = (): void => {
-    frameId = 0;
-    countGesture(startTransform ? 'apply' : 'applyIdle');
-    if (startTransform) {
-      const points = [...pointers.values()].slice(0, 2);
-      options.onChange(applyGestureStep(startTransform, getPointersStep(startPoints, points)));
-    }
-  };
-
-  const pointerDownHandler = (event: PointerEvent): void => {
-    if (event.pointerType === 'mouse' && event.button !== 0) {
-      return;
-    }
-    // WebKit иначе начинает выделение текста или перетаскивание картинки мышью
-    event.preventDefault();
-    addPointer(pointers, event, options.frame);
-    restartGesture();
-  };
-
-  const pointerMoveHandler = (event: PointerEvent): void => {
-    if (updatePointer(pointers, event, options.frame)) {
-      frameId ||= requestAnimationFrame(applyPointers);
-    }
-  };
-
-  const pointerEndHandler = (event: PointerEvent): void => {
-    countGesture(`end:${event.type}`);
-    if (pointers.delete(event.pointerId)) {
-      restartGesture();
-    }
-  };
-
-  const unlisten = listenGesture(element, {
-    down: pointerDownHandler,
-    move: pointerMoveHandler,
-    end: pointerEndHandler,
-    wheel: createWheelHandler(options),
-  });
+  element.addEventListener('touchstart', touch.start, { passive: false });
+  element.addEventListener('touchmove', touch.move, { passive: false });
+  element.addEventListener('touchend', touch.end);
+  element.addEventListener('touchcancel', touch.end);
+  element.addEventListener('pointerdown', pointer.down);
+  element.addEventListener('wheel', wheel, { passive: false });
+  window.addEventListener('pointermove', pointer.move);
+  window.addEventListener('pointerup', pointer.end);
+  window.addEventListener('pointercancel', pointer.end);
 
   return () => {
-    cancelAnimationFrame(frameId);
-    unlisten();
+    element.removeEventListener('touchstart', touch.start);
+    element.removeEventListener('touchmove', touch.move);
+    element.removeEventListener('touchend', touch.end);
+    element.removeEventListener('touchcancel', touch.end);
+    element.removeEventListener('pointerdown', pointer.down);
+    element.removeEventListener('wheel', wheel);
+    window.removeEventListener('pointermove', pointer.move);
+    window.removeEventListener('pointerup', pointer.end);
+    window.removeEventListener('pointercancel', pointer.end);
   };
 };
