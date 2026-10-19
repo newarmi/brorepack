@@ -1,4 +1,4 @@
-import { onBeforeUnmount, watch } from 'vue';
+import { computed, onBeforeUnmount, watch } from 'vue';
 import type { Ref } from 'vue';
 
 import type { PlaqueImage, PlaqueImageTransform } from '@brorepack/shared';
@@ -30,14 +30,19 @@ export const useImageGesture = (
     return image ? pickTransform(image) : { x: 0, y: 0, scale: 1, rotation: 0 };
   };
 
-  // Следим только за фактом «картинка есть», а не за её положением: иначе жест перевешивался бы каждый кадр
+  // Следим только за фактом «картинка есть», а не за её положением: иначе жест перевешивался бы каждый кадр.
+  // Именно computed, а не функция в источниках watch: в продакшен-сборке useTemplateRef отдаёт shallowRef,
+  // и с ним watch зовёт обработчик при каждом изменении картинки, даже если результат функции тот же.
+  // Жест перевешивался с пустым списком пальцев — картинка сдвигалась на первый move и вставала
+  const hasImage = computed(() => getImage() !== null);
+
   watch(
-    [elements.target, elements.frame, () => getImage() !== null],
-    ([element, frameElement, hasImage]) => {
+    [elements.target, elements.frame, hasImage],
+    ([element, frameElement]) => {
       unbind?.();
       countGesture('bind');
       unbind =
-        element && frameElement && hasImage
+        element && frameElement && hasImage.value
           ? bindImageGesture(element, {
               frame: frameElement,
               getTransform,
