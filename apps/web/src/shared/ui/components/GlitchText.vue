@@ -1,5 +1,8 @@
 <template>
-  <span class="glitch-text" :class="{ 'glitch-text--glitch': isGlitching }">
+  <span
+    class="glitch-text"
+    :class="{ 'glitch-text--glitch': isGlitching, 'glitch-text--multiline': props.isMultiline }"
+  >
     <span class="visually-hidden">{{ props.text }}</span>
     <!-- Каждая цифра — барабан 0–9, он прокручивается к новой цифре.
          Изменившиеся буквы на мгновение перебирают пиксельные глифы и проявляются слева направо -->
@@ -24,10 +27,15 @@ import { computed, onScopeDispose, shallowRef, watch } from 'vue';
 
 import { useTextScramble } from '../composables/useTextScramble';
 
-const props = defineProps<{
-  /** Готовая строка: «3 470 ₽», «Оплатить 3 470 ₽» */
-  text: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    /** Готовая строка: «3 470 ₽», «Оплатить 3 470 ₽» */
+    text: string;
+    /** Длинный текст (подсказка поля): переносится по словам, а не тянется в одну строку */
+    isMultiline?: boolean;
+  }>(),
+  { isMultiline: false },
+);
 
 // Барабан — 10 цифр столбиком: сдвиг на цифру — 10% его высоты
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -93,6 +101,17 @@ onScopeDispose(() => clearTimeout(timer));
   overflow: hidden;
   line-height: 1.2em;
   vertical-align: bottom;
+}
+
+/* Блок, а не строка: так текст переносится по пробелам, а сдвиг глитча (transform) продолжает работать */
+.glitch-text--multiline,
+.glitch-text--multiline .glitch-text__chars {
+  display: block;
+  white-space: normal;
+}
+
+.glitch-text--multiline .glitch-text__char {
+  white-space: pre-wrap;
 }
 
 /* steps — цифры щёлкают по кадрам, как на табло, а не плывут */

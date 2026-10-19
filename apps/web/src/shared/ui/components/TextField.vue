@@ -55,12 +55,17 @@
     <p v-if="props.error" :id="errorId" class="text-field__error appear" role="alert">
       {{ props.error }}
     </p>
-    <p v-if="props.hint" :id="hintId" class="text-field__hint">{{ props.hint }}</p>
+    <!-- Подсказка меняется вместе с выбором (способ доставки) — новая «расшифровывается», как цены -->
+    <p v-if="props.hint" :id="hintId" class="text-field__hint">
+      <GlitchText :text="props.hint" isMultiline />
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, useId } from 'vue';
+
+import GlitchText from './GlitchText.vue';
 
 const emits = defineEmits<{ blur: [] }>();
 
