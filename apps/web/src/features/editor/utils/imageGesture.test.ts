@@ -49,6 +49,17 @@ describe('bindImageGesture', () => {
     expect(gesture.onChange).toHaveBeenCalledWith(expect.objectContaining({ x: 120, y: 100 }));
   });
 
+  // Telegram на iPhone иначе забирает палец под прокрутку веб-вью на первом же сдвиге
+  it('cancels touchstart, so iOS does not start scrolling under the finger', () => {
+    const gesture = setup();
+    unbind = gesture.unbind;
+
+    const event = new Event('touchstart', { bubbles: true, cancelable: true });
+    gesture.child.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
   it('stops dragging when the stage itself loses the capture', async () => {
     const gesture = setup();
     unbind = gesture.unbind;
