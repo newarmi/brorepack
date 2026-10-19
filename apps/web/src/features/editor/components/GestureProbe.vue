@@ -7,6 +7,7 @@
 import { computed, onBeforeUnmount, onMounted, shallowRef } from 'vue';
 
 import { BUILD_ID } from '@/shared/config';
+import { describeTelegramClient } from '@/shared/telegram';
 
 import type { GestureProbeStats } from '../utils/gestureProbe';
 import { startGestureProbe } from '../utils/gestureProbe';
@@ -24,9 +25,11 @@ const text = computed(() => {
     .join('\n');
   return [
     `build ${BUILD_ID}`,
+    `tg ${describeTelegramClient()}`,
     `fps ${value.fps} · пауза кадра ${value.maxFrameGap} мс`,
     `move/с ${value.movesPerSecond} · пауза move ${value.maxMoveGap} мс`,
     ends,
+    `cancel: ${value.lastCancel}`,
   ].join('\n');
 });
 

@@ -83,6 +83,8 @@ export interface TelegramWebApp {
   setBottomBarColor?(color: string): void;
   /** Bot API 7.7+ */
   disableVerticalSwipes?(): void;
+  /** Bot API 7.7+ */
+  readonly isVerticalSwipesEnabled?: boolean;
   openInvoice(url: string, callback?: (status: TelegramInvoiceStatus) => void): void;
   requestContact(
     callback?: (isShared: boolean, response?: TelegramRequestContactResponse) => void,

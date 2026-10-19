@@ -12,67 +12,145 @@ export interface GestureProbeStats {
   maxMoveGap: number;
   /** Сколько раз приходили события, обрывающие касание, — за всё время */
   ends: Record<string, number>;
+  /** Последний pointercancel: куда и сколько вёл палец от касания до обрыва */
+  lastCancel: string;
+}
+
+interface Touch {
+  x: number;
+  y: number;
+  time: number;
+  lastX: number;
+  lastY: number;
 }
 
 const END_EVENTS = ['pointerup', 'pointercancel', 'lostpointercapture', 'touchcancel'];
+const LISTENER_OPTIONS = { capture: true, passive: true };
 
-const createStats = (): GestureProbeStats => {
-  return { fps: 0, maxFrameGap: 0, movesPerSecond: 0, maxMoveGap: 0, ends: {} };
+/** Где начался каждый палец и где он сейчас — чтобы описать обрыв касания */
+const createTouchTracker = () => {
+  const touches = new Map<number, Touch>();
+
+  const down = (event: PointerEvent): void => {
+    const { clientX: x, clientY: y, timeStamp: time } = event;
+    touches.set(event.pointerId, { x, y, time, lastX: x, lastY: y });
+  };
+
+  const move = (event: PointerEvent): void => {
+    const touch = touches.get(event.pointerId);
+    if (touch) {
+      touch.lastX = event.clientX;
+      touch.lastY = event.clientY;
+    }
+  };
+
+  const describe = (event: PointerEvent): string => {
+    const touch = touches.get(event.pointerId);
+    if (!touch) {
+      return 'без pointerdown';
+    }
+    const dx = Math.round(touch.lastX - touch.x);
+    const dy = Math.round(touch.lastY - touch.y);
+    const time = Math.round(event.timeStamp - touch.time);
+    const start = `${Math.round(touch.x)},${Math.round(touch.y)}`;
+    return `dx ${dx} dy ${dy} за ${time} мс, старт ${start}, пальцев ${touches.size}`;
+  };
+
+  const end = (event: PointerEvent): void => {
+    touches.delete(event.pointerId);
+  };
+
+  return { down, move, describe, end };
+};
+
+/** Замер за одну секунду */
+interface Sample {
+  frames: number;
+  moves: number;
+  maxFrameGap: number;
+  maxMoveGap: number;
+}
+
+const createSample = (): Sample => ({ frames: 0, moves: 0, maxFrameGap: 0, maxMoveGap: 0 });
+
+const buildStats = (
+  sample: Sample,
+  ends: Record<string, number>,
+  lastCancel: string,
+): GestureProbeStats => {
+  return {
+    fps: sample.frames,
+    maxFrameGap: Math.round(sample.maxFrameGap),
+    movesPerSecond: sample.moves,
+    maxMoveGap: Math.round(sample.maxMoveGap),
+    ends: { ...ends },
+    lastCancel,
+  };
+};
+
+/** Пассивные слушатели на документе в фазе захвата; возвращает функцию, которая их снимает */
+const listenDocument = (handlers: Record<string, (event: PointerEvent) => void>): (() => void) => {
+  const entries = Object.entries(handlers) as [string, EventListener][];
+  entries.forEach(([type, handler]) => document.addEventListener(type, handler, LISTENER_OPTIONS));
+  return () => {
+    entries.forEach(([type, handler]) =>
+      document.removeEventListener(type, handler, LISTENER_OPTIONS),
+    );
+  };
 };
 
 /** Запускает замер; onUpdate получает сводку раз в секунду. Возвращает функцию остановки */
 export const startGestureProbe = (onUpdate: (stats: GestureProbeStats) => void): (() => void) => {
-  const total = createStats();
-  let frames = 0;
-  let moves = 0;
-  let maxFrameGap = 0;
-  let maxMoveGap = 0;
+  const tracker = createTouchTracker();
+  const ends: Record<string, number> = {};
+  let lastCancel = '—';
+  let sample = createSample();
   let lastFrame = performance.now();
   let lastMove = 0;
   let frameId = 0;
 
   const frameHandler = (now: number): void => {
-    frames += 1;
-    maxFrameGap = Math.max(maxFrameGap, now - lastFrame);
+    sample.frames += 1;
+    sample.maxFrameGap = Math.max(sample.maxFrameGap, now - lastFrame);
     lastFrame = now;
     frameId = requestAnimationFrame(frameHandler);
   };
 
   const moveHandler = (event: PointerEvent): void => {
-    moves += 1;
+    sample.moves += 1;
+    tracker.move(event);
     if (lastMove && event.buttons) {
-      maxMoveGap = Math.max(maxMoveGap, event.timeStamp - lastMove);
+      sample.maxMoveGap = Math.max(sample.maxMoveGap, event.timeStamp - lastMove);
     }
     lastMove = event.buttons ? event.timeStamp : 0;
   };
 
-  const endHandler = (event: Event): void => {
-    total.ends[event.type] = (total.ends[event.type] ?? 0) + 1;
+  const endHandler = (event: PointerEvent): void => {
+    ends[event.type] = (ends[event.type] ?? 0) + 1;
     lastMove = 0;
+    if (event instanceof PointerEvent && event.type === 'pointercancel') {
+      lastCancel = tracker.describe(event);
+    }
+    if (event instanceof PointerEvent && event.type !== 'lostpointercapture') {
+      tracker.end(event);
+    }
   };
 
   const intervalId = setInterval(() => {
-    onUpdate({
-      fps: frames,
-      maxFrameGap: Math.round(maxFrameGap),
-      movesPerSecond: moves,
-      maxMoveGap: Math.round(maxMoveGap),
-      ends: { ...total.ends },
-    });
-    frames = 0;
-    moves = 0;
-    maxFrameGap = 0;
-    maxMoveGap = 0;
+    onUpdate(buildStats(sample, ends, lastCancel));
+    sample = createSample();
   }, 1000);
 
   frameId = requestAnimationFrame(frameHandler);
-  document.addEventListener('pointermove', moveHandler, { capture: true, passive: true });
-  END_EVENTS.forEach((type) => document.addEventListener(type, endHandler, { capture: true, passive: true }));
+  const unlisten = listenDocument({
+    pointerdown: tracker.down,
+    pointermove: moveHandler,
+    ...Object.fromEntries(END_EVENTS.map((type) => [type, endHandler])),
+  });
 
   return () => {
     cancelAnimationFrame(frameId);
     clearInterval(intervalId);
-    document.removeEventListener('pointermove', moveHandler, { capture: true });
-    END_EVENTS.forEach((type) => document.removeEventListener(type, endHandler, { capture: true }));
+    unlisten();
   };
 };

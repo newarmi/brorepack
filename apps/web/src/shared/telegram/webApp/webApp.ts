@@ -18,3 +18,11 @@ export const startParam: string | null = isTelegram
 export const checkTelegramVersion = (version: string): boolean => {
   return isTelegram && Boolean(webApp?.isVersionAtLeast(version));
 };
+
+/** Клиент Telegram одной строкой — для временной диагностики жестов */
+export const describeTelegramClient = (): string => {
+  if (!webApp) {
+    return 'не Telegram';
+  }
+  return `${webApp.platform} ${webApp.version} · vswipes ${String(webApp.isVerticalSwipesEnabled)}`;
+};
