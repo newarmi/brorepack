@@ -17,7 +17,13 @@
       <div class="image-stage__plaque">
         <PlaquePreview :design="props.design" layer="back" decorative />
         <div v-if="props.image" class="image-stage__clip">
-          <img class="image-stage__photo" :src="props.image.href" :style="photoStyle" alt="" draggable="false" />
+          <img
+            class="image-stage__photo"
+            :src="props.image.href"
+            :style="photoStyle"
+            alt=""
+            draggable="false"
+          />
         </div>
         <PlaquePreview class="image-stage__front" :design="props.design" layer="front" />
       </div>

@@ -17,6 +17,7 @@ import { describeTelegramClient } from '@/shared/telegram';
 
 import type { GestureProbeStats } from '../utils/gestureProbe';
 import { startGestureProbe } from '../utils/gestureProbe';
+import { gestureCounters } from '../utils/imageGesture';
 import type { Point } from '../utils/imageTransform';
 
 const VISIBLE_RECORDS = 3;
@@ -45,6 +46,9 @@ const buildSummary = (value: GestureProbeStats): string[] => {
     `fps ${value.fps} · пауза кадра ${value.maxFrameGap} мс`,
     `move/с ${value.movesPerSecond} · пауза move ${value.maxMoveGap} мс`,
     ends.join(' · '),
+    Object.entries(gestureCounters)
+      .map(([name, count]) => `${name} ${count}`)
+      .join(' · '),
   ];
 };
 

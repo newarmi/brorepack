@@ -12,6 +12,13 @@ export interface ImageGestureOptions {
   onChange: (transform: PlaqueImageTransform) => void;
 }
 
+/** Временная диагностика: что происходит внутри жеста на телефоне (показывает GestureProbe) */
+export const gestureCounters: Record<string, number> = {};
+
+export const countGesture = (name: string): void => {
+  gestureCounters[name] = (gestureCounters[name] ?? 0) + 1;
+};
+
 /** Экранная точка → пункты листа */
 const toPlaquePoint = (frame: HTMLElement, event: MouseEvent): Point => {
   const rect = frame.getBoundingClientRect();
@@ -82,10 +89,25 @@ const addPointer = (
   event: PointerEvent,
   frame: HTMLElement,
 ): void => {
+  countGesture('down');
   if (event.isPrimary) {
     pointers.clear();
   }
   pointers.set(event.pointerId, toPlaquePoint(frame, event));
+};
+
+/** Новое положение пальца, если он участвует в жесте; false — чужой палец */
+const updatePointer = (
+  pointers: Map<number, Point>,
+  event: PointerEvent,
+  frame: HTMLElement,
+): boolean => {
+  const isTracked = pointers.has(event.pointerId);
+  countGesture(isTracked ? 'move' : 'ignored');
+  if (isTracked) {
+    pointers.set(event.pointerId, toPlaquePoint(frame, event));
+  }
+  return isTracked;
 };
 
 /**
@@ -112,6 +134,7 @@ export const bindImageGesture = (
   // Не чаще кадра: каждое изменение перерисовывает SVG плашки
   const applyPointers = (): void => {
     frameId = 0;
+    countGesture(startTransform ? 'apply' : 'applyIdle');
     if (startTransform) {
       const points = [...pointers.values()].slice(0, 2);
       options.onChange(applyGestureStep(startTransform, getPointersStep(startPoints, points)));
@@ -129,13 +152,13 @@ export const bindImageGesture = (
   };
 
   const pointerMoveHandler = (event: PointerEvent): void => {
-    if (pointers.has(event.pointerId)) {
-      pointers.set(event.pointerId, toPlaquePoint(options.frame, event));
+    if (updatePointer(pointers, event, options.frame)) {
       frameId ||= requestAnimationFrame(applyPointers);
     }
   };
 
   const pointerEndHandler = (event: PointerEvent): void => {
+    countGesture(`end:${event.type}`);
     if (pointers.delete(event.pointerId)) {
       restartGesture();
     }
