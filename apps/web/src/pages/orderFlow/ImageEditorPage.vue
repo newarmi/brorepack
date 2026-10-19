@@ -47,6 +47,8 @@ useMainButton({
   margin: 0 auto;
   padding: var(--content-top) calc(var(--screen-padding) + var(--safe-right)) var(--content-bottom)
     calc(var(--screen-padding) + var(--safe-left));
+  /* Без «резинового» отскока: на iOS он перехватывал палец у жеста картинки */
+  overscroll-behavior: none;
   background: var(--color-bg);
 }
 

@@ -39,10 +39,20 @@ interface GestureHandlers {
 }
 
 /**
+ * iOS (Safari и Telegram) на экране поверх страницы может забрать палец под прокрутку или «резиновый»
+ * отскок, несмотря на touch-action: none, — тогда приходит pointercancel и картинка не двигается.
+ * Отмена touchmove надёжно оставляет жест нам
+ */
+const preventTouchScroll = (event: TouchEvent): void => {
+  event.preventDefault();
+};
+
+/**
  * up, cancel и потеря захвата (системный жест, сворачивание приложения) завершают касание одинаково.
- * wheel — не passive, иначе preventDefault не остановит прокрутку
+ * wheel и touchmove — не passive, иначе preventDefault не остановит прокрутку
  */
 const listenGesture = (element: HTMLElement, handlers: GestureHandlers): (() => void) => {
+  element.addEventListener('touchmove', preventTouchScroll, { passive: false });
   element.addEventListener('pointerdown', handlers.down);
   element.addEventListener('pointermove', handlers.move);
   element.addEventListener('pointerup', handlers.end);
@@ -50,6 +60,7 @@ const listenGesture = (element: HTMLElement, handlers: GestureHandlers): (() => 
   element.addEventListener('lostpointercapture', handlers.end);
   element.addEventListener('wheel', handlers.wheel, { passive: false });
   return () => {
+    element.removeEventListener('touchmove', preventTouchScroll);
     element.removeEventListener('pointerdown', handlers.down);
     element.removeEventListener('pointermove', handlers.move);
     element.removeEventListener('pointerup', handlers.end);
