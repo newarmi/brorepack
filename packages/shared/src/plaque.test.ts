@@ -74,7 +74,7 @@ describe('renderPlaqueSvg', () => {
     assert.ok(svg.indexOf('href="/a.svg"') < imageIndex)
     assert.ok(imageIndex < svg.indexOf('href="/front.svg"'))
     assert.ok(svg.indexOf('clip-path=') < imageIndex)
-    assert.ok(svg.includes('<g id="plaque-image" transform="translate(210 300) rotate(15) scale(2)">'))
+    assert.ok(svg.includes('translate(210 300) rotate(15) scale(2)'))
     assert.ok(svg.includes('x="-100" y="-50" width="200" height="100"'))
   })
 

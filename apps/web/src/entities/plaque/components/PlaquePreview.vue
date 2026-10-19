@@ -2,7 +2,6 @@
   <!-- SVG собирает renderPlaqueSvg, пользовательский текст в нём экранирован -->
   <!-- eslint-disable vue/no-v-html -->
   <div
-    ref="root"
     class="plaque-preview"
     :class="{ 'plaque-preview--glow': props.glow }"
     :style="{ '--glow-color': glowColor }"
@@ -12,15 +11,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useId, useTemplateRef, watchPostEffect } from 'vue';
+import { computed, useId } from 'vue';
 
 import type { PlaqueDesign, PlaqueImage, RenderPlaqueOptions } from '@brorepack/shared';
-import {
-  formatPlaqueImageTransform,
-  getPlaqueImageId,
-  getTemplate,
-  renderPlaqueSvg,
-} from '@brorepack/shared';
+import { getTemplate, renderPlaqueSvg } from '@brorepack/shared';
 
 import { getFrontArt, getPreviewArt } from '../utils/art';
 
@@ -46,32 +40,15 @@ const idPrefix = `plaque-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
 // Свечение — цвета шаблона: под красной плашкой красное, под белой — белое
 const glowColor = computed(() => getTemplate(props.design.templateId).glowColor);
 
-// Положение картинки в разметку не входит: при перетаскивании строка SVG та же, и v-html не пересоздаёт DOM.
-// Иначе каждый кадр жеста заново создавал бы все <image> и отрывал от документа узел под пальцем
-const STILL_IMAGE = { x: 0, y: 0, scale: 1, rotation: 0 };
-
 const svg = computed(() =>
   renderPlaqueSvg(props.design, {
     idPrefix,
     art: getPreviewArt(props.design.templateId),
-    image: props.image ? { ...props.image, ...STILL_IMAGE } : undefined,
+    image: props.image ?? undefined,
     frontArt: getFrontArt(props.design.templateId),
     layer: props.layer,
   }),
 );
-
-const root = useTemplateRef<HTMLElement>('root');
-
-// Post-эффект: и при монтировании, и после того как v-html вставил новую разметку (смена шаблона, ника, файла).
-// svg читаем, чтобы перезапуститься после такой пересборки
-watchPostEffect(() => {
-  const markup = svg.value;
-  const image = props.image;
-  const imageGroup = root.value?.querySelector(`#${getPlaqueImageId(idPrefix)}`);
-  if (markup && image && imageGroup) {
-    imageGroup.setAttribute('transform', formatPlaqueImageTransform(image));
-  }
-});
 </script>
 
 <style scoped>

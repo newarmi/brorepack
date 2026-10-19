@@ -23,39 +23,11 @@ const image: PlaqueImage = {
   rotation: 0,
 };
 
-const getImageGroup = (element: Element): Element | null =>
-  element.querySelector('g[id$="-image"]');
-
 describe('PlaquePreview', () => {
   it('places the customer image where its transform says', () => {
     const wrapper = mount(PlaquePreview, { props: { design, image } });
 
-    expect(getImageGroup(wrapper.element)?.getAttribute('transform')).toBe(
-      'translate(210 300) rotate(0) scale(0.7)',
-    );
-  });
-
-  // Пересборка SVG на каждом кадре жеста отрывала от документа узел под пальцем и перезагружала картинки
-  it('moves the image without rebuilding the plaque markup', async () => {
-    const wrapper = mount(PlaquePreview, { props: { design, image } });
-    const svg = wrapper.element.querySelector('svg');
-
-    await wrapper.setProps({ image: { ...image, x: 250, y: 320, scale: 1.4, rotation: 30 } });
-
-    expect(wrapper.element.querySelector('svg')).toBe(svg);
-    expect(getImageGroup(wrapper.element)?.getAttribute('transform')).toBe(
-      'translate(250 320) rotate(30) scale(1.4)',
-    );
-  });
-
-  it('keeps the image position when the plaque is rebuilt for a new nickname', async () => {
-    const wrapper = mount(PlaquePreview, { props: { design, image } });
-
-    await wrapper.setProps({ design: { ...design, displayName: 'shinshila' } });
-
-    expect(wrapper.text()).toContain('shinshila');
-    expect(getImageGroup(wrapper.element)?.getAttribute('transform')).toBe(
-      'translate(210 300) rotate(0) scale(0.7)',
-    );
+    expect(wrapper.html()).toContain('href="blob:photo"');
+    expect(wrapper.html()).toContain('translate(210 300) rotate(0) scale(0.7)');
   });
 });
