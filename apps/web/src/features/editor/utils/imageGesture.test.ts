@@ -4,10 +4,18 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { bindImageGesture } from './imageGesture';
 
 const createPointerEvent = (type: string, clientX = 0): PointerEvent => {
-  return new PointerEvent(type, { pointerId: 1, button: 0, clientX, bubbles: true, cancelable: true });
+  return new PointerEvent(type, {
+    pointerId: 1,
+    isPrimary: true,
+    button: 0,
+    clientX,
+    bubbles: true,
+    cancelable: true,
+  });
 };
 
-const waitFrame = (): Promise<void> => new Promise((resolve) => requestAnimationFrame(() => resolve()));
+const waitFrame = (): Promise<void> =>
+  new Promise((resolve) => requestAnimationFrame(() => resolve()));
 
 const setup = () => {
   const element = document.createElement('div');
@@ -36,14 +44,14 @@ describe('bindImageGesture', () => {
     document.body.innerHTML = '';
   });
 
-  // iOS: захват касания переходит от узла под пальцем к сцене, его lostpointercapture всплывает
-  it('keeps dragging when lostpointercapture bubbles up from a child', async () => {
+  // Telegram на iPhone снимает захват пальца через ~30 мс после начала движения — жест должен продолжиться
+  it('keeps dragging after the stage loses pointer capture', async () => {
     const gesture = setup();
     unbind = gesture.unbind;
 
     gesture.element.dispatchEvent(createPointerEvent('pointerdown', 10));
-    gesture.child.dispatchEvent(createPointerEvent('lostpointercapture'));
-    gesture.element.dispatchEvent(createPointerEvent('pointermove', 30));
+    gesture.element.dispatchEvent(createPointerEvent('lostpointercapture'));
+    gesture.child.dispatchEvent(createPointerEvent('pointermove', 30));
     await waitFrame();
 
     expect(gesture.onChange).toHaveBeenCalledWith(expect.objectContaining({ x: 120, y: 100 }));
@@ -60,13 +68,24 @@ describe('bindImageGesture', () => {
     expect(event.defaultPrevented).toBe(true);
   });
 
-  it('stops dragging when the stage itself loses the capture', async () => {
+  it('keeps following the finger outside the stage', async () => {
     const gesture = setup();
     unbind = gesture.unbind;
 
     gesture.element.dispatchEvent(createPointerEvent('pointerdown', 10));
-    gesture.element.dispatchEvent(createPointerEvent('lostpointercapture'));
-    gesture.element.dispatchEvent(createPointerEvent('pointermove', 30));
+    document.body.dispatchEvent(createPointerEvent('pointermove', 30));
+    await waitFrame();
+
+    expect(gesture.onChange).toHaveBeenCalledWith(expect.objectContaining({ x: 120, y: 100 }));
+  });
+
+  it('stops dragging after the finger is lifted', async () => {
+    const gesture = setup();
+    unbind = gesture.unbind;
+
+    gesture.element.dispatchEvent(createPointerEvent('pointerdown', 10));
+    document.body.dispatchEvent(createPointerEvent('pointerup', 10));
+    document.body.dispatchEvent(createPointerEvent('pointermove', 30));
     await waitFrame();
 
     expect(gesture.onChange).not.toHaveBeenCalled();

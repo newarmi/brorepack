@@ -51,36 +51,41 @@ const preventTouchScroll = (event: TouchEvent): void => {
 };
 
 /**
- * up, cancel и потеря захвата (системный жест, сворачивание приложения) завершают касание одинаково.
+ * Касание начинается на сцене, а движение и отпускание слушаются на window: палец может уйти за край
+ * сцены, а жест продолжится. Захват пальца (setPointerCapture) не используем — Telegram на iPhone
+ * снимает его через ~30 мс после начала движения (lostpointercapture, замер на устройстве),
+ * и картинка вставала, хотя палец ещё двигался.
  * wheel, touchstart и touchmove — не passive, иначе preventDefault не остановит прокрутку
  */
 const listenGesture = (element: HTMLElement, handlers: GestureHandlers): (() => void) => {
   element.addEventListener('touchstart', preventTouchScroll, { passive: false });
   element.addEventListener('touchmove', preventTouchScroll, { passive: false });
   element.addEventListener('pointerdown', handlers.down);
-  element.addEventListener('pointermove', handlers.move);
-  element.addEventListener('pointerup', handlers.end);
-  element.addEventListener('pointercancel', handlers.end);
-  element.addEventListener('lostpointercapture', handlers.end);
   element.addEventListener('wheel', handlers.wheel, { passive: false });
+  window.addEventListener('pointermove', handlers.move);
+  window.addEventListener('pointerup', handlers.end);
+  window.addEventListener('pointercancel', handlers.end);
   return () => {
     element.removeEventListener('touchstart', preventTouchScroll);
     element.removeEventListener('touchmove', preventTouchScroll);
     element.removeEventListener('pointerdown', handlers.down);
-    element.removeEventListener('pointermove', handlers.move);
-    element.removeEventListener('pointerup', handlers.end);
-    element.removeEventListener('pointercancel', handlers.end);
-    element.removeEventListener('lostpointercapture', handlers.end);
     element.removeEventListener('wheel', handlers.wheel);
+    window.removeEventListener('pointermove', handlers.move);
+    window.removeEventListener('pointerup', handlers.end);
+    window.removeEventListener('pointercancel', handlers.end);
   };
 };
 
-/**
- * Касание iOS сначала само захвачено узлом под пальцем; когда захват переходит к сцене, его
- * lostpointercapture всплывает сюда — это не конец жеста, иначе картинка замирает посреди движения
- */
-const checkGestureEnd = (event: PointerEvent, element: HTMLElement): boolean => {
-  return event.type !== 'lostpointercapture' || event.target === element;
+/** Первый палец нового касания сбрасывает прежние: если отпускание прошлого потерялось, он не помешает */
+const addPointer = (
+  pointers: Map<number, Point>,
+  event: PointerEvent,
+  frame: HTMLElement,
+): void => {
+  if (event.isPrimary) {
+    pointers.clear();
+  }
+  pointers.set(event.pointerId, toPlaquePoint(frame, event));
 };
 
 /**
@@ -119,9 +124,7 @@ export const bindImageGesture = (
     }
     // WebKit иначе начинает выделение текста или перетаскивание картинки мышью
     event.preventDefault();
-    // Захват: палец может уйти за край плашки, а жест продолжится
-    element.setPointerCapture(event.pointerId);
-    pointers.set(event.pointerId, toPlaquePoint(options.frame, event));
+    addPointer(pointers, event, options.frame);
     restartGesture();
   };
 
@@ -133,7 +136,7 @@ export const bindImageGesture = (
   };
 
   const pointerEndHandler = (event: PointerEvent): void => {
-    if (checkGestureEnd(event, element) && pointers.delete(event.pointerId)) {
+    if (pointers.delete(event.pointerId)) {
       restartGesture();
     }
   };
