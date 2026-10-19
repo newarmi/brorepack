@@ -71,6 +71,14 @@ const listenGesture = (element: HTMLElement, handlers: GestureHandlers): (() => 
 };
 
 /**
+ * Касание iOS сначала само захвачено узлом под пальцем; когда захват переходит к сцене, его
+ * lostpointercapture всплывает сюда — это не конец жеста, иначе картинка замирает посреди движения
+ */
+const checkGestureEnd = (event: PointerEvent, element: HTMLElement): boolean => {
+  return event.type !== 'lostpointercapture' || event.target === element;
+};
+
+/**
  * Двигает картинку клиента по плашке через Pointer Events: мышь или один палец — сдвиг,
  * два пальца — ещё масштаб и поворот, колесо мыши — масштаб вокруг курсора.
  * Возвращает функцию, которая снимает обработчики
@@ -120,7 +128,7 @@ export const bindImageGesture = (
   };
 
   const pointerEndHandler = (event: PointerEvent): void => {
-    if (pointers.delete(event.pointerId)) {
+    if (checkGestureEnd(event, element) && pointers.delete(event.pointerId)) {
       restartGesture();
     }
   };

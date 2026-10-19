@@ -74,9 +74,12 @@ const imageTransform = computed(() => {
 }
 
 /* Поля вокруг плашки — чтобы был виден полупрозрачный край картинки, который обрежется */
+/* Палец всегда попадает в саму сцену, а не в SVG внутри: iOS не захватывает касание узлом плашки
+   и не начинает системное перетаскивание картинки (pointercancel посреди жеста) */
 .image-stage__frame {
   position: relative;
   width: min(86cqw, 92cqh * 148 / 210);
+  pointer-events: none;
 }
 
 .image-stage__overflow {
