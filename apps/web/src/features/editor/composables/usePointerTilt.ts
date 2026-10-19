@@ -1,4 +1,4 @@
-import { onBeforeUnmount, onMounted, shallowRef } from 'vue';
+import { onBeforeUnmount, onMounted, shallowRef, watch } from 'vue';
 import type { Ref } from 'vue';
 
 import type { TiltOptions } from '../constants/tilt';
@@ -10,10 +10,12 @@ import { bindTiltGesture } from '../utils/tiltGesture';
  * При prefers-reduced-motion обработчики не вешаются и элемент остаётся статичным;
  * настройку можно переключить, не закрывая приложение.
  * `isTiltEnabled` — для класса с touch-action: none: без наклона свайп по элементу прокручивает страницу.
+ * `isActive` — выключатель снаружи: например, когда вместо CSS-плашки показана 3D-версия.
  */
 export const usePointerTilt = (
   target: Readonly<Ref<HTMLElement | null>>,
   options: Partial<TiltOptions> = {},
+  isActive: Readonly<Ref<boolean>> = shallowRef(true),
 ) => {
   const settings = { ...TILT_OPTIONS, ...options };
   const isTiltEnabled = shallowRef(false);
@@ -28,7 +30,7 @@ export const usePointerTilt = (
 
   const updateTilt = (): void => {
     const element = target.value;
-    if (!element || reducedMotion?.matches) {
+    if (!element || reducedMotion?.matches || !isActive.value) {
       disable();
       return;
     }
@@ -45,6 +47,13 @@ export const usePointerTilt = (
     reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)') ?? null;
     reducedMotion?.addEventListener('change', updateTilt);
     updateTilt();
+  });
+
+  // До монтирования элемента нет — включение и так произойдёт в onMounted
+  watch(isActive, () => {
+    if (typeof window.PointerEvent === 'function' && target.value) {
+      updateTilt();
+    }
   });
 
   onBeforeUnmount(() => {

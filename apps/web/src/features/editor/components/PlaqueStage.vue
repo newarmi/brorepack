@@ -5,15 +5,15 @@
     <div
       ref="product"
       class="plaque-stage__product"
-      :class="{ 'plaque-stage__product--tiltable': isTiltEnabled }"
+      :class="{
+        'plaque-stage__product--tiltable': isTiltEnabled,
+        'plaque-stage__product--3d': is3dReady,
+      }"
     >
       <div class="plaque-stage__plaque">
         <span class="plaque-stage__glow" aria-hidden="true" />
         <!-- Торцы акрила толщиной 5 мм: лицевая сторона вынесена вперёд, торцы видны при наклоне -->
-        <span class="plaque-stage__edge plaque-stage__edge--left" aria-hidden="true" />
-        <span class="plaque-stage__edge plaque-stage__edge--right" aria-hidden="true" />
-        <span class="plaque-stage__edge plaque-stage__edge--top" aria-hidden="true" />
-        <span class="plaque-stage__edge plaque-stage__edge--bottom" aria-hidden="true" />
+        <PlaqueEdges />
         <div class="plaque-stage__front">
           <!-- Ключ — шаблон: смена шаблона перекрёстно растворяет плашки, правка ника перерисовывает без анимации -->
           <Transition name="plaque-swap">
@@ -28,6 +28,16 @@
       </div>
       <!-- Подставка всегда занимает место: при переключении меняется только прозрачность, без скачка -->
       <PlaqueStand :isLit="props.lightStand" />
+      <!-- 3D из акрила поверх CSS-версии; как они сменяют друг друга — useAcrylicPreview -->
+      <AcrylicPlaque3D
+        v-if="!is3dFailed"
+        class="plaque-stage__acrylic"
+        :design="props.design"
+        :image="props.image"
+        :lightStand="props.lightStand"
+        @ready="acrylicReadyHandler"
+        @fail="acrylicFailHandler"
+      />
     </div>
     <figcaption class="plaque-stage__caption">
       <span class="plaque-stage__size mono">{{ sizeCaption }}</span>
@@ -46,10 +56,11 @@ import { computed, useTemplateRef } from 'vue';
 import type { PlaqueDesign, PlaqueImage } from '@brorepack/shared';
 import { getSize } from '@brorepack/shared';
 
-import { PlaquePreview } from '@/entities/plaque';
+import { AcrylicPlaque3D, PlaquePreview } from '@/entities/plaque';
 import { AppIcon } from '@/shared/ui';
 
-import { usePointerTilt } from '../composables/usePointerTilt';
+import { useAcrylicPreview } from '../composables/useAcrylicPreview';
+import PlaqueEdges from './PlaqueEdges.vue';
 import PlaqueStand from './PlaqueStand.vue';
 
 const props = withDefaults(
@@ -66,7 +77,8 @@ const props = withDefaults(
 );
 
 const product = useTemplateRef<HTMLElement>('product');
-const { isTiltEnabled } = usePointerTilt(product);
+const { isTiltEnabled, is3dReady, is3dFailed, acrylicReadyHandler, acrylicFailHandler } =
+  useAcrylicPreview(product);
 
 const sizeCaption = computed(() => {
   const size = getSize(props.design.size);
@@ -101,6 +113,7 @@ const sizeCaption = computed(() => {
 
 /* Ширина — по подставке, она шире плашки. Так область касания не выходит за предмет */
 .plaque-stage__product {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -122,6 +135,11 @@ const sizeCaption = computed(() => {
   cursor: grabbing;
 }
 
+/* 3D готово: CSS-версия прячется, но продолжает держать место — вёрстка не прыгает */
+.plaque-stage__product--3d > :not(.plaque-stage__acrylic) {
+  visibility: hidden;
+}
+
 /* Те же размеры, что раньше относительно сцены: min(60%, 230px) = 230/268 ширины подставки */
 .plaque-stage__plaque {
   position: relative;
@@ -133,49 +151,6 @@ const sizeCaption = computed(() => {
 .plaque-stage__front {
   position: relative;
   transform: translateZ(calc(var(--plaque-depth) / 2));
-}
-
-/* Торец стоит ребром в середине толщины. Отступы — на скругление углов плашки (1.9% / 1.35%) */
-.plaque-stage__edge {
-  position: absolute;
-  background: linear-gradient(
-    90deg,
-    rgb(255 255 255 / 45%),
-    rgb(200 220 220 / 18%) 50%,
-    rgb(255 255 255 / 35%)
-  );
-}
-
-.plaque-stage__edge--left,
-.plaque-stage__edge--right {
-  top: 1.35%;
-  bottom: 1.35%;
-  left: calc(var(--plaque-depth) / -2);
-  width: var(--plaque-depth);
-  transform: rotateY(90deg);
-}
-
-.plaque-stage__edge--right {
-  left: calc(100% - var(--plaque-depth) / 2);
-}
-
-.plaque-stage__edge--top,
-.plaque-stage__edge--bottom {
-  top: calc(var(--plaque-depth) / -2);
-  left: 1.9%;
-  right: 1.9%;
-  height: var(--plaque-depth);
-  background: linear-gradient(
-    180deg,
-    rgb(255 255 255 / 45%),
-    rgb(200 220 220 / 18%) 50%,
-    rgb(255 255 255 / 35%)
-  );
-  transform: rotateX(90deg);
-}
-
-.plaque-stage__edge--bottom {
-  top: calc(100% - var(--plaque-depth) / 2);
 }
 
 .plaque-swap-enter-active,

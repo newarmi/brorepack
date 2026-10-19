@@ -58,7 +58,7 @@ export const restrictedSyntaxExceptions = [
   {
     files: [
       'src/shared/api/transports/http.ts',
-      'src/features/admin/print/embeddedFonts.ts',
+      'src/entities/plaque/utils/embeddedFonts.ts',
       'src/entities/plaque/utils/art.ts',
     ],
     allow: ['fetch'],

@@ -19,6 +19,8 @@ import techFront from '@brorepack/shared/assets/plaques/tech.front.svg?url';
 import techPreview from '@brorepack/shared/assets/plaques/tech.preview.svg?url';
 import techPrint from '@brorepack/shared/assets/plaques/tech.svg?url';
 
+import { blobToBase64 } from '@/shared/lib';
+
 // Арт шаблонов (фон, стрелка, знак FACEIT) — файлы из макетов дизайнера.
 // В превью — лёгкая версия по ссылке, в файле для печати — полная, встроенная в SVG
 
@@ -64,4 +66,37 @@ export const loadPrintArt = async (templateId: TemplateId): Promise<PlaqueArt> =
     throw new Error('Не загрузился макет плашки');
   }
   return { markup: getSvgInnerMarkup(await response.text()) };
+};
+
+export type InlineArtKind = 'preview' | 'front';
+
+const INLINE_ART_URLS: Record<InlineArtKind, Record<TemplateArtId, string>> = {
+  preview: PREVIEW_ART_URLS,
+  front: FRONT_ART_URLS,
+};
+
+const inlineArtCache = new Map<string, Promise<PlaqueArt>>();
+
+const fetchInlineArt = async (url: string): Promise<PlaqueArt> => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Не загрузился макет плашки');
+  }
+  return { href: `data:image/svg+xml;base64,${await blobToBase64(await response.blob())}` };
+};
+
+/**
+ * Арт превью как data URL — для SVG, который рисуется как картинка (3D-текстура):
+ * такой SVG не загружает внешние ссылки. Markup не подходит — id внутри арта и переднего слоя совпадают
+ */
+export const loadInlineArt = (templateId: TemplateId, kind: InlineArtKind): Promise<PlaqueArt> => {
+  const url = INLINE_ART_URLS[kind][getTemplate(templateId).artId];
+  let artPromise = inlineArtCache.get(url);
+  if (!artPromise) {
+    artPromise = fetchInlineArt(url);
+    inlineArtCache.set(url, artPromise);
+    // Ошибку не кэшируем — следующая попытка загрузит файл заново
+    artPromise.catch(() => inlineArtCache.delete(url));
+  }
+  return artPromise;
 };
