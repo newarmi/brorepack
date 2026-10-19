@@ -5,7 +5,6 @@
  */
 
 export { default as CustomImageCard } from './components/CustomImageCard.vue';
-export { default as GestureProbe } from './components/GestureProbe.vue';
 export { default as ImageEditorStage } from './components/ImageEditorStage.vue';
 export { default as ImageEditorToolbar } from './components/ImageEditorToolbar.vue';
 export { default as LightStandRow } from './components/LightStandRow.vue';

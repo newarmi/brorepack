@@ -14,4 +14,3 @@ export { useTelegram } from './composables/useTelegram';
 export { useBackButtonStore } from './stores/backButtonStore';
 export { useMainButtonStore } from './stores/mainButtonStore';
 export { initTelegram } from './webApp/initTelegram';
-export { describeTelegramClient } from './webApp/webApp';

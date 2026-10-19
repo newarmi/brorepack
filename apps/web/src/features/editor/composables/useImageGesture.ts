@@ -3,7 +3,7 @@ import type { Ref } from 'vue';
 
 import type { PlaqueImage, PlaqueImageTransform } from '@brorepack/shared';
 
-import { bindImageGesture, countGesture } from '../utils/imageGesture';
+import { bindImageGesture } from '../utils/imageGesture';
 import { clampTransform, pickTransform } from '../utils/imageTransform';
 
 /**
@@ -19,7 +19,6 @@ export const useImageGesture = (
 
   const changeHandler = (transform: PlaqueImageTransform): void => {
     const image = getImage();
-    countGesture('change');
     if (image) {
       onChange(clampTransform(transform, image));
     }
@@ -40,7 +39,6 @@ export const useImageGesture = (
     [elements.target, elements.frame, hasImage],
     ([element, frameElement]) => {
       unbind?.();
-      countGesture('bind');
       unbind =
         element && frameElement && hasImage.value
           ? bindImageGesture(element, {

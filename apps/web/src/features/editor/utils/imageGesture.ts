@@ -12,13 +12,6 @@ export interface ImageGestureOptions {
   onChange: (transform: PlaqueImageTransform) => void;
 }
 
-/** Временная диагностика: что происходит внутри жеста на телефоне (показывает GestureProbe) */
-export const gestureCounters: Record<string, number> = {};
-
-export const countGesture = (name: string): void => {
-  gestureCounters[name] = (gestureCounters[name] ?? 0) + 1;
-};
-
 type ScreenPoint = Pick<MouseEvent, 'clientX' | 'clientY'>;
 
 /** Экранная точка (курсор или палец) → пункты листа */
@@ -48,7 +41,6 @@ const createGesture = (options: ImageGestureOptions) => {
   // сразу в обработчике, без requestAnimationFrame: в Telegram на iPhone отложенный кадр мог не дождаться
   // следующего движения, и картинка стояла
   const apply = (): void => {
-    countGesture(startTransform ? 'apply' : 'applyIdle');
     if (startTransform) {
       const points = [...pointers.values()].slice(0, 2);
       options.onChange(applyGestureStep(startTransform, getPointersStep(startPoints, points)));
@@ -87,7 +79,6 @@ const createWheelHandler = (options: ImageGestureOptions) => {
 const createTouchHandlers = (gesture: Gesture, frame: HTMLElement) => {
   const start = (event: TouchEvent): void => {
     event.preventDefault();
-    countGesture('touchstart');
     // Первый палец нового касания сбрасывает прежние: если отпускание прошлого потерялось, он не помешает
     if (event.touches.length === event.changedTouches.length) {
       gesture.pointers.clear();
@@ -100,7 +91,6 @@ const createTouchHandlers = (gesture: Gesture, frame: HTMLElement) => {
 
   const move = (event: TouchEvent): void => {
     event.preventDefault();
-    countGesture('touchmove');
     const touches = Array.from(event.changedTouches).filter((touch) =>
       gesture.pointers.has(touch.identifier),
     );
@@ -113,7 +103,6 @@ const createTouchHandlers = (gesture: Gesture, frame: HTMLElement) => {
   };
 
   const end = (event: TouchEvent): void => {
-    countGesture(`end:${event.type}`);
     const removed = Array.from(event.changedTouches).filter((touch) =>
       gesture.pointers.delete(touch.identifier),
     );
