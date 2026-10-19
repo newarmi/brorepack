@@ -49,6 +49,11 @@ export interface RenderPlaqueOptions {
   embeddedFontCss?: string
   /** Префикс для id внутри SVG, если на странице несколько плашек */
   idPrefix?: string
+  /**
+   * Только слой под картинкой клиента (фон и арт) или над ней (знак FACEIT, игрок, кант).
+   * Редактор кладёт между ними саму картинку HTML-слоем и двигает её без перерисовки SVG
+   */
+  layer?: 'back' | 'front'
 }
 
 // В макетах содержимое занимает 419.02 × 594.55 pt со сдвигом 0.02 — растягиваем его на весь лист,
@@ -195,13 +200,17 @@ function renderPlayerLayer(design: PlaqueDesign): string {
 }
 
 export function renderPlaqueSvg(design: PlaqueDesign, options: RenderPlaqueOptions = {}): string {
-  const { mode = 'preview', art, image, frontArt, embeddedFontCss, idPrefix = 'plaque' } = options
+  const { mode = 'preview', art, image, frontArt, embeddedFontCss, idPrefix = 'plaque', layer } = options
   const { width: w, height: h } = PLAQUE_VIEWBOX
   const isPrint = mode === 'print'
   const printSize = PLAQUE_PRINT_SIZE_MM[design.size]
   const sizeAttrs = isPrint ? `width="${printSize.width}mm" height="${printSize.height}mm"` : 'width="100%" height="100%"'
   const cornerRadius = isPrint ? 0 : 8
   const clipId = `${idPrefix}-clip`
+  const hasBack = layer !== 'front'
+  const hasFront = layer !== 'back'
+  // Верхний слой отдельно рисуется только поверх картинки клиента — значит, и знак FACEIT ему нужен
+  const hasFrontArt = Boolean(image) || layer === 'front'
 
   const defs = [`<clipPath id="${clipId}"><rect width="${w}" height="${h}" rx="${cornerRadius}"/></clipPath>`]
   if (embeddedFontCss) defs.push(`<style>${embeddedFontCss}</style>`)
@@ -215,16 +224,16 @@ export function renderPlaqueSvg(design: PlaqueDesign, options: RenderPlaqueOptio
     `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${w} ${h}" ${sizeAttrs} role="img" aria-label="${label}">`,
     `<defs>${defs.join('')}</defs>`,
     `<g clip-path="url(#${clipId})">`,
-    `<rect width="${w}" height="${h}" fill="${getTemplate(design.templateId).baseColor}"/>`,
-    `<g transform="${ART_TRANSFORM}">${renderArt(art)}</g>`,
+    hasBack ? `<rect width="${w}" height="${h}" fill="${getTemplate(design.templateId).baseColor}"/>` : '',
+    hasBack ? `<g transform="${ART_TRANSFORM}">${renderArt(art)}</g>` : '',
     // Картинка клиента — между фоном и всем, что должно остаться читаемым: знаком FACEIT, кольцом, ником
     image ? renderImage(image, idPrefix) : '',
-    `<g transform="${ART_TRANSFORM}">`,
-    image ? renderArt(frontArt) : '',
-    renderPlayerLayer(design),
+    hasFront ? `<g transform="${ART_TRANSFORM}">` : '',
+    hasFront && hasFrontArt ? renderArt(frontArt) : '',
+    hasFront ? renderPlayerLayer(design) : '',
+    hasFront ? '</g>' : '',
     '</g>',
-    '</g>',
-    edge,
+    hasFront ? edge : '',
     '</svg>',
   ].join('')
 }

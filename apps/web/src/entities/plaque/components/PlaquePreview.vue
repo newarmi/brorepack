@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { computed, useId, useTemplateRef, watchPostEffect } from 'vue';
 
-import type { PlaqueDesign, PlaqueImage } from '@brorepack/shared';
+import type { PlaqueDesign, PlaqueImage, RenderPlaqueOptions } from '@brorepack/shared';
 import {
   formatPlaqueImageTransform,
   getPlaqueImageId,
@@ -32,8 +32,10 @@ const props = withDefaults(
     image?: PlaqueImage | null;
     /** Миниатюра рядом с текстом — скрыть от скринридеров, чтобы не дублировать подпись */
     decorative?: boolean;
+    /** Только слой под картинкой клиента или над ней — для редактора, где картинка лежит между ними */
+    layer?: RenderPlaqueOptions['layer'];
   }>(),
-  { glow: false, image: null, decorative: false },
+  { glow: false, image: null, decorative: false, layer: undefined },
 );
 
 // id внутри SVG должны быть уникальны на странице: превью бывает несколько
@@ -54,6 +56,7 @@ const svg = computed(() =>
     art: getPreviewArt(props.design.templateId),
     image: props.image ? { ...props.image, ...STILL_IMAGE } : undefined,
     frontArt: getFrontArt(props.design.templateId),
+    layer: props.layer,
   }),
 );
 

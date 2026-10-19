@@ -78,6 +78,16 @@ describe('renderPlaqueSvg', () => {
     assert.ok(svg.includes('x="-100" y="-50" width="200" height="100"'))
   })
 
+  it('рисует отдельно слой под картинкой клиента и над ней', () => {
+    const options = { art: { href: '/a.svg' }, frontArt: { href: '/front.svg' } }
+    const back = renderPlaqueSvg(design, { ...options, layer: 'back' })
+    assert.ok(back.includes('/a.svg'))
+    assert.ok(!back.includes('/front.svg') && !back.includes('</text>'))
+    const front = renderPlaqueSvg(design, { ...options, layer: 'front' })
+    assert.ok(front.includes('/front.svg') && front.includes('goodlifeee</text>'))
+    assert.ok(!front.includes('/a.svg') && !front.includes(getTemplate('graphite').baseColor))
+  })
+
   it('без картинки клиента верхний слой арта не рисует', () => {
     const svg = renderPlaqueSvg(design, { frontArt: { href: '/front.svg' } })
     assert.ok(!svg.includes('/front.svg'))
