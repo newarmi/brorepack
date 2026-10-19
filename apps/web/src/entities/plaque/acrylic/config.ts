@@ -81,15 +81,16 @@ export interface QualityPreset {
 }
 
 export const QUALITY_PRESETS: Record<AcrylicQuality, QualityPreset> = {
-  high: { hasTransmission: true, clearcoat: 0.3, maxPixelRatio: 2, isAntialias: true, idleFps: 60 },
+  high: { hasTransmission: true, clearcoat: 0.3, maxPixelRatio: 3, isAntialias: true, idleFps: 60 },
   medium: {
     hasTransmission: false,
     clearcoat: 0.2,
-    maxPixelRatio: 1.75,
+    // Родной DPR iPhone (3): при меньшем мелкий текст плашки растягивается и мылится
+    maxPixelRatio: 3,
     isAntialias: true,
     idleFps: 60,
   },
-  low: { hasTransmission: false, clearcoat: 0, maxPixelRatio: 1.25, isAntialias: false, idleFps: 30 },
+  low: { hasTransmission: false, clearcoat: 0, maxPixelRatio: 1.5, isAntialias: false, idleFps: 30 },
 };
 
 export type GradientBlend = 'screen' | 'overlay' | 'add' | 'multiply';
@@ -198,10 +199,13 @@ export const ROTATION = {
 
 export type RotationSettings = typeof ROTATION;
 
-/** Текстура дизайна: ширина экрана × DPR × запас на поворот, но не больше лимита */
+/** Текстура дизайна: ширина плашки на экране × DPR, но не больше лимита */
 export const DESIGN_TEXTURE = {
-  maxWidth: 1024,
-  oversample: 1.5,
+  // 230 CSS px плашки × DPR 3 iPhone ≈ 690 px; лимит — с запасом для планшетов
+  maxWidth: 1536,
+  // 1:1 к пикселям экрана. Больше нельзя: при уменьшении GPU подмешивает мип-уровень
+  // вдвое меньше (трилинейная фильтрация), и мелкий текст плашки мылится
+  oversample: 1,
   /** Картинка клиента внутри SVG уменьшается до этой стороны */
   maxImageSide: 1600,
   anisotropy: 4,

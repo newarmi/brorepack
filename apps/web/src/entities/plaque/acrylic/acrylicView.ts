@@ -1,7 +1,13 @@
 import type { WebGPURenderer } from 'three/webgpu';
 
 import type { AcrylicQuality } from './config';
-import { CANVAS_OVERFLOW, PRODUCT_HEIGHT_M, QUALITY_PRESETS } from './config';
+import {
+  CANVAS_OVERFLOW,
+  PLAQUE_SIZE_M,
+  PRODUCT_HEIGHT_M,
+  QUALITY_PRESETS,
+  STAND,
+} from './config';
 import type { DesignTextureInput } from './designTexture';
 import { createDesignTexture } from './designTexture';
 import type { FrameLoop } from './frameLoop';
@@ -91,7 +97,8 @@ const startViewLoop = (parts: ViewParts, rotation: ReturnType<typeof bindRotatio
 const createDesignSetter = (parts: ViewParts, loop: FrameLoop, checkDisposed: () => boolean) => {
   return async (input: DesignInput): Promise<void> => {
     const designTexture = await createDesignTexture(
-      { ...input, displayWidth: parts.host.clientWidth },
+      // host шириной с подставку, а текстура — на плашку: она уже подставки
+      { ...input, displayWidth: (parts.host.clientWidth * PLAQUE_SIZE_M.width) / STAND.width },
       getPixelRatio(parts.quality),
       parts.renderer.getMaxAnisotropy(),
     );

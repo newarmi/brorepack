@@ -1,16 +1,13 @@
 import type { AcrylicQuality } from './config';
 
 /**
- * Качество по умолчанию: настоящее преломление — только на десктопе с WebGPU.
- * На телефонах и в WebGL 2 — medium, на слабых телефонах (≤ 4 ядер) — low
+ * Качество по умолчанию: настоящее преломление — только на десктопе с WebGPU, иначе medium.
+ * low сам не выбирается: Safari ради приватности занижает navigator.hardwareConcurrency,
+ * и iPhone по числу ядер выглядел «слабым» — плашка рисовалась мутной и без сглаживания
  */
 export const getAutoQuality = (): AcrylicQuality => {
   const isFinePointer = window.matchMedia?.('(pointer: fine)').matches ?? false;
-  if ('gpu' in navigator && isFinePointer) {
-    return 'high';
-  }
-  const isWeakDevice = !isFinePointer && (navigator.hardwareConcurrency || 8) <= 4;
-  return isWeakDevice ? 'low' : 'medium';
+  return 'gpu' in navigator && isFinePointer ? 'high' : 'medium';
 };
 
 /** ?gl=webgl в адресе — WebGL 2 даже там, где есть WebGPU: так проверяют fallback */
